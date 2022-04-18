@@ -4,9 +4,40 @@
 	<meta charset="utf-8" />
 	<title>Page jquery</title>
 	<style type="text/css" title="text/css">
-	button, input {
+	:root {
+		--color-pair0: #EEF;
+		--color-pair1: #EFE;
+		--text-color: black;
+		--hover-background: #420;
+		--hover-color: white;
+		--input-background: #EBEBEB;
+	}
+	body {
+		background: white;
+		color: black;
+	}
+	@media (prefers-color-scheme: dark) {
+		:root {
+			--color-pair0: #224;
+			--color-pair1: #222;
+			--text-color: white;
+			--hover-background: #B84;
+			--hover-color: black;
+			--input-background: #181F1F;
+		}
+		body {
+			background: #15141a;
+			color: white;
+		}
+	}
+
+	button, input
+	{
 		font: inherit;
 		font-size: inherit;
+		background-color: var(--input-background);
+		color: var(--text-color);
+		padding: 2px;
 	}
 	#container {
 		display: grid;
@@ -40,11 +71,15 @@
 		color: inherit;
 		text-decoration: none;
 	}
-	.pair0 { background: #EEF; }
-	.pair1 { background: #EFE; }
+	.pair0 {
+		background: var(--color-pair0);
+	}
+	.pair1 {
+		background: var(--color-pair1);
+	}
 	.liste p:hover {
-		background: black;
-		color: white;
+		background: var(--hover-background);
+		color: var(--hover-color);
 	}
 
 	/* Filter */
@@ -56,7 +91,6 @@
 	}
 	#clear_search {
 		display: none;
-		float: right;
 	}
 	
 	/* Modules list */
@@ -67,10 +101,7 @@
 	#modules img {
 		vertical-align: middle;
 	}
-	.checkbox_on {
-		display: none;
-	}
-	.loading_image {
+	#modules .loading_image {
 		display: block;
 		margin: auto;
 	}
@@ -81,7 +112,7 @@
 		color: #888;
 	}
 	#deselect_all.enabled {
-		color: black;
+		color: var(--text-color);
 	}
 	#modules .selected .checkbox_on {
 		display: inline;
@@ -114,8 +145,8 @@
 
 	/* Zip buttons */
 	#zipit {
+		position: relative;
 		text-align: center;
-		padding: 2px;
 	}
 	#zip_button {
 		display: block;
@@ -124,10 +155,21 @@
 	}
 	#zip_link {
 		display: none;
+		margin: 0px;
+		border: 2px dotted #bbb;
+	}
+	#zip_link a, #zip_link p {
+		display: block;
 		padding: 16px 0px;
 		margin: 0px;
-		border: 1px solid #bbb;
-		width: 100%;
+		color: #DDD;
+	}
+	#zipit .loading_image {
+		display: none;
+		position: absolute;
+		left: calc(50% - 22px);
+		top: 8px;
+		z-index: -1;
 	}
 	</style>
 	<script type="text/javascript" src="jquery.min.js"></script>
@@ -213,10 +255,12 @@
 		var that = $("#filter input");
 		var search_string = that.val().trim();
 		if(search_string == "") {
+			$("#clear_search").hide();
 			$("#modules p").show();
 			color_the_lists();
 			return;
 		}
+		$("#clear_search").show();
 		var list_search = search_string.split(" ").filter(i => i);
 		$("#modules p").each((i,item) => {
 			var module_name = $(item).children(".module").html();
@@ -236,6 +280,11 @@
 	}
 
 	$(document).on("keyup", "#filter input", (event) => {
+		filter_the_modules();
+	});
+	
+	$(document).on("click", "#clear_search", (event) => {
+		$("#filter input").val("");
 		filter_the_modules();
 	});
 
@@ -360,7 +409,8 @@
 		zipping = true;
 		$("#zip_button").hide();
 		$("#zip_link").show();
-		$("#zip_link").html("CREATING THE ZIP, PLEASE WAIT");
+		$("#zip_link").html("<p>CREATING THE ZIP, PLEASE WAIT</p>");
+		$("#zipit .loading_image").show();
 		// start the following as an async
 		async_zipit().then(async (base64) => {
 			// hide "in progress"
@@ -370,11 +420,13 @@
 			link.attr("href", data_url);
 			$("#zip_link").html("");
 			$("#zip_link").append(link);
-			zipping = false;
 		}).catch((error) => {
 			alert("Error downloading the bundle from github. Try again later.");
 			$("#zip_button").show();
 			$("#zip_link").hide();
+		}).finally(() => {
+			$("#zipit .loading_image").hide();
+			zipping = false;
 		});
 	}
 
@@ -431,7 +483,6 @@
 			}
 		}
 		var annoying_promises = [];
-		dropped_modules_list = [];
 		dropped_files.forEach((file) => {
 			if(file.name.match(/\.py$/)) {
 				annoying_promises.push(file.text());
@@ -447,6 +498,8 @@
 				});
 			});
 
+			update_dependencies_list();
+
 			$("#drop_loading").hide();
 			if(dropped_modules_list.length > 0) {
 				$("#erase_drop").show();
@@ -455,8 +508,6 @@
 				$("#erase_drop").hide();
 				$("#drop_message").show();
 			}
-
-			update_dependencies_list();
 		});
 		// nothing here, because reading a file can not be synchronous somehow ?
 	});
@@ -557,6 +608,7 @@
 	
 	<div></div>
 	<div id="zipit">
+		<img class="loading_image" src="loading_black_small.gif"/>
 		<button id="zip_button" onclick="zipit()">Create a zip with these modules</button>
 		<p id="zip_link"></p>
 	</div>
