@@ -4,6 +4,7 @@
 	<meta charset="utf-8" />
 	<title>Page jquery</title>
 	<style type="text/css" title="text/css">
+	/* Variables and dark mode */
 	:root {
 		--color-pair0: #EEF;
 		--color-pair1: #EFE;
@@ -11,6 +12,10 @@
 		--hover-background: #420;
 		--hover-color: white;
 		--input-background: #EBEBEB;
+		--select-background-pair0: #FF0;
+		--select-background-pair1: #BF0;
+		--select-text-pair0: black;
+		--select-text-pair1: black;
 	}
 	body {
 		background: white;
@@ -18,12 +23,16 @@
 	}
 	@media (prefers-color-scheme: dark) {
 		:root {
-			--color-pair0: #224;
-			--color-pair1: #222;
+			--color-pair0: #181818;
+			--color-pair1: #202020;
 			--text-color: white;
 			--hover-background: #B84;
 			--hover-color: black;
 			--input-background: #181F1F;
+			--select-background-pair0: #FF0;
+			--select-background-pair1: #BF0;
+			--select-text-pair0: black;
+			--select-text-pair1: black;
 		}
 		body {
 			background: #15141a;
@@ -31,6 +40,7 @@
 		}
 	}
 
+	/* Basics */
 	button, input
 	{
 		font: inherit;
@@ -78,25 +88,29 @@
 		background: var(--color-pair1);
 	}
 	.liste p:hover {
-		background: var(--hover-background);
-		color: var(--hover-color);
+		background: var(--hover-background) !important;
+		color: var(--hover-color) !important;
 	}
 
 	/* Filter */
 	#filter {
-		padding: 2em 1em 0px;
+		padding: 2em 4px 0px;
 	}
 	#filter input {
-		width: 70%;
+		width: 66%;
 	}
 	#clear_search {
 		display: none;
 	}
 	
 	/* Modules list */
-	#modules p.selected {
-		background: #FF0;
-		color: black;
+	#modules p.pair0.selected {
+		background: var(--select-background-pair0);
+		color: var(--select-text-pair0);
+	}
+	#modules p.pair1.selected {
+		background: var(--select-background-pair1);
+		color: var(--select-text-pair1);
 	}
 	#modules img {
 		vertical-align: middle;
@@ -139,7 +153,6 @@
 	}
 	#erase_drop {
 		display: none;
-		padding: 0px;
 		margin: 0px;
 	}
 
