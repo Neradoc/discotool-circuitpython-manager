@@ -192,17 +192,30 @@ async function async_zipit() {
 
 	// readme file
 	await outputZip.file(ZIP_PREFIX + "README.txt", README);
-
 	var modules_bom = $("#dependencies p .module");
+
+	var total_zip_files = modules_bom.length + dropped_files_list.length;
+	var zip_files_progress = 0;
+
+	function count_one_file() {
+		zip_files_progress += 1;
+		// in case the math is weird:
+		zip_files_progress = Math.min(zip_files_progress, total_zip_files);
+		$("#zip_in_progress .file_progress").html(
+			`${zip_files_progress}&nbsp;/`
+			+ `&nbsp;${total_zip_files}`
+		);
+	}
+
 	for(index = 0; index < modules_bom.length; ++index) {
+		count_one_file();
+
 		var item = modules_bom[index];
 		var module_name = $(item).html();
 		var module = all_the_modules[module_name];
-
 		var zip_url = get_bundle_zip(module.bundle, module.bundle_tag);
 		var bundle_base = get_bundle_base(module.bundle, module.bundle_tag);
 		var bundle_path = `${bundle_base}/lib`;
-		// var bundle_path = "lib";
 
 		if(!bundle_zips.has(zip_url)) {
 			var zipContents = await getBundleContents(zip_url);
@@ -216,7 +229,7 @@ async function async_zipit() {
 			// loop through the subfiles in zipContents and add them
 			var zipFolder = await zipContents.folder(`${bundle_path}/${module_name}/`);
 			if(zipFolder == null) {
-				console.log("oo zipFolder is NULL");
+				console.log("NULL ??? zipFolder is NULL !");
 			}
 			var subliste = [];
 			await zipFolder.forEach((relativePath, file) => {
@@ -246,6 +259,7 @@ async function async_zipit() {
 		}
 	}
 	for(idx in dropped_files_list) {
+		count_one_file();
 		var file = dropped_files_list[idx];
 		await outputZip.file(ZIP_PREFIX + file.name, file);
 	}
@@ -257,8 +271,7 @@ function zipit() {
 	if($("#dependencies p").length == 0) return false;
 	zipping = true;
 	$("#zip_button").hide();
-	$("#zip_link").show();
-	$("#zip_link").html("<p>CREATING THE ZIP, PLEASE WAIT</p>");
+	$("#zip_in_progress").show();
 	$("#zipit .loading_image").show();
 	// start the following as an async
 	async_zipit().then(async (base64) => {
@@ -267,12 +280,11 @@ function zipit() {
 		// window.location = data_url;
 		var link = $('<a name="zip">Download the zip with all that</a>');
 		link.attr("href", data_url);
-		$("#zip_link").html("");
-		$("#zip_link").append(link);
-	//}).catch((error) => {
-	//	alert("Error downloading the bundle from github. Try again later.");
-	//	$("#zip_button").show();
-	//	$("#zip_link").hide();
+		link.attr("download", "libraries_bundle.zip");
+		link.attr("title", "libraries_bundle.zip");
+		$("#zip_link").html(link);
+		$("#zip_link").show();
+		$("#zip_in_progress").hide();
 	}).finally(() => {
 		$("#zipit .loading_image").hide();
 		zipping = false;

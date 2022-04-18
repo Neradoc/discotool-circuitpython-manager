@@ -200,7 +200,7 @@ input[type="file"] {
 }
 #zip_button {
 	display: block;
-	padding: 16px;
+	padding: 1em;
 	width: 100%;
 }
 #zip_link {
@@ -218,4 +218,10 @@ input[type="file"] {
 	left: calc(50% - 22px);
 	top: 8px;
 	z-index: -1;
+	opacity: 0.5;
+}
+#zip_in_progress {
+	display: none;
+	border: 2px dotted #bbb;
+	padding: 0.5em;
 }
