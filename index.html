@@ -19,6 +19,8 @@
 		--disabled-text: #888;
 		--disabled-border: #CCC;
 		--enabled-border: #888;
+		--drop-zone-text: #888;
+		--drop-zone-border: #888;
 	}
 	body {
 		background: white;
@@ -51,8 +53,15 @@
 		font: inherit;
 		font-size: inherit;
 		background-color: var(--input-background);
-		color: var(--text-color);
-		padding: 2px;
+		color: inherit;
+		padding: 2px 12px;
+	}
+	p {
+		margin: 0px;
+	}
+	input[type="file"] {
+		background: transparent;
+		color: var(--drop-zone-text);
 	}
 	#container {
 		display: grid;
@@ -64,6 +73,7 @@
 
 	/* Titles */
 	.title {
+		text-align: center;
 		padding: 4px 8px;
 		border: 2px solid #888;
 		border-width: 2px 2px 0px;
@@ -79,7 +89,6 @@
 		overflow: hidden auto;
 	}
 	.liste p {
-		margin: 0px;
 		padding: 2px 4px;
 	}
 	.liste p a {
@@ -97,9 +106,15 @@
 		color: var(--hover-color) !important;
 	}
 
+	/* Title block */
+	#title_block {
+		text-align: center;
+		font-size: 120%;
+	}
+
 	/* Filter */
 	#filter {
-		padding: 2em 4px 2px;
+		padding: 0.8em 4px 2px;
 		display: grid;
 		grid-template-columns: auto 100px 140px;
 	}
@@ -148,11 +163,14 @@
 	/* The drop zone */
 	#drop_zone {
 		text-align: center;
-		color: #BBB;
-		border: 4px dotted #BBB;
+		vertical-align: middle;
+		color: var(--drop-zone-text);
+		border: 4px dotted var(--drop-zone-border);
 		border-radius: 16px;
-		padding-top: 1em;
-		height: 2.5em;
+		height: 3.5em;
+	}
+	#drop_message {
+		padding: 2px;
 	}
 	#drop_loading {
 		display: none;
@@ -161,9 +179,20 @@
 	#drop_zone.being_hovered {
 		background: #FFD;
 	}
-	#erase_drop {
+	#drop_controls {
 		display: none;
-		margin: 0px;
+		padding: 2px;
+		color: var(--text-color);
+	}
+	#dropped_files_list {
+		display: none;
+		padding: 2px;
+		font-family: monospace;
+		height: 1em;
+		overflow: hidden;
+	}
+	#select_files_input {
+		display: none;
 	}
 
 	/* Zip buttons */
@@ -178,13 +207,11 @@
 	}
 	#zip_link {
 		display: none;
-		margin: 0px;
 		border: 2px dotted #bbb;
 	}
 	#zip_link a, #zip_link p {
 		display: block;
 		padding: 16px 0px;
-		margin: 0px;
 		color: #DDD;
 	}
 	#zipit .loading_image {
@@ -203,12 +230,23 @@
 		"adafruit/CircuitPython_Community_Bundle",
 		"circuitpython/CircuitPython_Org_Bundle",
 	];
+	let MAX_FILE_NAMES = 80;
 	let base_github = "https://github.com/";
 	var all_the_modules = {};
 	var bundle_promises = [];
 	var dropped_modules_list = [];
+	var dropped_files_list = [];
 	var bundle_zips = new Map();
 	var zipping = false;
+
+	let README = `Circuitpython Libraries Bundle
+	
+	Copy the files and directories in this bundle from the "lib" directory
+	into the target board's "lib" directory inside the CIRCUITPY drive.
+	
+	More information on Circuitpython librairies:
+	https://circuitpython.org/libraries
+	`.replaceAll("	","");
 
 	/***************************************************************
 	*** NOTE Colorize list of modules
@@ -371,6 +409,9 @@
 	async function async_zipit() {
 		var outputZip = new JSZip();
 
+		// readme file
+		await outputZip.file("README.txt", README);
+
 		var modules_bom = $("#dependencies p .module");
 		for(index = 0; index < modules_bom.length; ++index) {
 			var item = modules_bom[index];
@@ -423,6 +464,10 @@
 				}
 			}
 		}
+		for(idx in dropped_files_list) {
+			var file = dropped_files_list[idx];
+			await outputZip.file(file.name, file);
+		}
 		return await outputZip.generateAsync({type:"base64"});
 	}
 
@@ -443,10 +488,10 @@
 			link.attr("href", data_url);
 			$("#zip_link").html("");
 			$("#zip_link").append(link);
-		}).catch((error) => {
-			alert("Error downloading the bundle from github. Try again later.");
-			$("#zip_button").show();
-			$("#zip_link").hide();
+		//}).catch((error) => {
+		//	alert("Error downloading the bundle from github. Try again later.");
+		//	$("#zip_button").show();
+		//	$("#zip_link").hide();
 		}).finally(() => {
 			$("#zipit .loading_image").hide();
 			zipping = false;
@@ -478,35 +523,9 @@
 		});
 		return modules_list;
 	}
-	
-	$(document).on("drop", "#drop_zone", (event) => {
-		event.stopPropagation();
-		event.preventDefault();
-
-		$("#drop_zone").removeClass("being_hovered");
-		$("#drop_loading").show();
-		$("#erase_drop").hide();
-		$("#drop_message").hide();
-
-		var data_transfer = event.originalEvent.dataTransfer;
-		var dropped_files = [];
-		if (data_transfer.items) {
-			// Use DataTransferItemList interface to access the file(s)
-			for (var i = 0; i < data_transfer.items.length; i++) {
-				// If dropped items aren't files, reject them
-				if (data_transfer.items[i].kind === 'file') {
-					var file = data_transfer.items[i].getAsFile();
-					dropped_files.push(file);
-				}
-			}
-		} else {
-			// Use DataTransfer interface to access the file(s)
-			for (var i = 0; i < data_transfer.files.length; i++) {
-				dropped_files.push(data_transfer.files[i]);
-			}
-		}
+	function update_the_selected_files() {
 		var annoying_promises = [];
-		dropped_files.forEach((file) => {
+		dropped_files_list.forEach((file) => {
 			if(file.name.match(/\.py$/)) {
 				annoying_promises.push(file.text());
 			}
@@ -521,18 +540,69 @@
 				});
 			});
 
+			var name_list = "";
+			for(idx in dropped_files_list) {
+				var file = dropped_files_list[idx];
+				var temp_list = name_list + " " + file.name;
+				if(temp_list.length > MAX_FILE_NAMES) {
+					name_list += " ...";
+					break;
+				}
+				name_list = temp_list;
+			}
+			$("#dropped_files_list").html(name_list);
+
 			update_dependencies_list();
 
 			$("#drop_loading").hide();
-			if(dropped_modules_list.length > 0) {
-				$("#erase_drop").show();
+			if(dropped_files_list.length > 0) {
+				$("#drop_controls").show();
 				$("#drop_message").hide();
+				$("#dropped_files_list").show();
 			} else {
-				$("#erase_drop").hide();
+				$("#drop_controls").hide();
 				$("#drop_message").show();
+				$("#dropped_files_list").hide();
 			}
+
 		});
 		// nothing here, because reading a file can not be synchronous somehow ?
+	}
+
+	$(document).on("change", "#select_files_input", (event) => {
+		var that = event.target;
+		for(idx=0; idx < that.files.length; ++idx) {
+			var file = that.files[idx];
+			dropped_files_list.push(file);
+		}
+		update_the_selected_files();
+	});
+	$(document).on("drop", "#drop_zone", (event) => {
+		event.stopPropagation();
+		event.preventDefault();
+
+		$("#drop_zone").removeClass("being_hovered");
+		$("#drop_loading").show();
+		$("#drop_controls").hide();
+		$("#drop_message").hide();
+
+		var data_transfer = event.originalEvent.dataTransfer;
+		if (data_transfer.items) {
+			// Use DataTransferItemList interface to access the file(s)
+			for (var i = 0; i < data_transfer.items.length; i++) {
+				// If dropped items aren't files, reject them
+				if (data_transfer.items[i].kind === 'file') {
+					var file = data_transfer.items[i].getAsFile();
+					dropped_files_list.push(file);
+				}
+			}
+		} else {
+			// Use DataTransfer interface to access the file(s)
+			for (var i = 0; i < data_transfer.files.length; i++) {
+				dropped_files_list.push(data_transfer.files[i]);
+			}
+		}
+		update_the_selected_files();
 	});
 	$(document).on("dragenter", "#drop_zone", (event) => {
 		$("#drop_zone").addClass("being_hovered");
@@ -548,12 +618,22 @@
 		event.stopPropagation();
 		event.preventDefault();
 	});
-	function erase_dropped_files() {
+	$(document).on("click", "#select_files_input", (event) => {
+		event.stopPropagation();
+	});
+	$(document).on("click", ".load_some_files", (event) => {
+		event.stopPropagation();
+		$("#select_files_input").click();
+	});
+	$(document).on("click", "#erase_drop", (event) => {
+		event.stopPropagation();
 		dropped_modules_list = [];
+		dropped_files_list = [];
 		update_dependencies_list();
-		$("#erase_drop").hide();
+		$("#drop_controls").hide();
 		$("#drop_message").show();
-	}
+		$("#dropped_files_list").hide().html("");
+	});
 
 	/***************************************************************
 	*** NOTE Init the content of the modules list
@@ -613,15 +693,26 @@
 </head>
 <body>
 <div id="container">
-	<div id="filter">
-		<input name="filter" value="" placeholder="Enter library name to filter"/>
-		<button id="clear_search">Clear</button>
-		<button id="deselect_all">Deselect All</button>
+	<div>
+		<p id="title_block">Libraries Bundler For Circuitpython</p>
+		<div id="filter">
+			<input name="filter" value="" placeholder="Enter library name to filter"/>
+			<button id="clear_search">Clear</button>
+			<button id="deselect_all">Deselect All</button>
+		</div>
 	</div>
 	<div id="drop_zone">
-		<button id="erase_drop" onclick="erase_dropped_files()">Remove dropped files</button>
-		<span id="drop_message">Drop your code.py here.</span>
+		<p id="drop_controls">
+			<button class="load_some_files">Load More Files</button>
+			<button id="erase_drop">Remove Files</button>
+		</p>
+		<p id="drop_message">
+			<button class="load_some_files">Select your code.py file</button><br/>
+			Or drop your files here.
+		</p>
+		<p id="dropped_files_list"></p>
 		<img id="drop_loading" src="loading_black_small.gif" />
+		<input id="select_files_input" type="file" multiple />
 	</div>
 
 	<div class="title">Modules <span id="nselected"></span></div>
