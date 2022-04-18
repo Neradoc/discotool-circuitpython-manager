@@ -1,0 +1,217 @@
+/* Variables and dark mode */
+:root {
+	--color-pair0: #EEF;
+	--color-pair1: #EFE;
+	--text-color: black;
+	--hover-background: #420;
+	--hover-color: white;
+	--input-background: #EBEBEB;
+	--select-background-pair0: #FF0;
+	--select-background-pair1: #BF0;
+	--select-text-pair0: black;
+	--select-text-pair1: black;
+	--disabled-text: #888;
+	--disabled-border: #CCC;
+	--enabled-border: #888;
+	--drop-zone-text: #888;
+	--drop-zone-border: #888;
+}
+body {
+	background: white;
+	color: black;
+}
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-pair0: #181818;
+		--color-pair1: #202020;
+		--text-color: white;
+		--hover-background: #B84;
+		--hover-color: black;
+		--input-background: #181F1F;
+		--select-background-pair0: #FF0;
+		--select-background-pair1: #BF0;
+		--select-text-pair0: black;
+		--select-text-pair1: black;
+		--disabled-border: #444;
+		--enabled-border: #CCC;
+	}
+	body {
+		background: #15141a;
+		color: white;
+	}
+}
+
+/* Basics */
+button, input
+{
+	font: inherit;
+	font-size: inherit;
+	background-color: var(--input-background);
+	color: inherit;
+	padding: 2px 12px;
+}
+p {
+	margin: 0px;
+}
+input[type="file"] {
+	background: transparent;
+	color: var(--drop-zone-text);
+}
+#container {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+}
+#modules, #dependencies {
+	float: left;
+}
+
+/* Titles */
+.title {
+	text-align: center;
+	padding: 4px 8px;
+	border: 2px solid #888;
+	border-width: 2px 2px 0px;
+	border-radius: 8px 8px 0px 0px;
+}
+
+/* Lists */
+.liste {
+	padding: 0px 4px;
+	border: 2px solid #888;
+	border-width: 0px 2px 2px;
+	height: calc(100vh - 12em);
+	overflow: hidden auto;
+}
+.liste p {
+	padding: 2px 4px;
+}
+.liste p a {
+	color: inherit;
+	text-decoration: none;
+}
+.pair0 {
+	background: var(--color-pair0);
+}
+.pair1 {
+	background: var(--color-pair1);
+}
+.liste p:hover {
+	background: var(--hover-background) !important;
+	color: var(--hover-color) !important;
+}
+
+/* Title block */
+#title_block {
+	text-align: center;
+	font-size: 120%;
+}
+
+/* Filter */
+#filter {
+	padding: 0.8em 4px 2px;
+	display: grid;
+	grid-template-columns: auto 100px 140px;
+}
+#clear_search {
+	color: var(--disabled-text);
+	border-color: var(--disabled-border);
+}
+#clear_search.enabled {
+	color: var(--text-color);
+	border-color: var(--enabled-border);
+}
+
+/* Modules list */
+#modules p.pair0.selected {
+	background: var(--select-background-pair0);
+	color: var(--select-text-pair0);
+}
+#modules p.pair1.selected {
+	background: var(--select-background-pair1);
+	color: var(--select-text-pair1);
+}
+#modules img {
+	vertical-align: middle;
+}
+#modules .loading_image {
+	display: block;
+	margin: auto;
+}
+
+/* Selection */
+#deselect_all {
+	color: var(--disabled-text);
+	border-color: var(--disabled-border);
+}
+#deselect_all.enabled {
+	color: var(--text-color);
+	border-color: var(--enabled-border);
+}
+#modules .selected .checkbox_on {
+	display: inline;
+}
+#modules .selected .checkbox_off {
+	display: none;
+}
+
+/* The drop zone */
+#drop_zone {
+	text-align: center;
+	vertical-align: middle;
+	color: var(--drop-zone-text);
+	border: 4px dotted var(--drop-zone-border);
+	border-radius: 16px;
+	height: 3.5em;
+}
+#drop_message {
+	padding: 2px;
+}
+#drop_loading {
+	display: none;
+	margin-top: -0.5em;
+}
+#drop_zone.being_hovered {
+	background: #FFD;
+}
+#drop_controls {
+	display: none;
+	padding: 2px;
+	color: var(--text-color);
+}
+#dropped_files_list {
+	display: none;
+	padding: 2px;
+	font-family: monospace;
+	height: 1em;
+	overflow: hidden;
+}
+#select_files_input {
+	display: none;
+}
+
+/* Zip buttons */
+#zipit {
+	position: relative;
+	text-align: center;
+}
+#zip_button {
+	display: block;
+	padding: 16px;
+	width: 100%;
+}
+#zip_link {
+	display: none;
+	border: 2px dotted #bbb;
+}
+#zip_link a, #zip_link p {
+	display: block;
+	padding: 16px 0px;
+	color: #DDD;
+}
+#zipit .loading_image {
+	display: none;
+	position: absolute;
+	left: calc(50% - 22px);
+	top: 8px;
+	z-index: -1;
+}
