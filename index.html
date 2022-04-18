@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8" />
+	<title>Page jquery</title>
+	<style type="text/css" title="text/css">
+	/* vos styles ici */
+	#container {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+	}
+	#modules, #dependencies {
+		float: left;
+	}
+	.liste {
+		padding: 0px 4px;
+		border: 2px solid #888;
+		border-width: 0px 2px 2px;
+		height: 300px;
+		overflow: auto;
+	}
+	.liste p {
+		margin: 0px;
+	}
+	.liste p a {
+		display: block;
+		color: inherit;
+		text-decoration: none;
+	}
+	.pair0 { background: #EEF; }
+	.pair1 { background: #EFE; }
+	.liste p:hover {
+		background: black;
+		color: white;
+	}
+	#modules a.selected {
+		background: #008;
+		color: white;
+	}
+	.title {
+		padding: 4px 8px;
+		border: 2px solid #888;
+		border-width: 2px 2px 0px;
+		border-radius: 8px 8px 0px 0px;
+	}
+	#filter input {
+		font: inherit;
+		font-size: inherit;
+		width: 48%;
+	}
+	#zipit {
+		text-align: right;
+	}
+	#zip_button {
+		font: inherit;
+		font-size: inherit;
+	}
+	</style>
+	<script type="text/javascript" src="jquery.min.js"></script>
+	<script src="jszip.min.js"></script>
+	<script type="text/javascript" language="javascript" charset="utf-8">
+	/* votre code ici */
+	var bundles = [
+		"Adafruit_CircuitPython_Bundle",
+		"CircuitPython_Community_Bundle",
+	];
+	let base_adafruit = "https://github.com/adafruit";
+	var all_the_modules = {};
+	var bundle_promises = [];
+	var bundle_zips = new Map();
+	var zipping = false;
+
+	function color_the_lists() {
+		function color_list(i,that) {
+			$(that).removeClass("pair0");
+			$(that).removeClass("pair1");
+			$(that).addClass(`pair${i%2}`);
+		}
+		$("#modules p:visible").each(color_list);
+		$("#dependencies p:visible").each(color_list);
+	}
+
+	function get_bundle_zip(repo, tag) {
+		let base_name = repo.toLowerCase().replaceAll("_","-");
+		let zip_name = `${base_name}-7.x-mpy-${tag}.zip`;
+		let zip_url = `${base_adafruit}/${repo}/releases/download/${tag}/${zip_name}`;
+		return zip_url;
+	}
+	function get_bundle_base(repo, tag) {
+		let base_name = repo.toLowerCase().replaceAll("_","-");
+		return `${base_name}-7.x-mpy-${tag}`;
+	}
+
+	function filter_the_modules() {
+		var that = $("#filter input");
+		var search_string = that.val().trim();
+		if(search_string == "") {
+			$("#modules p").show();
+			color_the_lists();
+			return;
+		}
+		var list_search = search_string.split(" ").filter(i => i);
+		$("#modules p").each((i,item) => {
+			var module_name = $(item).children("a").html();
+			var matches = false;
+			list_search.forEach((sstring) => {
+				if(module_name.match(sstring)) {
+					matches = true;
+				}
+			});
+			if(!matches) {
+				$(item).hide();
+			} else {
+				$(item).show();
+			}
+		});
+		color_the_lists();
+	}
+
+	bundles.forEach((repo, index) => {
+		let base_name = repo.toLowerCase().replaceAll("_","-")
+		var url_latest = `${base_adafruit}/${repo}/releases/latest`;
+		var xhr = new XMLHttpRequest();
+		var bundle_tag = "";
+
+		var prom = $.ajax({
+			url: url_latest,
+			type: 'get',
+			xhr: function() {
+				 return xhr;
+			}
+		}).then((data, textStatus, jqXHR) => {
+			bundle_tag = xhr.responseURL.split("/").pop();
+			let json_name = `${base_name}-${bundle_tag}.json`;
+			let json_url = `${base_adafruit}/${repo}/releases/download/${bundle_tag}/${json_name}`;
+			return $.ajax({
+				url: json_url,
+				type: 'get',
+			});
+		}).then((data, textStatus, jqXHR) => {
+			modules = JSON.parse(data);
+			for(key in modules) {
+				modules[key]["bundle"] = repo;
+				modules[key]["bundle_tag"] = bundle_tag;
+			}
+			return modules;
+		});
+		bundle_promises.push(prom);
+	});
+	Promise.all(bundle_promises).then((values) => {
+		values.forEach((item) => {
+			all_the_modules = Object.assign({}, all_the_modules, item);
+		});
+		var keys = Object.keys(all_the_modules);
+		keys.sort();
+		keys.forEach((module_name, pair) => {
+			$("#modules").append(
+				`<p class="pair${pair%2}"><a href="#">${module_name}</a></p>`
+			);
+		});
+		filter_the_modules();
+	});
+	function get_dependencies(module, all_deps) {
+		if(!all_deps.includes(module)) {
+			all_deps.push(module);
+		}
+		var deps = all_the_modules[module].dependencies;
+		for(index in deps) {
+			depmodule = deps[index];
+			if(all_deps.includes(depmodule)) { continue; }
+			all_deps.push(depmodule);
+			get_dependencies(depmodule, all_deps);
+		}
+	}
+	function update_dependencies_list() {
+		var modules_list = [];
+		$("#modules p a.selected").each((i,that) => {
+			var module = $(that).html();
+			get_dependencies(module, modules_list);
+		});
+		modules_list.sort();
+		$("#dependencies").html("");
+		var pair = 0;
+		for(index in modules_list) {
+			pair = pair + 1;
+			var module_name = modules_list[index];
+			var module = all_the_modules[module_name];
+			var ext = "";
+			if(!module.package) {
+				ext = ".mpy";
+			}
+			$("#dependencies").append(
+				`<p class="pair${pair%2}"><a href="#">${module_name}${ext}</a></p>`
+			);
+		}
+		$(".num_deps").html(pair);
+	}
+	$(document).on("click", "#modules p a", (event) => {
+		var that = $(event.target);
+		that.toggleClass("selected");
+		update_dependencies_list();
+		return false;
+	});
+
+
+	$(document).on("keyup", "#filter input", (event) => {
+		filter_the_modules();
+	});
+
+
+	async function getBundleContents(zip_url) {
+		var response = await fetch(zip_url);
+		var data = response.blob();
+		var bundleContents = new JSZip();
+		await bundleContents.loadAsync(data);
+		return bundleContents;
+	}
+
+	async function async_zipit() {
+		var outputZip = new JSZip();
+
+		var modules_bom = $("#dependencies p a");
+		for(index = 0; index < modules_bom.length; ++index) {
+			var item = modules_bom[index];
+			var module_name = $(item).html().replace(/\.mpy$/,"");
+			var module = all_the_modules[module_name];
+
+			var zip_url = get_bundle_zip(module.bundle, module.bundle_tag);
+			var bundle_base = get_bundle_base(module.bundle, module.bundle_tag);
+			var bundle_path = `${bundle_base}/lib`;
+			// var bundle_path = "lib";
+
+			if(!bundle_zips.has(zip_url)) {
+				var zipContents = await getBundleContents(zip_url);
+				bundle_zips.set(zip_url, zipContents);
+			}
+			var zipContents = bundle_zips.get(zip_url);
+
+			if(module.package) {
+				var new_dir_name = `lib/${module_name}`;
+				console.log("/ DIR:", new_dir_name);
+				await outputZip.folder(new_dir_name);
+				// loop through the subfiles in zipContents and add them
+				var zipFolder = await zipContents.folder(`${bundle_path}/${module_name}/`);
+				if(zipFolder == null) {
+					console.log("oo zipFolder is NULL");
+				}
+				var subliste = [];
+				await zipFolder.forEach((relativePath, file) => {
+					subliste.push(file);
+				});
+				console.log(subliste);
+				for(idx in subliste) {
+					var file = subliste[idx];
+					var out_file_name = file.name.replace(`${bundle_path}`, "lib");
+					var zipFile = await zipContents.file(file.name);
+					console.log(zipFile);
+					if (zipFile !== null) {
+						var zipData = await zipFile.async("uint8array");
+						console.log("-- Full:", file.name);
+						console.log("-- Save:", out_file_name);
+						console.log(zipData);
+						await outputZip.file(out_file_name, zipData);
+					} else {
+						console.log("NULL ???", file.name);
+					}
+				}
+			} else {
+				var in_file_name = `${bundle_path}/${module_name}.mpy`;
+				var out_file_name = `lib/${module_name}.mpy`;
+				console.log("+ FILE:", in_file_name);
+				console.log("+ Save:", out_file_name);
+				var zipFile = await zipContents.file(in_file_name);
+				if (zipFile !== null) {
+					var zipData = await zipFile.async("uint8array");
+					await outputZip.file(out_file_name, zipData);
+				} else {
+					console.log("NULL ???", in_file_name);
+				}
+			}
+		}
+		return await outputZip.generateAsync({type:"base64"});
+	}
+	function zipit() {
+		if(zipping) return false;
+		zipping = true;
+		$("#zip_link").html("CREATING THE ZIP, PLEASE WAIT");
+		// start the following as an async
+		async_zipit().then(async (base64) => {
+			// hide "in progress"
+			data_url = "data:application/zip;base64," + base64;
+			// window.location = data_url;
+			var link = $('<a name="zip">Download the zip on the modules</a>');
+			link.attr("href", data_url);
+			$("#zip_link").html("");
+			$("#zip_link").append(link);
+			zipping = false;
+		});
+	}
+	</script>
+</head>
+<body>
+<div id="filter"><input name="filter" value="" placeholder="Enter library name to filter"/></div>
+<div id="container">
+	<div class="title">Modules</div>
+	<div class="title">Dependencies (<span class="num_deps">0</span>)</div>
+	<div id="modules" class="liste"></div>
+	<div id="dependencies" class="liste"></div>
+</div>
+<div id="zipit">
+	<p><button id="zip_button" onclick="zipit()">Do the zip thing</button></p>
+	<p id="zip_link"></p>
+</div>
+</body>
+</html>
+
