@@ -77,7 +77,9 @@
 		padding-top: 1em;
 		height: 2.5em;
 	}
-	#drop_message {
+	#drop_loading {
+		display: none;
+		margin-top: -0.5em;
 	}
 	#drop_zone.being_hovered {
 		background: #FFD;
@@ -384,9 +386,14 @@
 	}
 	
 	$(document).on("drop", "#drop_zone", (event) => {
-		$("#drop_zone").removeClass("being_hovered");
 		event.stopPropagation();
 		event.preventDefault();
+
+		$("#drop_zone").removeClass("being_hovered");
+		$("#drop_loading").show();
+		$("#erase_drop").hide();
+		$("#drop_message").hide();
+
 		var data_transfer = event.originalEvent.dataTransfer;
 		var dropped_files = [];
 		if (data_transfer.items) {
@@ -414,7 +421,6 @@
 		Promise.all(annoying_promises).then((values) => {
 			values.forEach((full_content) => {
 				var imports = get_imports_from_python(full_content);
-				console.log(imports);
 				imports.forEach((item) => {
 					if(!dropped_modules_list.includes(item)) {
 						dropped_modules_list.push(item);
@@ -422,10 +428,13 @@
 				});
 			});
 
-			console.log(dropped_modules_list, dropped_modules_list.length);
+			$("#drop_loading").hide();
 			if(dropped_modules_list.length > 0) {
 				$("#erase_drop").show();
 				$("#drop_message").hide();
+			} else {
+				$("#erase_drop").hide();
+				$("#drop_message").show();
 			}
 
 			update_dependencies_list();
@@ -516,6 +525,7 @@
 	<div id="drop_zone">
 		<button id="erase_drop" onclick="erase_dropped_files()">Remove dropped files</button>
 		<span id="drop_message">Drop your code.py here.</span>
+		<img id="drop_loading" src="loading_black_small.gif" />
 	</div>
 
 	<div class="title">Modules <span id="nselected"></span></div>
