@@ -39,6 +39,10 @@ body {
 		background: #15141a;
 		color: white;
 	}
+	.liste {
+		scrollbar-color: #888 #222;
+		scrollbar-width: auto;
+	}
 }
 
 /* Basics */
@@ -95,10 +99,6 @@ input[type="file"] {
 .pair1 {
 	background: var(--color-pair1);
 }
-.liste p:hover {
-	background: var(--hover-background) !important;
-	color: var(--hover-color) !important;
-}
 
 /* Title block */
 #title_block {
@@ -110,7 +110,7 @@ input[type="file"] {
 #filter {
 	padding: 0.8em 4px 2px;
 	display: grid;
-	grid-template-columns: auto 100px 140px;
+	grid-template-columns: auto 80px 130px;
 }
 #clear_search {
 	color: var(--disabled-text);
@@ -136,6 +136,10 @@ input[type="file"] {
 #modules .loading_image {
 	display: block;
 	margin: auto;
+}
+#modules p:hover {
+	background: var(--hover-background) !important;
+	color: var(--hover-color) !important;
 }
 
 /* Selection */

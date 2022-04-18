@@ -1,17 +1,25 @@
+let base_github = "https://github.com/";
 var bundles_config = [
 	"adafruit/Adafruit_CircuitPython_Bundle",
 	"adafruit/CircuitPython_Community_Bundle",
 	"circuitpython/CircuitPython_Org_Bundle",
 ];
-let MAX_FILE_NAMES = 80;
-let base_github = "https://github.com/";
+// full modules list from the github bundles
 var all_the_modules = {};
-var bundle_promises = [];
-var dropped_modules_list = [];
+// list of files added to the drop zone
 var dropped_files_list = [];
+// list of modules found in the files
+var dropped_modules_list = [];
+// the circuitpython bundles from github
 var bundle_zips = new Map();
+// the zip code is running, the button won't respond
 var zipping = false;
 
+// limit to the list of files names before cut to "..."
+let MAX_FILE_NAMES = 80;
+// the prefix is added to file paths inside the zip (add "/" for a folder)
+let ZIP_PREFIX = "CIRCUITPY/";
+// README.txt file added to the zip
 let README = `Circuitpython Libraries Bundle
 
 Copy the files and directories in this bundle from the "lib" directory
@@ -19,7 +27,7 @@ into the target board's "lib" directory inside the CIRCUITPY drive.
 
 More information on Circuitpython librairies:
 https://circuitpython.org/libraries
-`.replaceAll("	","");
+`;
 
 /***************************************************************
 *** NOTE Colorize list of modules
@@ -183,7 +191,7 @@ async function async_zipit() {
 	var outputZip = new JSZip();
 
 	// readme file
-	await outputZip.file("README.txt", README);
+	await outputZip.file(ZIP_PREFIX + "README.txt", README);
 
 	var modules_bom = $("#dependencies p .module");
 	for(index = 0; index < modules_bom.length; ++index) {
@@ -204,7 +212,7 @@ async function async_zipit() {
 
 		if(module.package) {
 			var new_dir_name = `lib/${module_name}`;
-			await outputZip.folder(new_dir_name);
+			await outputZip.folder(ZIP_PREFIX + new_dir_name);
 			// loop through the subfiles in zipContents and add them
 			var zipFolder = await zipContents.folder(`${bundle_path}/${module_name}/`);
 			if(zipFolder == null) {
@@ -220,7 +228,7 @@ async function async_zipit() {
 				var zipFile = await zipContents.file(file.name);
 				if (zipFile !== null) {
 					var zipData = await zipFile.async("uint8array");
-					await outputZip.file(out_file_name, zipData);
+					await outputZip.file(ZIP_PREFIX + out_file_name, zipData);
 				} else {
 					console.log("NULL ???", file.name);
 				}
@@ -231,7 +239,7 @@ async function async_zipit() {
 			var zipFile = await zipContents.file(in_file_name);
 			if (zipFile !== null) {
 				var zipData = await zipFile.async("uint8array");
-				await outputZip.file(out_file_name, zipData);
+				await outputZip.file(ZIP_PREFIX + out_file_name, zipData);
 			} else {
 				console.log("NULL ???", in_file_name);
 			}
@@ -239,7 +247,7 @@ async function async_zipit() {
 	}
 	for(idx in dropped_files_list) {
 		var file = dropped_files_list[idx];
-		await outputZip.file(file.name, file);
+		await outputZip.file(ZIP_PREFIX + file.name, file);
 	}
 	return await outputZip.generateAsync({type:"base64"});
 }
@@ -412,50 +420,57 @@ $(document).on("click", "#erase_drop", (event) => {
 *** NOTE Init the content of the modules list
 */
 
-$("#modules .loading_image").show();
+function setup_the_modules_list() {
+	$("#modules .loading_image").show();
 
-bundles_config.forEach((repo, index) => {
-	let base_name = repo.split("/")[1].toLowerCase().replaceAll("_","-")
-	var url_latest = `${base_github}/${repo}/releases/latest`;
-	var xhr = new XMLHttpRequest();
-	var bundle_tag = "";
+	var bundle_promises = [];
+	bundles_config.forEach((repo, index) => {
+		let base_name = repo.split("/")[1].toLowerCase().replaceAll("_","-")
+		var url_latest = `${base_github}/${repo}/releases/latest`;
+		var xhr = new XMLHttpRequest();
+		var bundle_tag = "";
 
-	var prom = $.ajax({
-		url: url_latest,
-		type: 'get',
-		xhr: function() {
-			 return xhr;
-		}
-	}).then((data, textStatus, jqXHR) => {
-		bundle_tag = xhr.responseURL.split("/").pop();
-		let json_name = `${base_name}-${bundle_tag}.json`;
-		let json_url = `${base_github}/${repo}/releases/download/${bundle_tag}/${json_name}`;
-		return $.ajax({
-			url: json_url,
+		var prom = $.ajax({
+			url: url_latest,
 			type: 'get',
+			xhr: function() {
+				 return xhr;
+			}
+		}).then((data, textStatus, jqXHR) => {
+			bundle_tag = xhr.responseURL.split("/").pop();
+			let json_name = `${base_name}-${bundle_tag}.json`;
+			let json_url = `${base_github}/${repo}/releases/download/${bundle_tag}/${json_name}`;
+			return $.ajax({
+				url: json_url,
+				type: 'get',
+			});
+		}).then((data, textStatus, jqXHR) => {
+			modules = JSON.parse(data);
+			for(key in modules) {
+				modules[key]["bundle"] = repo;
+				modules[key]["bundle_tag"] = bundle_tag;
+			}
+			return modules;
 		});
-	}).then((data, textStatus, jqXHR) => {
-		modules = JSON.parse(data);
-		for(key in modules) {
-			modules[key]["bundle"] = repo;
-			modules[key]["bundle_tag"] = bundle_tag;
-		}
-		return modules;
+		bundle_promises.push(prom);
 	});
-	bundle_promises.push(prom);
-});
 
-Promise.all(bundle_promises).then((values) => {
-	values.forEach((item) => {
-		all_the_modules = Object.assign({}, all_the_modules, item);
+	Promise.all(bundle_promises).then((values) => {
+		values.forEach((item) => {
+			all_the_modules = Object.assign({}, all_the_modules, item);
+		});
+		var keys = Object.keys(all_the_modules);
+		$("#modules .loading_image").hide();
+		keys.sort();
+		keys.forEach((module_name, pair) => {
+			$("#modules").append(
+				`<p class="pair${pair%2}">
+					<input class="checkbox" type="checkbox"/>
+					<span class="module">${module_name}</span>
+				</p>`
+			);
+		});
+		filter_the_modules();
 	});
-	var keys = Object.keys(all_the_modules);
-	$("#modules .loading_image").hide();
-	keys.sort();
-	keys.forEach((module_name, pair) => {
-		$("#modules").append(
-			`<p class="pair${pair%2}"><input class="checkbox" type="checkbox"/> <span class="module">${module_name}</span></p>`
-		);
-	});
-	filter_the_modules();
-});
+}
+setup_the_modules_list();
