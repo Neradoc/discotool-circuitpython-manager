@@ -16,6 +16,9 @@
 		--select-background-pair1: #BF0;
 		--select-text-pair0: black;
 		--select-text-pair1: black;
+		--disabled-text: #888;
+		--disabled-border: #CCC;
+		--enabled-border: #888;
 	}
 	body {
 		background: white;
@@ -33,6 +36,8 @@
 			--select-background-pair1: #BF0;
 			--select-text-pair0: black;
 			--select-text-pair1: black;
+			--disabled-border: #444;
+			--enabled-border: #CCC;
 		}
 		body {
 			background: #15141a;
@@ -70,7 +75,7 @@
 		padding: 0px 4px;
 		border: 2px solid #888;
 		border-width: 0px 2px 2px;
-		height: 480px;
+		height: calc(100vh - 12em);
 		overflow: hidden auto;
 	}
 	.liste p {
@@ -94,13 +99,17 @@
 
 	/* Filter */
 	#filter {
-		padding: 2em 4px 0px;
-	}
-	#filter input {
-		width: 66%;
+		padding: 2em 4px 2px;
+		display: grid;
+		grid-template-columns: auto 100px 140px;
 	}
 	#clear_search {
-		display: none;
+		color: var(--disabled-text);
+		border-color: var(--disabled-border);
+	}
+	#clear_search.enabled {
+		color: var(--text-color);
+		border-color: var(--enabled-border);
 	}
 	
 	/* Modules list */
@@ -122,11 +131,12 @@
 
 	/* Selection */
 	#deselect_all {
-		float: right;
-		color: #888;
+		color: var(--disabled-text);
+		border-color: var(--disabled-border);
 	}
 	#deselect_all.enabled {
 		color: var(--text-color);
+		border-color: var(--enabled-border);
 	}
 	#modules .selected .checkbox_on {
 		display: inline;
@@ -268,12 +278,12 @@
 		var that = $("#filter input");
 		var search_string = that.val().trim();
 		if(search_string == "") {
-			$("#clear_search").hide();
+			$("#clear_search").removeClass("enabled");
 			$("#modules p").show();
 			color_the_lists();
 			return;
 		}
-		$("#clear_search").show();
+		$("#clear_search").addClass("enabled");
 		var list_search = search_string.split(" ").filter(i => i);
 		$("#modules p").each((i,item) => {
 			var module_name = $(item).children(".module").html();
