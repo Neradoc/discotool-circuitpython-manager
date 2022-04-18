@@ -4,7 +4,6 @@
 	<meta charset="utf-8" />
 	<title>Page jquery</title>
 	<style type="text/css" title="text/css">
-	/* vos styles ici */
 	button, input {
 		font: inherit;
 		font-size: inherit;
@@ -16,6 +15,16 @@
 	#modules, #dependencies {
 		float: left;
 	}
+
+	/* Titles */
+	.title {
+		padding: 4px 8px;
+		border: 2px solid #888;
+		border-width: 2px 2px 0px;
+		border-radius: 8px 8px 0px 0px;
+	}
+
+	/* Lists */
 	.liste {
 		padding: 0px 4px;
 		border: 2px solid #888;
@@ -37,38 +46,51 @@
 		background: black;
 		color: white;
 	}
-	#modules p.selected {
-		background: #FF0;
-		color: black;
-	}
-	.title {
-		padding: 4px 8px;
-		border: 2px solid #888;
-		border-width: 2px 2px 0px;
-		border-radius: 8px 8px 0px 0px;
-	}
+
+	/* Filter */
 	#filter {
 		padding: 2em 1em 0px;
 	}
 	#filter input {
 		width: 70%;
 	}
-	#zipit {
-		text-align: center;
-		padding: 2px;
-	}
-	#zip_button {
-		display: block;
-		padding: 16px;
-		width: 100%;
-	}
-	#zip_link {
+	#clear_search {
 		display: none;
-		padding: 16px 0px;
-		margin: 0px;
-		border: 1px solid #bbb;
-		width: 100%;
+		float: right;
 	}
+	
+	/* Modules list */
+	#modules p.selected {
+		background: #FF0;
+		color: black;
+	}
+	#modules img {
+		vertical-align: middle;
+	}
+	.checkbox_on {
+		display: none;
+	}
+	.loading_image {
+		display: block;
+		margin: auto;
+	}
+
+	/* Selection */
+	#deselect_all {
+		float: right;
+		color: #888;
+	}
+	#deselect_all.enabled {
+		color: black;
+	}
+	#modules .selected .checkbox_on {
+		display: inline;
+	}
+	#modules .selected .checkbox_off {
+		display: none;
+	}
+
+	/* The drop zone */
 	#drop_zone {
 		text-align: center;
 		color: #BBB;
@@ -89,26 +111,23 @@
 		padding: 0px;
 		margin: 0px;
 	}
-	#clear_search {
+
+	/* Zip buttons */
+	#zipit {
+		text-align: center;
+		padding: 2px;
+	}
+	#zip_button {
+		display: block;
+		padding: 16px;
+		width: 100%;
+	}
+	#zip_link {
 		display: none;
-		float: right;
-	}
-	#deselect_all {
-		float: right;
-		color: #888;
-	}
-	#deselect_all.enabled {
-		color: black;
-	}
-	#modules img {
-		vertical-align: middle;
-	}
-	.checkbox_on { display: none; }
-	#modules .selected .checkbox_on {
-		display: inline;
-	}
-	#modules .selected .checkbox_off {
-		display: none;
+		padding: 16px 0px;
+		margin: 0px;
+		border: 1px solid #bbb;
+		width: 100%;
 	}
 	</style>
 	<script type="text/javascript" src="jquery.min.js"></script>
@@ -127,8 +146,8 @@
 	var zipping = false;
 
 	/***************************************************************
-	*** Colorize list of modules
-	***************************************************************/
+	*** NOTE Colorize list of modules
+	*/
 
 	function color_the_lists() {
 		function color_list(i,that) {
@@ -141,8 +160,8 @@
 	}
 
 	/***************************************************************
-	*** Manage the dependencies list
-	***************************************************************/
+	*** NOTE Manage the dependencies list
+	*/
 
 	function get_dependencies(module, all_deps) {
 		if(!all_deps.includes(module)) {
@@ -187,8 +206,8 @@
 	}
 
 	/***************************************************************
-	*** Filter modules by name
-	***************************************************************/
+	*** NOTE Filter modules by name
+	*/
 
 	function filter_the_modules() {
 		var that = $("#filter input");
@@ -221,8 +240,8 @@
 	});
 
 	/***************************************************************
-	*** Manually select and deselect modules
-	***************************************************************/
+	*** NOTE Manually select and deselect modules
+	*/
 
 	function toggle_deselect() {
 		nselected = $(".selected").length;
@@ -254,8 +273,8 @@
 	});
 
 	/***************************************************************
-	*** Zip generating stuff
-	***************************************************************/
+	*** NOTE Zip generating stuff
+	*/
 
 	function get_bundle_zip(repo, tag) {
 		let base_name = repo.toLowerCase().replaceAll("_","-").replace(/^.*\//,"");
@@ -360,8 +379,8 @@
 	}
 
 	/***************************************************************
-	*** Manage the dropped files
-	***************************************************************/
+	*** NOTE Manage the dropped files
+	*/
 
 	function get_imports_from_python(full_content) {
 		var modules_list = [];
@@ -463,8 +482,10 @@
 	}
 
 	/***************************************************************
-	*** Init the content of the modules list
-	***************************************************************/
+	*** NOTE Init the content of the modules list
+	*/
+
+	$("#modules .loading_image").show();
 
 	bundles_config.forEach((repo, index) => {
 		let base_name = repo.split("/")[1].toLowerCase().replaceAll("_","-")
@@ -502,6 +523,7 @@
 			all_the_modules = Object.assign({}, all_the_modules, item);
 		});
 		var keys = Object.keys(all_the_modules);
+		$("#modules .loading_image").hide();
 		keys.sort();
 		keys.forEach((module_name, pair) => {
 			$("#modules").append(
@@ -530,7 +552,7 @@
 
 	<div class="title">Modules <span id="nselected"></span></div>
 	<div class="title">Dependencies (<span class="num_deps">0</span>)</div>
-	<div id="modules" class="liste"></div>
+	<div id="modules" class="liste"><img class="loading_image" src="loading_black_small.gif"/></div>
 	<div id="dependencies" class="liste"></div>
 	
 	<div></div>
