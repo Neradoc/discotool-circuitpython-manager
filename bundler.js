@@ -1,3 +1,8 @@
+/*
+SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
+SPDX-License-Identifier: MIT
+*/
+
 let base_github = "https://github.com/";
 var bundles_config = [
 	"adafruit/Adafruit_CircuitPython_Bundle",
@@ -180,19 +185,19 @@ function get_bundle_base(repo, tag) {
 	return `${base_name}-7.x-mpy-${tag}`;
 }
 
-async function getBundleContents(zip_url) {
+async function get_bundle_contents(zip_url) {
 	var response = await fetch(zip_url);
 	var data = response.blob();
-	var bundleContents = new JSZip();
-	await bundleContents.loadAsync(data);
-	return bundleContents;
+	var bundle_contents = new JSZip();
+	await bundle_contents.loadAsync(data);
+	return bundle_contents;
 }
 
 async function async_zipit() {
-	var outputZip = new JSZip();
+	var output_zip = new JSZip();
 
 	// readme file
-	await outputZip.file(ZIP_PREFIX + "README.txt", README);
+	await output_zip.file(ZIP_PREFIX + "README.txt", README);
 	var modules_bom = $("#dependencies p .module");
 
 	var total_zip_files = modules_bom.length + dropped_files_list.length;
@@ -219,30 +224,30 @@ async function async_zipit() {
 		var bundle_path = `${bundle_base}/lib`;
 
 		if(!bundle_zips.has(zip_url)) {
-			var zipContents = await getBundleContents(zip_url);
-			bundle_zips.set(zip_url, zipContents);
+			var zip_contents = await get_bundle_contents(zip_url);
+			bundle_zips.set(zip_url, zip_contents);
 		}
-		var zipContents = bundle_zips.get(zip_url);
+		var zip_contents = bundle_zips.get(zip_url);
 
 		if(module.package) {
 			var new_dir_name = `lib/${module_name}`;
-			await outputZip.folder(ZIP_PREFIX + new_dir_name);
-			// loop through the subfiles in zipContents and add them
-			var zipFolder = await zipContents.folder(`${bundle_path}/${module_name}/`);
-			if(zipFolder == null) {
-				console.log("NULL ??? zipFolder is NULL !");
+			await output_zip.folder(ZIP_PREFIX + new_dir_name);
+			// loop through the subfiles in zip_contents and add them
+			var zip_folder = await zip_contents.folder(`${bundle_path}/${module_name}/`);
+			if(zip_folder == null) {
+				console.log("NULL ??? zip_folder is NULL !");
 			}
 			var subliste = [];
-			await zipFolder.forEach((relativePath, file) => {
+			await zip_folder.forEach((relativePath, file) => {
 				subliste.push(file);
 			});
 			for(idx in subliste) {
 				var file = subliste[idx];
 				var out_file_name = file.name.replace(`${bundle_path}`, "lib");
-				var zipFile = await zipContents.file(file.name);
-				if (zipFile !== null) {
-					var zipData = await zipFile.async("uint8array");
-					await outputZip.file(ZIP_PREFIX + out_file_name, zipData);
+				var zip_file = await zip_contents.file(file.name);
+				if (zip_file !== null) {
+					var zip_data = await zip_file.async("uint8array");
+					await output_zip.file(ZIP_PREFIX + out_file_name, zip_data);
 				} else {
 					console.log("NULL ???", file.name);
 				}
@@ -250,10 +255,10 @@ async function async_zipit() {
 		} else {
 			var in_file_name = `${bundle_path}/${module_name}.mpy`;
 			var out_file_name = `lib/${module_name}.mpy`;
-			var zipFile = await zipContents.file(in_file_name);
-			if (zipFile !== null) {
-				var zipData = await zipFile.async("uint8array");
-				await outputZip.file(ZIP_PREFIX + out_file_name, zipData);
+			var zip_file = await zip_contents.file(in_file_name);
+			if (zip_file !== null) {
+				var zip_data = await zip_file.async("uint8array");
+				await output_zip.file(ZIP_PREFIX + out_file_name, zip_data);
 			} else {
 				console.log("NULL ???", in_file_name);
 			}
@@ -262,10 +267,10 @@ async function async_zipit() {
 	for(idx in dropped_files_list) {
 		count_one_file();
 		var file = dropped_files_list[idx];
-		await outputZip.file(ZIP_PREFIX + file.name, file);
+		await output_zip.file(ZIP_PREFIX + file.name, file);
 	}
 	$("#zip_in_progress .preparing").show();
-	return await outputZip.generateAsync({type:"base64"});
+	return await output_zip.generateAsync({type:"base64"});
 }
 
 function zipit() {
