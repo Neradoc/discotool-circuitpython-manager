@@ -206,13 +206,30 @@ input[type="file"] {
 #zip_link {
 	display: none;
 	border: 2px dotted #bbb;
+	background: var(--input-background);
 }
 #zip_link a, #zip_link p {
 	display: block;
-	padding: 16px 0px;
 	color: #DDD;
 }
-#zipit .loading_image {
+#zip_in_progress {
+	display: none;
+	border: 2px dotted #bbb;
+	background: var(--input-background);
+}
+
+/* Zip popup */
+#zip_popup {
+	display: none;
+	background: rgba(20, 20, 32, 0.75);
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	width: 100vw;
+	height: 100vh;
+}
+#zip_popup .loading_image {
+	text-align: center;
 	display: none;
 	position: absolute;
 	left: calc(50% - 22px);
@@ -220,8 +237,24 @@ input[type="file"] {
 	z-index: -1;
 	opacity: 0.5;
 }
-#zip_in_progress {
-	display: none;
-	border: 2px dotted #bbb;
-	padding: 0.5em;
+#zip_in_progress .content,
+#zip_link a, #zip_link p {
+	position: relative;
+	top: 40%;
+}
+
+#zip_in_progress, #zip_link {
+	position: absolute;
+	height: 33vh;
+	width: calc(75%);
+	top: 33vh;
+	left: 12.5%;
+	text-align: center;
+}
+#zip_popup .close {
+	position: absolute;
+	width: 140px;
+	padding: 8px;
+	top: 67vh;
+	left: calc(50% - 70px);
 }

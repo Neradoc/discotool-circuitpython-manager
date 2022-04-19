@@ -84,7 +84,6 @@ function update_dependencies_list() {
 		);
 	}
 	$(".num_deps").html(pair);
-	$("#zip_button").show();
 	$("#zip_link").hide();
 	$("#zip_in_progress").hide();
 }
@@ -272,16 +271,15 @@ function zipit() {
 	if(zipping) return false;
 	if($("#dependencies p").length == 0) return false;
 	zipping = true;
-	$("#modules p, #drop_zone, #filter").css("opacity", 0.4);
-	$("#zip_button").hide();
 	$("#zip_in_progress").show();
 	$("#zipit .loading_image").show();
+	$("#zip_popup").show();
 	// start the following as an async
 	async_zipit().then(async (base64) => {
 		// hide "in progress"
 		data_url = "data:application/zip;base64," + base64;
 		// window.location = data_url;
-		var link = $('<a name="zip">Download the zip with all that</a>');
+		var link = $("#zip_a");
 		link.attr("href", data_url);
 		link.attr("download", "libraries_bundle.zip");
 		link.attr("title", "libraries_bundle.zip");
@@ -289,11 +287,21 @@ function zipit() {
 		$("#zip_link").show();
 		$("#zip_in_progress").hide();
 	}).finally(() => {
-		$("#modules p, #drop_zone, #filter").css("opacity", 1);
 		$("#zipit .loading_image").hide();
 		zipping = false;
 	});
 }
+
+$(document).on("click", "#zip_popup .close", (event) => {
+	$("#zip_popup").hide();
+});
+$(document).on("click", "#zip_popup", (event) => {
+	event.stopPropagation();
+	var that = event.target;
+	if(that == $("#zip_popup")[0]) {
+		$("#zip_popup").hide();
+	}
+});
 
 /***************************************************************
 *** NOTE Manage the dropped files

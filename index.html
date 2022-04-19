@@ -39,15 +39,19 @@
 	
 	<div></div>
 	<div id="zipit">
-		<img class="loading_image" src="loading_black_small.gif"/>
 		<button id="zip_button" onclick="zipit()">Create a zip with these modules</button>
-		<p id="zip_in_progress">
-			CREATING THE ZIP, PLEASE WAIT<br/>
-			Processing Modules And Files <span class="file_progress"></span>
-		</p>
-		<p id="zip_link"></p>
 	</div>
+</div>
+<div id="zip_popup">
+	<img class="loading_image" src="loading_black_small.gif"/>
+	<p id="zip_in_progress">
+		<span class="content">
+		CREATING THE ZIP, PLEASE WAIT<br/>
+		Processing Modules And Files <span class="file_progress"></span>
+		</span>
+	</p>
+	<p id="zip_link"><a id="zip_a" name="zip">Download the zip with the selected modules.</a></p>
+	<div><button class="close">Close</button></div>
 </div>
 </body>
 </html>
-
