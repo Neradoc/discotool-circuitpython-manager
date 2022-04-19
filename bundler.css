@@ -6,8 +6,8 @@
 	--hover-background: #420;
 	--hover-color: white;
 	--input-background: #EBEBEB;
-	--select-background-pair0: #FF0;
-	--select-background-pair1: #BF0;
+	--select-background-pair0: #0A0;
+	--select-background-pair1: #080;
 	--select-text-pair0: black;
 	--select-text-pair1: black;
 	--disabled-text: #888;
@@ -28,8 +28,6 @@ body {
 		--hover-background: #B84;
 		--hover-color: black;
 		--input-background: #181F1F;
-		--select-background-pair0: #FF0;
-		--select-background-pair1: #BF0;
 		--select-text-pair0: black;
 		--select-text-pair1: black;
 		--disabled-border: #444;
