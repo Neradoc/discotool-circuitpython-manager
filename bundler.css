@@ -170,6 +170,9 @@ input[type="file"] {
 #drop_message {
 	padding: 2px;
 }
+#drop_message .load_some_files {
+	color: var(--text-color);
+}
 #drop_loading {
 	display: none;
 	margin-top: -0.5em;
@@ -228,19 +231,13 @@ input[type="file"] {
 	width: 100vw;
 	height: 100vh;
 }
-#zip_popup .loading_image {
-	text-align: center;
-	display: none;
-	position: absolute;
-	left: calc(50% - 22px);
-	top: 8px;
-	z-index: -1;
-	opacity: 0.5;
-}
 #zip_in_progress .content,
 #zip_link a, #zip_link p {
 	position: relative;
 	top: 40%;
+}
+#zip_in_progress .preparing {
+	display: none;
 }
 
 #zip_in_progress, #zip_link {

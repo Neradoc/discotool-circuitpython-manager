@@ -264,6 +264,7 @@ async function async_zipit() {
 		var file = dropped_files_list[idx];
 		await outputZip.file(ZIP_PREFIX + file.name, file);
 	}
+	$("#zip_in_progress .preparing").show();
 	return await outputZip.generateAsync({type:"base64"});
 }
 
@@ -271,8 +272,10 @@ function zipit() {
 	if(zipping) return false;
 	if($("#dependencies p").length == 0) return false;
 	zipping = true;
+	$("#zip_in_progress .preparing").hide();
 	$("#zip_in_progress").show();
-	$("#zipit .loading_image").show();
+	$("#zip_link").hide();
+	$("#zip_popup .close").hide();
 	$("#zip_popup").show();
 	// start the following as an async
 	async_zipit().then(async (base64) => {
@@ -286,8 +289,8 @@ function zipit() {
 		$("#zip_link").html(link);
 		$("#zip_link").show();
 		$("#zip_in_progress").hide();
+		$("#zip_popup .close").show();
 	}).finally(() => {
-		$("#zipit .loading_image").hide();
 		zipping = false;
 	});
 }
@@ -298,7 +301,7 @@ $(document).on("click", "#zip_popup .close", (event) => {
 $(document).on("click", "#zip_popup", (event) => {
 	event.stopPropagation();
 	var that = event.target;
-	if(that == $("#zip_popup")[0]) {
+	if(that == $("#zip_popup")[0] && !zipping) {
 		$("#zip_popup").hide();
 	}
 });
