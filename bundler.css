@@ -1,15 +1,20 @@
+/*
+SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
+SPDX-License-Identifier: MIT
+*/
+
 /* Variables and dark mode */
 :root {
 	--color-pair0: #EEF;
 	--color-pair1: #EFE;
 	--text-color: black;
-	--hover-background: #420;
-	--hover-color: white;
+	--hover-background: #B84;
+	--hover-color: black;
 	--input-background: #EBEBEB;
-	--select-background-pair0: #0A0;
-	--select-background-pair1: #080;
-	--select-text-pair0: black;
-	--select-text-pair1: black;
+	--select-background-pair0: #030;
+	--select-background-pair1: #040;
+	--select-text-pair0: white;
+	--select-text-pair1: white;
 	--disabled-text: #888;
 	--disabled-border: #CCC;
 	--enabled-border: #888;
@@ -20,16 +25,13 @@ body {
 	background: white;
 	color: black;
 }
+
 @media (prefers-color-scheme: dark) {
 	:root {
 		--color-pair0: #181818;
 		--color-pair1: #202020;
 		--text-color: white;
-		--hover-background: #B84;
-		--hover-color: black;
 		--input-background: #181F1F;
-		--select-text-pair0: black;
-		--select-text-pair1: black;
 		--disabled-border: #444;
 		--enabled-border: #CCC;
 	}
