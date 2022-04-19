@@ -84,9 +84,9 @@ function update_dependencies_list() {
 		);
 	}
 	$(".num_deps").html(pair);
-
 	$("#zip_button").show();
 	$("#zip_link").hide();
+	$("#zip_in_progress").hide();
 }
 
 /***************************************************************
@@ -150,13 +150,16 @@ $(document).on("click", "#modules p", (event) => {
 	// "this" should work but doesn't, "target" can be the internal span or img
 	var that = $(event.target).parents().addBack().filter("#modules p");
 	var checkbox = that.find(".checkbox");
-	that.toggleClass("selected");
+	if(!zipping) {
+		that.toggleClass("selected");
+		update_dependencies_list();
+		toggle_deselect();
+	}
 	checkbox.prop("checked", that.hasClass("selected"))
-	update_dependencies_list();
-	toggle_deselect();
 });
 
 $(document).on("click", "#deselect_all", (event) => {
+	if(zipping) return;
 	$(".selected").removeClass("selected");
 	$("#modules p .checkbox").prop("checked", false);
 	update_dependencies_list();
@@ -166,7 +169,6 @@ $(document).on("click", "#deselect_all", (event) => {
 /***************************************************************
 *** NOTE Zip generating stuff
 */
-
 function get_bundle_zip(repo, tag) {
 	let base_name = repo.toLowerCase().replaceAll("_","-").replace(/^.*\//,"");
 	let zip_name = `${base_name}-7.x-mpy-${tag}.zip`;
@@ -270,6 +272,7 @@ function zipit() {
 	if(zipping) return false;
 	if($("#dependencies p").length == 0) return false;
 	zipping = true;
+	$("#modules p, #drop_zone, #filter").css("opacity", 0.4);
 	$("#zip_button").hide();
 	$("#zip_in_progress").show();
 	$("#zipit .loading_image").show();
@@ -286,6 +289,7 @@ function zipit() {
 		$("#zip_link").show();
 		$("#zip_in_progress").hide();
 	}).finally(() => {
+		$("#modules p, #drop_zone, #filter").css("opacity", 1);
 		$("#zipit .loading_image").hide();
 		zipping = false;
 	});
@@ -416,10 +420,12 @@ $(document).on("click", "#select_files_input", (event) => {
 });
 $(document).on("click", ".load_some_files", (event) => {
 	event.stopPropagation();
+	if(zipping) return;
 	$("#select_files_input").click();
 });
 $(document).on("click", "#erase_drop", (event) => {
 	event.stopPropagation();
+	if(zipping) return;
 	dropped_modules_list = [];
 	dropped_files_list = [];
 	update_dependencies_list();
