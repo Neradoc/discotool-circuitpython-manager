@@ -24,6 +24,8 @@ SPDX-License-Identifier: MIT
 body {
 	background: white;
 	color: black;
+	font-family: Verdana;
+	font-size: 16px;
 }
 
 @media (prefers-color-scheme: dark) {
