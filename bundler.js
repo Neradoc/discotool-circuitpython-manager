@@ -35,6 +35,22 @@ https://circuitpython.org/libraries
 `;
 
 /***************************************************************
+*** NOTE Proxy URLs
+*/
+
+function get_bundle_json_url(repo) {
+	var user = repo.split("/")[0];
+	var repo_name = repo.split("/")[1];
+	return `proxy.php?action=json&user=${user}&repo=${repo_name}`;
+}
+
+function get_bundle_zip_url(repo) {
+	var user = repo.split("/")[0];
+	var repo_name = repo.split("/")[1];
+	return `proxy.php?action=zip&user=${user}&repo=${repo_name}`;
+}
+
+/***************************************************************
 *** NOTE Colorize list of modules
 */
 
@@ -173,25 +189,6 @@ $(document).on("click", "#deselect_all", (event) => {
 /***************************************************************
 *** NOTE Zip generating stuff
 */
-function get_bundle_zip(repo, tag) {
-	let base_name = repo.toLowerCase().replaceAll("_","-").replace(/^.*\//,"");
-	let zip_name = `${base_name}-7.x-mpy-${tag}.zip`;
-	let zip_url = `${base_github}/${repo}/releases/download/${tag}/${zip_name}`;
-	return zip_url;
-}
-
-function get_bundle_base(repo, tag) {
-	let base_name = repo.toLowerCase().replaceAll("_","-").replace(/^.*\//,"");
-	return `${base_name}-7.x-mpy-${tag}`;
-}
-
-async function get_bundle_contents(zip_url) {
-	var response = await fetch(zip_url);
-	var data = response.blob();
-	var bundle_contents = new JSZip();
-	await bundle_contents.loadAsync(data);
-	return bundle_contents;
-}
 
 async function async_zipit() {
 	var output_zip = new JSZip();
@@ -219,15 +216,19 @@ async function async_zipit() {
 		var item = modules_bom[index];
 		var module_name = $(item).html();
 		var module = all_the_modules[module_name];
-		var zip_url = get_bundle_zip(module.bundle, module.bundle_tag);
-		var bundle_base = get_bundle_base(module.bundle, module.bundle_tag);
-		var bundle_path = `${bundle_base}/lib`;
+		var zip_url = get_bundle_zip_url(module.bundle);
 
 		if(!bundle_zips.has(zip_url)) {
-			var zip_contents = await get_bundle_contents(zip_url);
+			var response = await fetch(zip_url);
+			var data = await response.blob();
+			var zip_contents = new JSZip();
+			await zip_contents.loadAsync(data);
 			bundle_zips.set(zip_url, zip_contents);
 		}
 		var zip_contents = bundle_zips.get(zip_url);
+		var bundle_path = "";
+
+		bundle_path = Object.keys(zip_contents.files)[0].split("/")[0]+"/lib";
 
 		if(module.package) {
 			var new_dir_name = `lib/${module_name}`;
@@ -459,30 +460,11 @@ function setup_the_modules_list() {
 
 	var bundle_promises = [];
 	bundles_config.forEach((repo, index) => {
-		let base_name = repo.split("/")[1].toLowerCase().replaceAll("_","-")
-		var url_latest = `${base_github}/${repo}/releases/latest`;
-		var xhr = new XMLHttpRequest();
-		var bundle_tag = "";
-
-		var prom = $.ajax({
-			url: url_latest,
-			type: 'get',
-			xhr: function() {
-				 return xhr;
-			}
-		}).then((data, textStatus, jqXHR) => {
-			bundle_tag = xhr.responseURL.split("/").pop();
-			let json_name = `${base_name}-${bundle_tag}.json`;
-			let json_url = `${base_github}/${repo}/releases/download/${bundle_tag}/${json_name}`;
-			return $.ajax({
-				url: json_url,
-				type: 'get',
-			});
-		}).then((data, textStatus, jqXHR) => {
-			modules = JSON.parse(data);
+		let json_url = get_bundle_json_url(repo);
+		var prom = fetch(json_url).then(async (response) => {
+			modules = await response.json();
 			for(key in modules) {
 				modules[key]["bundle"] = repo;
-				modules[key]["bundle_tag"] = bundle_tag;
 			}
 			return modules;
 		});
