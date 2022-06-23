@@ -8,6 +8,7 @@ const bundles_config = [
 	"adafruit/Adafruit_CircuitPython_Bundle",
 	"adafruit/CircuitPython_Community_Bundle",
 	"circuitpython/CircuitPython_Org_Bundle",
+	"Neradoc/Circuitpython_Keyboard_Layouts",
 ];
 // circuitpython version here for URLs (7.x)
 var cp_version_url = "7.x";
@@ -40,19 +41,19 @@ https://circuitpython.org/libraries
 *** NOTE Zip reading stuff
 */
 
-var bundles_tags = {};
+var bundles_tags = new Map();
 bundles_config.forEach((repo) => {
-	bundles_tags[repo] = false;
+	bundles_tags.set(repo, false);
 });
 
 async function get_bundle_tag(repo) {
-	if( bundles_tags[repo] != false ) {
-		return bundles_tags[repo];
+	if( bundles_tags.get(repo) != false ) {
+		return bundles_tags.get(repo);
 	}
 	const url_latest = `${base_github}/${repo}/releases/latest`;
 	var response = await fetch(url_latest);
 	var bundle_tag = response.url.split("/").pop();
-	bundles_tags[repo] = bundle_tag;
+	bundles_tags.set(repo,bundle_tag);
 	return bundle_tag;
 }
 
@@ -89,6 +90,101 @@ async function get_bundle_zip_url(repo) {
 	}
 }
 
+async function get_bundle_module_contents(module) {
+	var zip_url = await get_bundle_zip_url(module.bundle);
+
+	if(!bundle_zips.has(zip_url)) {
+		var response = await fetch(zip_url);
+		var data = await response.blob();
+		var zip_contents = new JSZip();
+		await zip_contents.loadAsync(data);
+		bundle_zips.set(zip_url, zip_contents);
+	}
+	var zip_contents = bundle_zips.get(zip_url);
+	return zip_contents;
+}
+
+async function list_module_files(module) {
+	var files_list = [];
+	var zip_contents = await get_bundle_module_contents(module);
+	var bundle_path = Object.keys(zip_contents.files)[0].split("/")[0]+"/lib";
+	if(module.package) {
+		var zip_folder = await zip_contents.folder(`${bundle_path}/${module.name}/`);
+		if(zip_folder == null) {
+			console.log("NULL ??? zip_folder is NULL !");
+		}
+		await zip_folder.forEach((relativePath, file) => {
+			files_list.push(file);
+		});
+		for(idx in files_list) {
+			var file = files_list[idx];
+			var zip_file = await zip_contents.file(file.name);
+			if (zip_file !== null) {
+				var zip_data = await zip_file.async("uint8array");
+			} else {
+				console.log("NULL ???", file.name);
+			}
+		}
+	} else {
+		var in_file_name = `${bundle_path}/${module_name}.mpy`;
+		var zip_file = await zip_contents.file(in_file_name);
+		if (zip_file !== null) {
+			var zip_data = await zip_file.async("uint8array");
+		} else {
+			console.log("NULL ???", in_file_name);
+		}
+	}
+	console.log(files_list);
+	return files_list;
+}
+
+/***************************************************************
+*** NOTE Manage dependencies
+*/
+
+// gets the dependencies of module, adds them to dependencies
+function get_dependencies(module, dependencies) {
+	if(!dependencies.includes(module)) {
+		dependencies.push(module);
+	}
+	var deps = all_the_modules[module].dependencies;
+	for(index in deps) {
+		depmodule = deps[index];
+		if(dependencies.includes(depmodule)) { continue; }
+		dependencies.push(depmodule);
+		get_dependencies(depmodule, dependencies);
+	}
+}
+
+// from a python file's full text, get the list of modules imported
+// Does not know anything about multiline strings
+function get_imports_from_python(full_content) {
+	var modules_list = [];
+	const pattern = /^\s*(import|from)\s+([^.\s]+).*/;
+	full_content.split(/\n|\r/).forEach((line) => {
+		/*
+		import module
+		import module as ...
+		import module.sub ...
+		from module import ...
+		from module.sub import ... as ...
+		*/
+		m = line.match(pattern);
+		if(m) {
+			module = m[2];
+			if(all_the_modules[module] != undefined && !modules_list.includes(module)) {
+				modules_list.push(module);
+			}
+		}
+	});
+	return modules_list;
+}
+
+// from the all_modules zip, list all the files that have to be copied to install
+function list_all_files(module) {
+	
+}
+
 /***************************************************************
 *** NOTE Colorize list of modules
 */
@@ -107,18 +203,6 @@ function color_the_lists() {
 *** NOTE Manage the dependencies list
 */
 
-function get_dependencies(module, all_deps) {
-	if(!all_deps.includes(module)) {
-		all_deps.push(module);
-	}
-	var deps = all_the_modules[module].dependencies;
-	for(index in deps) {
-		depmodule = deps[index];
-		if(all_deps.includes(depmodule)) { continue; }
-		all_deps.push(depmodule);
-		get_dependencies(depmodule, all_deps);
-	}
-}
 function update_dependencies_list() {
 	var modules_list = [];
 	$("#modules .selected .module").each((i,that) => {
@@ -202,7 +286,6 @@ function toggle_deselect() {
 		$("#deselect_all").removeClass("enabled");
 		$("#nselected").html("");
 	}
-	
 }
 
 $(document).on("click", "#modules p", (event) => {
@@ -255,16 +338,7 @@ async function async_zipit() {
 		var item = modules_bom[index];
 		var module_name = $(item).html();
 		var module = all_the_modules[module_name];
-		var zip_url = await get_bundle_zip_url(module.bundle);
-
-		if(!bundle_zips.has(zip_url)) {
-			var response = await fetch(zip_url);
-			var data = await response.blob();
-			var zip_contents = new JSZip();
-			await zip_contents.loadAsync(data);
-			bundle_zips.set(zip_url, zip_contents);
-		}
-		var zip_contents = bundle_zips.get(zip_url);
+		var zip_contents = await get_bundle_module_contents(module);
 		var bundle_path = "";
 
 		bundle_path = Object.keys(zip_contents.files)[0].split("/")[0]+"/lib";
@@ -355,27 +429,6 @@ $(document).on("click", "#zip_popup", (event) => {
 *** NOTE Manage the dropped files
 */
 
-function get_imports_from_python(full_content) {
-	var modules_list = [];
-	const pattern = /^\s*(import|from)\s+([^.\s]+).*/;
-	full_content.split(/\n|\r/).forEach((line) => {
-		/*
-		import module
-		import module as ...
-		import module.sub ...
-		from module import ...
-		from module.sub import ... as ...
-		*/
-		m = line.match(pattern);
-		if(m) {
-			module = m[2];
-			if(all_the_modules[module] != undefined && !modules_list.includes(module)) {
-				modules_list.push(module);
-			}
-		}
-	});
-	return modules_list;
-}
 function update_the_selected_files() {
 	var annoying_promises = [];
 	dropped_files_list.forEach((file) => {
@@ -504,6 +557,7 @@ function setup_the_modules_list() {
 			modules = await response.json();
 			for(key in modules) {
 				modules[key]["bundle"] = repo;
+				modules[key]["name"] = key;
 			}
 			return modules;
 		});
