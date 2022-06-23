@@ -4,6 +4,7 @@ $bundles_config = [
 	"adafruit/Adafruit_CircuitPython_Bundle",
 	"adafruit/CircuitPython_Community_Bundle",
 	"circuitpython/CircuitPython_Org_Bundle",
+	"Neradoc/Circuitpython_Keyboard_Layouts",
 ];
 $actions = ["json", "zip"];
 
