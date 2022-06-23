@@ -3,12 +3,14 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
-let base_github = "https://github.com/";
-var bundles_config = [
+const base_github = "https://github.com/";
+const bundles_config = [
 	"adafruit/Adafruit_CircuitPython_Bundle",
 	"adafruit/CircuitPython_Community_Bundle",
 	"circuitpython/CircuitPython_Org_Bundle",
 ];
+// circuitpython version here for URLs (7.x)
+var cp_version_url = "7.x";
 // full modules list from the github bundles
 var all_the_modules = {};
 // list of files added to the drop zone
@@ -21,11 +23,11 @@ var bundle_zips = new Map();
 var zipping = false;
 
 // limit to the list of files names before cut to "..."
-let MAX_FILE_NAMES = 80;
+const MAX_FILE_NAMES = 80;
 // the prefix is added to file paths inside the zip (add "/" for a folder)
-let ZIP_PREFIX = "CIRCUITPY/";
+const ZIP_PREFIX = "CIRCUITPY/";
 // README.txt file added to the zip
-let README = `Circuitpython Libraries Bundle
+const README = `Circuitpython Libraries Bundle
 
 Copy the files and directories in this bundle from the "lib" directory
 into the target board's "lib" directory inside the CIRCUITPY drive.
@@ -35,19 +37,56 @@ https://circuitpython.org/libraries
 `;
 
 /***************************************************************
-*** NOTE Proxy URLs
+*** NOTE Zip reading stuff
 */
 
-function get_bundle_json_url(repo) {
-	var user = repo.split("/")[0];
-	var repo_name = repo.split("/")[1];
-	return `proxy.php?action=json&user=${user}&repo=${repo_name}`;
+var bundles_tags = {};
+bundles_config.forEach((repo) => {
+	bundles_tags[repo] = false;
+});
+
+async function get_bundle_tag(repo) {
+	if( bundles_tags[repo] != false ) {
+		return bundles_tags[repo];
+	}
+	const url_latest = `${base_github}/${repo}/releases/latest`;
+	var response = await fetch(url_latest);
+	var bundle_tag = response.url.split("/").pop();
+	bundles_tags[repo] = bundle_tag;
+	return bundle_tag;
 }
 
-function get_bundle_zip_url(repo) {
+/***************************************************************
+*** NOTE Get urls for the files (local proxy to avoid CORS)
+*/
+
+const USE_PROXY = true;
+
+async function get_bundle_json_url(repo) {
 	var user = repo.split("/")[0];
 	var repo_name = repo.split("/")[1];
-	return `proxy.php?action=zip&user=${user}&repo=${repo_name}`;
+	if(USE_PROXY) {
+		return `proxy.php?action=json&user=${user}&repo=${repo_name}`;
+	} else {
+		var bundle_tag = await get_bundle_tag(repo);
+		var base_name = repo_name.toLowerCase().replaceAll("_","-");
+		var json_name = `${base_name}-${bundle_tag}.json`;
+		var json_url = `${base_github}/${repo}/releases/download/${bundle_tag}/${json_name}`;
+		return json_url;
+	}
+}
+
+async function get_bundle_zip_url(repo) {
+	var user = repo.split("/")[0];
+	var repo_name = repo.split("/")[1];
+	if(USE_PROXY) {
+		return `proxy.php?action=zip&user=${user}&repo=${repo_name}`;
+	} else {
+		var bundle_tag = await get_bundle_tag(repo);
+		var base_name = repo_name.toLowerCase().replaceAll("_","-");
+		var zip_name = `${base_name}-${cp_version_url}-mpy-${bundle_tag}.zip`;
+		return `${base_github}/${repo}/releases/download/${bundle_tag}/${zip_name}`;
+	}
 }
 
 /***************************************************************
@@ -216,7 +255,7 @@ async function async_zipit() {
 		var item = modules_bom[index];
 		var module_name = $(item).html();
 		var module = all_the_modules[module_name];
-		var zip_url = get_bundle_zip_url(module.bundle);
+		var zip_url = await get_bundle_zip_url(module.bundle);
 
 		if(!bundle_zips.has(zip_url)) {
 			var response = await fetch(zip_url);
@@ -318,7 +357,7 @@ $(document).on("click", "#zip_popup", (event) => {
 
 function get_imports_from_python(full_content) {
 	var modules_list = [];
-	let pattern = /^\s*(import|from)\s+([^.\s]+).*/;
+	const pattern = /^\s*(import|from)\s+([^.\s]+).*/;
 	full_content.split(/\n|\r/).forEach((line) => {
 		/*
 		import module
@@ -460,8 +499,8 @@ function setup_the_modules_list() {
 
 	var bundle_promises = [];
 	bundles_config.forEach((repo, index) => {
-		let json_url = get_bundle_json_url(repo);
-		var prom = fetch(json_url).then(async (response) => {
+		prom = get_bundle_json_url(repo).then(async (json_url) => {
+			response = await fetch(json_url);
 			modules = await response.json();
 			for(key in modules) {
 				modules[key]["bundle"] = repo;
