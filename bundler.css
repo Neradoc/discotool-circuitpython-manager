@@ -110,17 +110,25 @@ input[type="file"] {
 
 /* Filter */
 #filter {
+	position: relative;
 	padding: 0.8em 4px 2px;
 	display: grid;
-	grid-template-columns: auto 80px 130px;
+	grid-template-columns: auto 130px;
 }
 #clear_search {
+	display:none;
+	position: absolute;
 	color: var(--disabled-text);
 	border-color: var(--disabled-border);
+	right: calc(130px + 4px + 2px);
+	bottom: calc(2px + 2px);
+	font-size: 80%
 }
 #clear_search.enabled {
+	display:block;
 	color: var(--text-color);
-	border-color: var(--enabled-border);
+	border-color: var(--input-background);
+	background-color: rgba(255,255,255,0.1);
 }
 
 /* Modules list */
