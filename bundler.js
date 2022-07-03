@@ -3,32 +3,24 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
-const base_github = "https://github.com/";
-const bundles_config = [
-	"adafruit/Adafruit_CircuitPython_Bundle",
-	"adafruit/CircuitPython_Community_Bundle",
-	"circuitpython/CircuitPython_Org_Bundle",
-	"Neradoc/Circuitpython_Keyboard_Layouts",
-];
-// circuitpython version here for URLs (7.x)
-var cp_version_url = "7.x";
-// full modules list from the github bundles
-var all_the_modules = {};
-// list of files added to the drop zone
-var dropped_files_list = [];
-// list of modules found in the files
-var dropped_modules_list = [];
-// the circuitpython bundles from github
-var bundle_zips = new Map();
+circup = new Circup(true);
+
+/***************************************************************
+*** NOTE THE UI PART
+*/
+
 // the zip code is running, the button won't respond
 var zipping = false;
-
+// list of files added to the drop zone
+this.dropped_files_list = [];
+// list of modules found in the files
+var dropped_modules_list = [];
 // limit to the list of files names before cut to "..."
-const MAX_FILE_NAMES = 80;
+var MAX_FILE_NAMES = 80;
 // the prefix is added to file paths inside the zip (add "/" for a folder)
-const ZIP_PREFIX = "CIRCUITPY/";
+var ZIP_PREFIX = "CIRCUITPY/";
 // README.txt file added to the zip
-const README = `Circuitpython Libraries Bundle
+var README = `Circuitpython Libraries Bundle
 
 Copy the files and directories in this bundle from the "lib" directory
 into the target board's "lib" directory inside the CIRCUITPY drive.
@@ -37,153 +29,7 @@ More information on Circuitpython librairies:
 https://circuitpython.org/libraries
 `;
 
-/***************************************************************
-*** NOTE Zip reading stuff
-*/
 
-var bundles_tags = new Map();
-bundles_config.forEach((repo) => {
-	bundles_tags.set(repo, false);
-});
-
-async function get_bundle_tag(repo) {
-	if( bundles_tags.get(repo) != false ) {
-		return bundles_tags.get(repo);
-	}
-	const url_latest = `${base_github}/${repo}/releases/latest`;
-	var response = await fetch(url_latest);
-	var bundle_tag = response.url.split("/").pop();
-	bundles_tags.set(repo,bundle_tag);
-	return bundle_tag;
-}
-
-/***************************************************************
-*** NOTE Get urls for the files (local proxy to avoid CORS)
-*/
-
-const USE_PROXY = true;
-
-async function get_bundle_json_url(repo) {
-	var user = repo.split("/")[0];
-	var repo_name = repo.split("/")[1];
-	if(USE_PROXY) {
-		return `proxy.php?action=json&user=${user}&repo=${repo_name}`;
-	} else {
-		var bundle_tag = await get_bundle_tag(repo);
-		var base_name = repo_name.toLowerCase().replaceAll("_","-");
-		var json_name = `${base_name}-${bundle_tag}.json`;
-		var json_url = `${base_github}/${repo}/releases/download/${bundle_tag}/${json_name}`;
-		return json_url;
-	}
-}
-
-async function get_bundle_zip_url(repo) {
-	var user = repo.split("/")[0];
-	var repo_name = repo.split("/")[1];
-	if(USE_PROXY) {
-		return `proxy.php?action=zip&user=${user}&repo=${repo_name}`;
-	} else {
-		var bundle_tag = await get_bundle_tag(repo);
-		var base_name = repo_name.toLowerCase().replaceAll("_","-");
-		var zip_name = `${base_name}-${cp_version_url}-mpy-${bundle_tag}.zip`;
-		return `${base_github}/${repo}/releases/download/${bundle_tag}/${zip_name}`;
-	}
-}
-
-async function get_bundle_module_contents(module) {
-	var zip_url = await get_bundle_zip_url(module.bundle);
-
-	if(!bundle_zips.has(zip_url)) {
-		var response = await fetch(zip_url);
-		var data = await response.blob();
-		var zip_contents = new JSZip();
-		await zip_contents.loadAsync(data);
-		bundle_zips.set(zip_url, zip_contents);
-	}
-	var zip_contents = bundle_zips.get(zip_url);
-	return zip_contents;
-}
-
-async function list_module_files(module) {
-	var files_list = [];
-	var zip_contents = await get_bundle_module_contents(module);
-	var bundle_path = Object.keys(zip_contents.files)[0].split("/")[0]+"/lib";
-	if(module.package) {
-		var zip_folder = await zip_contents.folder(`${bundle_path}/${module.name}/`);
-		if(zip_folder == null) {
-			console.log("NULL ??? zip_folder is NULL !");
-		}
-		await zip_folder.forEach((relativePath, file) => {
-			files_list.push(file);
-		});
-		for(idx in files_list) {
-			var file = files_list[idx];
-			var zip_file = await zip_contents.file(file.name);
-			if (zip_file !== null) {
-				var zip_data = await zip_file.async("uint8array");
-			} else {
-				console.log("NULL ???", file.name);
-			}
-		}
-	} else {
-		var in_file_name = `${bundle_path}/${module_name}.mpy`;
-		var zip_file = await zip_contents.file(in_file_name);
-		if (zip_file !== null) {
-			var zip_data = await zip_file.async("uint8array");
-		} else {
-			console.log("NULL ???", in_file_name);
-		}
-	}
-	console.log(files_list);
-	return files_list;
-}
-
-/***************************************************************
-*** NOTE Manage dependencies
-*/
-
-// gets the dependencies of module, adds them to dependencies
-function get_dependencies(module, dependencies) {
-	if(!dependencies.includes(module)) {
-		dependencies.push(module);
-	}
-	var deps = all_the_modules[module].dependencies;
-	for(index in deps) {
-		depmodule = deps[index];
-		if(dependencies.includes(depmodule)) { continue; }
-		dependencies.push(depmodule);
-		get_dependencies(depmodule, dependencies);
-	}
-}
-
-// from a python file's full text, get the list of modules imported
-// Does not know anything about multiline strings
-function get_imports_from_python(full_content) {
-	var modules_list = [];
-	const pattern = /^\s*(import|from)\s+([^.\s]+).*/;
-	full_content.split(/\n|\r/).forEach((line) => {
-		/*
-		import module
-		import module as ...
-		import module.sub ...
-		from module import ...
-		from module.sub import ... as ...
-		*/
-		m = line.match(pattern);
-		if(m) {
-			module = m[2];
-			if(all_the_modules[module] != undefined && !modules_list.includes(module)) {
-				modules_list.push(module);
-			}
-		}
-	});
-	return modules_list;
-}
-
-// from the all_modules zip, list all the files that have to be copied to install
-function list_all_files(module) {
-	
-}
 
 /***************************************************************
 *** NOTE Colorize list of modules
@@ -207,24 +53,25 @@ function update_dependencies_list() {
 	var modules_list = [];
 	$("#modules .selected .module").each((i,that) => {
 		var module = $(that).html();
-		get_dependencies(module, modules_list);
+		circup.get_dependencies(module, modules_list);
 	});
 	dropped_modules_list.forEach((module) => {
-		get_dependencies(module, modules_list);
+		circup.get_dependencies(module, modules_list);
 	});
 	modules_list.sort();
 	$("#dependencies").html("");
 	var pair = 0;
-	for(index in modules_list) {
+	for(var index in modules_list) {
 		pair = pair + 1;
 		var module_name = modules_list[index];
-		var module = all_the_modules[module_name];
+		var module = circup.get_module(module_name);
+		if(module === false) { continue; } // skip external modules
 		var ext = "";
 		if(!module.package) {
 			ext = ".mpy";
 		}
 		$("#dependencies").append(
-			`<p class="pair${pair%2}"><span class="module">${module_name}</span>${ext}</p>`
+			`<p class="pair${pair%2}"><span class="module">${module.name}</span>${ext}</p>`
 		);
 	}
 	$(".num_deps").html(pair);
@@ -332,13 +179,13 @@ async function async_zipit() {
 		);
 	}
 
-	for(index = 0; index < modules_bom.length; ++index) {
+	for(var index = 0; index < modules_bom.length; ++index) {
 		count_one_file();
 
 		var item = modules_bom[index];
 		var module_name = $(item).html();
-		var module = all_the_modules[module_name];
-		var zip_contents = await get_bundle_module_contents(module);
+		var module = circup.all_the_modules[module_name];
+		var zip_contents = await circup.get_bundle_module_contents(module);
 		var bundle_path = "";
 
 		bundle_path = Object.keys(zip_contents.files)[0].split("/")[0]+"/lib";
@@ -355,7 +202,7 @@ async function async_zipit() {
 			await zip_folder.forEach((relativePath, file) => {
 				subliste.push(file);
 			});
-			for(idx in subliste) {
+			for(var idx in subliste) {
 				var file = subliste[idx];
 				var out_file_name = file.name.replace(`${bundle_path}`, "lib");
 				var zip_file = await zip_contents.file(file.name);
@@ -378,7 +225,7 @@ async function async_zipit() {
 			}
 		}
 	}
-	for(idx in dropped_files_list) {
+	for(var idx in dropped_files_list) {
 		count_one_file();
 		var file = dropped_files_list[idx];
 		await output_zip.file(ZIP_PREFIX + file.name, file);
@@ -438,7 +285,7 @@ function update_the_selected_files() {
 	});
 	Promise.all(annoying_promises).then((values) => {
 		values.forEach((full_content) => {
-			var imports = get_imports_from_python(full_content);
+			var imports = circup.get_imports_from_python(full_content);
 			imports.forEach((item) => {
 				if(!dropped_modules_list.includes(item)) {
 					dropped_modules_list.push(item);
@@ -447,7 +294,7 @@ function update_the_selected_files() {
 		});
 
 		var name_list = "";
-		for(idx in dropped_files_list) {
+		for(var idx in dropped_files_list) {
 			var file = dropped_files_list[idx];
 			var temp_list = name_list + " " + file.name;
 			if(temp_list.length > MAX_FILE_NAMES) {
@@ -477,7 +324,7 @@ function update_the_selected_files() {
 
 $(document).on("change", "#select_files_input", (event) => {
 	var that = event.target;
-	for(idx=0; idx < that.files.length; ++idx) {
+	for(var idx=0; idx < that.files.length; ++idx) {
 		var file = that.files[idx];
 		dropped_files_list.push(file);
 	}
@@ -547,39 +394,22 @@ $(document).on("click", "#erase_drop", (event) => {
 *** NOTE Init the content of the modules list
 */
 
-function setup_the_modules_list() {
+$(() => {
 	$("#modules .loading_image").show();
-
-	var bundle_promises = [];
-	bundles_config.forEach((repo, index) => {
-		prom = get_bundle_json_url(repo).then(async (json_url) => {
-			response = await fetch(json_url);
-			modules = await response.json();
-			for(key in modules) {
-				modules[key]["bundle"] = repo;
-				modules[key]["name"] = key;
-			}
-			return modules;
-		});
-		bundle_promises.push(prom);
-	});
-
-	Promise.all(bundle_promises).then((values) => {
-		values.forEach((item) => {
-			all_the_modules = Object.assign({}, all_the_modules, item);
-		});
-		var keys = Object.keys(all_the_modules);
+	circup.setup_the_modules_list().then(() => {
+		var keys = Object.keys(circup.all_the_modules);
 		$("#modules .loading_image").hide();
 		keys.sort();
 		keys.forEach((module_name, pair) => {
+			var nd1 = circup.all_the_modules[module_name].dependencies.length;
+			var nd2 = circup.all_the_modules[module_name].external_dependencies.length;
 			$("#modules").append(
 				`<p class="pair${pair%2}">
 					<input class="checkbox" type="checkbox"/>
-					<span class="module">${module_name}</span>
+					<span class="module">${module_name}</span> (${nd1+nd2})
 				</p>`
 			);
 		});
 		filter_the_modules();
 	});
-}
-setup_the_modules_list();
+});

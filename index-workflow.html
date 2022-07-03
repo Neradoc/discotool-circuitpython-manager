@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="shortcut icon" type="image/jpg" href="favicon.png"/>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<script src="jquery.min.js" defer="true"></script>
+	<script src="jszip.min.js"></script>
+	<script src="circuitpython.js" defer="true"></script>
+	<script src="circup.js" defer="true"></script>
+	<script src="workflow.js" defer="true"></script>
+	<style>
+	content {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+	}
+	#filelist, #circup {
+		padding: 4px;
+	}
+	#filelist {
+		/* display: none; */
+	}
+	#circup .line {
+		margin: 0px;
+	}
+	#circup .line.exists {
+		opacity: 0.5;
+	}
+	</style>
+</head>
+<body>
+	<h1></h1>
+	<template id="row">
+		<tr>
+			<td></td>
+			<td></td>
+			<td><a></a></td>
+			<td></td>
+			<td>
+				<button class="delete">🗑️</button>
+				<button class="analyse">🔎</button>
+			</td>
+		</tr>
+	</template>
+	<content>
+	<div id="filelist">
+		<table>
+			<thead>
+				<tr>
+					<th>Type</th>
+					<th>Size</th>
+					<th>Path</th>
+					<th>Modified</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+		<hr>
+		<input type="file" id="files" multiple />
+		<button type="submit" id="upload">Upload</button>
+		<hr>
+		+📁&nbsp;<input type="text" id="name" />
+		<button type="submit" id="mkdir">Create Directory</button>
+	</div>
+	<div id="circup">
+		<p class="title">The circup part <span class="loading"></span></p>
+		<div id="dependencies"></div>
+	</div>
+	</content>
+</body>
+</html>
