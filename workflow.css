@@ -1,0 +1,47 @@
+/*
+SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
+SPDX-License-Identifier: MIT
+*/
+
+body {
+	background: #222;
+	color: white;
+}
+a {
+	color: #BBF;
+}
+td {
+	padding: 2px 4px;
+}
+td a {
+	display: block;
+}
+td a:hover {
+	background: white;
+	color: black;
+}
+tr:nth-child(even) {
+	background: rgba(255,255,255,0.1);
+}
+tr.even {
+	background: rgba(255,255,255,0.1);
+}
+tr.odd {
+	background: transparent;
+}
+content {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+}
+#filelist, #circup {
+	padding: 4px;
+}
+#circup .line {
+	margin: 0px;
+}
+#circup .line.exists {
+	opacity: 0.5;
+}
+#circup .buttons {
+	display: none;
+}

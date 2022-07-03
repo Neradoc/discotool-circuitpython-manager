@@ -185,7 +185,7 @@ async function auto_install(file_name) {
 		var icon = module.package ? "&#128193;" : "&#128196;";
 		var template = $("#circup_row").html();
 		var new_line = $(template);
-		$(new_line).find("button.upload").on("click",(e) => {
+		new_line.find("button.upload").on("click",(e) => {
 			install_modules([item]);
 		});
 		new_line.find("button.upload").val(item);
@@ -213,6 +213,12 @@ async function auto_install(file_name) {
 				// no need to update
 				new_line.addClass("exists");
 				new_line.find(".status").html("Up to date");
+				new_line.hide(2000, () => {
+					$('#circup .line').removeClass("odd");
+					$('#circup .line').removeClass("even");
+					$('#circup .line:visible:odd').addClass("odd");
+					$('#circup .line:visible:even').addClass("even");
+				});
 				dont_need_update(module.name);
 				return;
 			}
@@ -225,7 +231,7 @@ async function auto_install(file_name) {
 			new_line.find(".status").html("&#10071;&#65039; Update available");
 		});
 	});
-	$("#install_all").show();
+	$("#circup .buttons").show();
 }
 
 async function is_editable() {

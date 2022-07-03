@@ -9,47 +9,7 @@
 	<script src="circuitpython.js" defer="true"></script>
 	<script src="circup.js" defer="true"></script>
 	<script src="workflow.js" defer="true"></script>
-	<style>
-	body {
-		background: #222;
-		color: white;
-	}
-	a {
-		color: #BBF;
-	}
-	td {
-		padding: 2px 4px;
-	}
-	td a {
-		display: block;
-	}
-	td a:hover {
-		background: white;
-		color: black;
-	}
-	tr:nth-child(even) > * {
-		background: rgba(255,255,255,0.1);
-	}
-	content {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-	}
-	#filelist, #circup {
-		padding: 4px;
-	}
-	#filelist {
-		/* display: none; */
-	}
-	#circup .line {
-		margin: 0px;
-	}
-	#circup .line.exists {
-		opacity: 0.5;
-	}
-	#circup #install_all {
-		display: none;
-	}
-	</style>
+	<link rel="stylesheet" href="workflow.css">
 </head>
 <body>
 	<h1></h1>
@@ -91,7 +51,8 @@
 		<button type="submit" id="mkdir">Create Directory</button>
 	</div>
 	<div id="circup">
-		<p><button id="install_all" onclick="install_all()" class="upload" name="install_all" value="">Update/Install All</button> <span class="title"></span></p>
+		<p><span class="title"></span></p>
+		<p class="buttons"><button onclick="install_all()" class="upload" name="install_all" value="">Update/Install All</button> <button onclick="$('#circup .exists').toggle()">Show/Hide Up-to-date.</button></p>
 		<div id="dependencies">
 			<table>
 			<template id="circup_row">
