@@ -34,6 +34,10 @@ async function refresh_list() {
         new_children.push(clone);
     }
 
+	data.sort((a,b) => {
+		return a.name.localeCompare(b.name);
+	})
+	
     for (const f of data) {
         // Clone the new row and insert it into the table
         var clone = template.content.cloneNode(true);
@@ -77,10 +81,8 @@ async function refresh_list() {
 async function find_devices() {
     const response = await fetch("http://circuitpython.local/cp/devices.json");
     let url = new URL("/", response.url);
-    console.log("Find devices", response, url);
     url_base = url.href;
     const data = await response.json();
-    console.log("Devices", data);
     refresh_list();
 }
 // async function find_devices() {
