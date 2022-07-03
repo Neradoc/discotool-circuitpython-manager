@@ -34,10 +34,13 @@ async function refresh_list() {
         new_children.push(clone);
     }
 
-	data.sort((a,b) => {
-		return a.name.localeCompare(b.name);
-	})
-	
+    var pwd = document.querySelector('#pwd');
+    pwd.innerHTML = `<a href="#/">CIRCUITPY</a>${current_path}`;
+
+    data.sort((a,b) => {
+        return a.name.localeCompare(b.name);
+    })
+
     for (const f of data) {
         // Clone the new row and insert it into the table
         var clone = template.content.cloneNode(true);

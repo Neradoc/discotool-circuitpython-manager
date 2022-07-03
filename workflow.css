@@ -45,3 +45,7 @@ content {
 #circup .buttons {
 	display: none;
 }
+#pwd {
+	font-size: 120%;
+	padding: 8px;
+}
