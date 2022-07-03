@@ -3,6 +3,7 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
+var DEBUG = false;
 circup = new Circup(true);
 
 /***************************************************************
@@ -403,10 +404,12 @@ $(() => {
 		keys.forEach((module_name, pair) => {
 			var nd1 = circup.all_the_modules[module_name].dependencies.length;
 			var nd2 = circup.all_the_modules[module_name].external_dependencies.length;
+			var num_deps = "";
+			if(DEBUG) { num_deps = `(${nd1+nd2})`; }
 			$("#modules").append(
 				`<p class="pair${pair%2}">
 					<input class="checkbox" type="checkbox"/>
-					<span class="module">${module_name}</span> (${nd1+nd2})
+					<span class="module">${module_name}</span> ${num_deps}
 				</p>`
 			);
 		});
