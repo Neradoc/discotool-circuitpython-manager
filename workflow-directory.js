@@ -81,6 +81,8 @@ async function refresh_list() {
     }
     var tbody = document.querySelector("tbody");
     tbody.replaceChildren(...new_children);
+    var loading = document.querySelector('#file_list_loading_image');
+    loading.style.display = "none";
 }
 
 async function find_devices() {

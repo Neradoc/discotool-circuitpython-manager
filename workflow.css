@@ -54,3 +54,7 @@ tr.odd {
 #circup .line.new_module { }
 #circup .line.invalid_module { }
 #circup .line.bad_mpy_module { }
+
+.small_load_image {
+	height: 14px;
+}
