@@ -4,6 +4,9 @@ let files = document.getElementById("files");
 var url_base = window.location;
 var current_path;
 
+const HIDDEN = [".fseventsd", ".metadata_never_index",".Trashes"];
+const SECRETS = [".env", "secrets.py"];
+
 async function refresh_list() {
     current_path = window.location.hash.substr(1);
     if (current_path == "") {
@@ -61,19 +64,26 @@ async function refresh_list() {
         } else {
             file_path = api_url;
         }
-
         var icon = "&#10067;";
-        if (f.directory) {
-            icon = "&#128193;";
+        if (current_path == "/" && SECRETS.includes(f.name)) {
+            icon = "🔐";
+        } else if (HIDDEN.includes(f.name)) {
+            continue;
+        } else if (f.name.startsWith(".")) {
+            icon = "🚫";
+        } else if (current_path == "/" && f.name == "lib") {
+            icon = "📚";
+        } else if (f.directory) {
+            icon = "📁";
         } else if(f.name.endsWith(".txt") ||
                   f.name.endsWith(".py") ||
                   f.name.endsWith(".js") ||
                   f.name.endsWith(".json")) {
-            icon = "&#128196;";
+            icon = "📄";
         } else if (f.name.endsWith(".html")) {
-            icon = "&#127760;";
+            icon = "🌐";
         } else if (f.name.endsWith(".mpy")) {
-            icon = "<img src='blinka.png'/>";
+            icon = "🐍"; // <img src='blinka.png'/>
         }
         td[0].innerHTML = icon;
         td[1].innerHTML = f.file_size;
