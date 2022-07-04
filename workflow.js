@@ -192,6 +192,13 @@ function dont_need_update(module_name) {
 	}
 }
 
+function update_odd_even() {
+	$('#circup .line').removeClass("odd");
+	$('#circup .line').removeClass("even");
+	$('#circup .line:visible:odd').addClass("odd");
+	$('#circup .line:visible:even').addClass("even");
+}
+
 async function pre_update_process() {
 	$("#circup .hide").hide();
 	$("#circup .loading").show();
@@ -246,30 +253,30 @@ async function run_update_process(imports) {
 				new_line.find(".board_version").html(version);
 			}
 			if(version === BAD_MPY) {
-				// no file
-				new_line.find(".status").html("&#10071;&#65039; Bad MPY format");
+				// bad mpy file
+				new_line.addClass("bad_mpy_module");
+				new_line.find(".status").html("&#9888;&#65039; Bad MPY format");
 			} else if(version === null) {
 				// no file
-				new_line.find(".status").html("&#10071;&#65039; New dependency");
+				new_line.addClass("new_module");
+				new_line.find(".status").html("&#10069; New dependency");
 			} else if(version === false) {
 				// invalid file, replace
-				new_line.find(".status").html("&#10071;&#65039; Module invalid");
+				new_line.addClass("invalid_module");
+				new_line.find(".status").html("&#9888;&#65039; Module invalid");
 			} else if(module.version == version) {
 				// no need to update
-				new_line.addClass("exists");
-				new_line.find(".status").html("Up to date");
-				new_line.hide(2000, () => {
-					$('#circup .line').removeClass("odd");
-					$('#circup .line').removeClass("even");
-					$('#circup .line:visible:odd').addClass("odd");
-					$('#circup .line:visible:even').addClass("even");
-				});
+				new_line.addClass("module_exists");
+				new_line.find(".status").html("&#10004;&#65038; Up to date");
+				new_line.hide(2000, update_odd_even);
 				dont_need_update(module.name);
 			} else if(semver(module.version)[0] != semver(version)[0]) {
 				// this is a major update
-				new_line.find(".status").html("&#10071;&#65039; Major update");
+				new_line.addClass("major_update_module");
+				new_line.find(".status").html("&#8252;&#65039; Major update");
 			} else {
 				// this is a normal update
+				new_line.addClass("update_module");
 				new_line.find(".status").html("&#10071;&#65039; Update available");
 			}
 		}
@@ -337,6 +344,10 @@ $("#auto_install").on("click", (e) => {
 });
 $("#update_all").on("click", (e) => {
 	run_exclusively(() => update_all());
+});
+$("#toggle_updates").on("click", (e) => {
+	$('#circup .module_exists').toggle();
+	update_odd_even();
 });
 
 init_page();

@@ -47,6 +47,10 @@ tr.odd {
 #circup .line {
 	margin: 0px;
 }
-#circup .line.exists {
-	opacity: 0.5;
-}
+
+#circup .line.module_exists { opacity: 0.5; }
+#circup .line.update_module { }
+#circup .line.major_update_module { }
+#circup .line.new_module { }
+#circup .line.invalid_module { }
+#circup .line.bad_mpy_module { }
