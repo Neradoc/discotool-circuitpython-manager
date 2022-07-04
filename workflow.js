@@ -228,7 +228,8 @@ async function run_update_process(imports) {
 		var template = $("#circup_row").html();
 		var new_line = $(template);
 		new_line.find("button.upload").on("click",(e) => {
-			install_modules([item]);
+			var target_module = $(e.target).val();
+			install_modules([target_module]);
 		});
 		new_line.find("button.upload").val(item);
 		new_line.find(".icon").html(icon);
