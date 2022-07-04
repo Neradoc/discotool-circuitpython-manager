@@ -21,7 +21,7 @@ async function refresh_list() {
     var new_children = [];
     var template = document.querySelector('#row');
 
-    if (window.location.path != "/fs/") {
+    if (current_path != "/") {
         var clone = template.content.cloneNode(true);
         var td = clone.querySelectorAll("td");
         td[0].innerHTML = "&#128190;";
@@ -35,7 +35,15 @@ async function refresh_list() {
     }
 
     var pwd = document.querySelector('#pwd');
-    pwd.innerHTML = `<a href="#/">CIRCUITPY</a>${current_path}`;
+    var pwd_link = `<a href="#/">CIRCUITPY</a>/`
+    var fullpath = "/";
+    for(var path of current_path.split("/")) {
+        if(path != "") {
+            fullpath += path + "/";
+            pwd_link += `<a href="#${fullpath}">${path}</a>/`;
+        }
+    }
+    pwd.innerHTML = pwd_link;
 
     data.sort((a,b) => {
         return a.name.localeCompare(b.name);
