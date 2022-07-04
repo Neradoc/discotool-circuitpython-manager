@@ -144,7 +144,23 @@ async function install_modules(dependencies) {
 }
 
 async function install_all() {
-	install_modules(modules_to_update);
+	var modules = Array.from(modules_to_update);
+	$("#circup tr.line").each((index, line) => {
+		var button = $(line).find("button.upload");
+		var module_name = button.val();
+		if(modules.includes(module_name)) {
+			$(line).find(".status_icon").html(LOADING_IMAGE);
+			button.attr("disabled", true);
+		}
+	});
+	await install_modules(modules_to_update);
+	var the_libs = await get_lib_directory();
+	$("#circup tr.line").each((index, line) => {
+		var module_name = $(line).find("button.upload").val();
+		if(modules.includes(module_name)) {
+			update_line($(line), the_libs);
+		}
+	});
 }
 
 async function get_module_version(module_name, libs_list) {
@@ -334,7 +350,8 @@ async function update_all() {
 	await pre_update_process();
 	$("#circup .title .filename").html("/lib/");
 	// get the list of libraries from the board
-	var libs_list = await get_lib_directory()
+	var libs_list = await get_lib_directory();
+	libs_list = libs_list
 		.filter((item) => !item.startsWith("."))
 		.map((item) => item.replace(/\.m?py$/,""));
 	// do the thing
