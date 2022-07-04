@@ -173,15 +173,17 @@ async function get_module_version(module_name, libs_list) {
 		var file_response = await get_file("/" + file_name);
 		if(!file_response.ok) { continue }
 		var file_data = await file_response.text();
-		// TODO: report the mpy format and compare to the CP version running
-		if(file_data[1] == "\x05" && cpver[0] < 7
-			|| file_data[1] != "\x05" && cpver[0] > 6) {
-			return BAD_MPY;
-		}
-		var matches = file_data.match(/(\d+\.\d+\.\d+).+?__version__/);
-		if(matches && matches.length > 1) {
-			version = matches[1];
-			break;
+		if(file_data.length > 0) {
+			if(file_data[1] == "\x05" && cpver[0] < 7
+				|| file_data[1] != "\x05" && cpver[0] > 6) {
+				verion = BAD_MPY;
+				break;
+			}
+			var matches = file_data.match(/(\d+\.\d+\.\d+).+?__version__/);
+			if(matches && matches.length > 1) {
+				version = matches[1];
+				break;
+			}
 		}
 	}
 	return version;
@@ -255,6 +257,7 @@ async function update_line(new_line, libs_list) {
 		new_line.find(".status_icon").html("&#10071;&#65039;");
 		new_line.find(".status").html("Update available");
 	}
+	new_line.find("button.upload").attr("disabled", false);
 }
 
 async function run_update_process(imports) {
