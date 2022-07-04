@@ -221,8 +221,7 @@ function dont_need_update(module_name) {
 }
 
 function update_odd_even() {
-	$('#circup .line').removeClass("odd");
-	$('#circup .line').removeClass("even");
+	$('#circup .line').removeClass("odd even");
 	$('#circup .line:visible:odd').addClass("odd");
 	$('#circup .line:visible:even').addClass("even");
 }

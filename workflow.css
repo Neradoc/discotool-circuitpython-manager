@@ -47,18 +47,21 @@ td a:hover {
 	background: var(--hover-background);
 	color: var(--hover-color);
 }
+tr:nth-child(even) { background: var(--color-pair0); }
+tr:nth-child(odd) { background: var(--color-pair1); }
+tr.even { background: var(--color-pair0); }
+tr.odd { background: var(--color-pair1); }
+
 #filelist table {
 	/* border: 2px solid grey; */
 	border-radius: 32px 32px 0px 0px;
 	overflow: hidden;
 }
-tr:nth-child(even),
-tr.even {
-	background: var(--color-pair0);
+#filelist table {
+	width: 100%;
 }
-tr:nth-child(odd),
-tr.odd {
-	background: var(--color-pair1);
+#filelist td:first-child {
+	text-align: center;
 }
 #filelist, #circup {
 	padding: 4px;
