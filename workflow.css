@@ -3,9 +3,31 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
+/* Variables and dark mode */
+:root {
+	--color-pair0: #EEF;
+	--color-pair1: #EFE;
+	--text-color: black;
+	--hover-background: #B84;
+	--hover-color: black;
+}
 body {
-	background: #222;
-	color: white;
+	background: white;
+	color: black;
+	font-family: Verdana;
+	font-size: 16px;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-pair0: #181818;
+		--color-pair1: #202020;
+		--text-color: white;
+	}
+	body {
+		background: #15141a;
+		color: white;
+	}
 }
 content {
 	display: grid;
@@ -19,19 +41,24 @@ td {
 }
 td a {
 	display: block;
+	padding: 2px 4px;
 }
 td a:hover {
-	background: white;
-	color: black;
+	background: var(--hover-background);
+	color: var(--hover-color);
 }
-tr:nth-child(even) {
-	background: rgba(255,255,255,0.1);
+#filelist table {
+	/* border: 2px solid grey; */
+	border-radius: 32px 32px 0px 0px;
+	overflow: hidden;
 }
+tr:nth-child(even),
 tr.even {
-	background: rgba(255,255,255,0.1);
+	background: var(--color-pair0);
 }
+tr:nth-child(odd),
 tr.odd {
-	background: transparent;
+	background: var(--color-pair1);
 }
 #filelist, #circup {
 	padding: 4px;
