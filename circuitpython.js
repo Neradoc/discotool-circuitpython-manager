@@ -54,7 +54,7 @@ async function refresh_list() {
             file_path = api_url;
         }
 
-        var icon = "&#11015;&#65039;";
+        var icon = "&#10067;";
         if (f.directory) {
             icon = "&#128193;";
         } else if(f.name.endsWith(".txt") ||
@@ -64,6 +64,8 @@ async function refresh_list() {
             icon = "&#128196;";
         } else if (f.name.endsWith(".html")) {
             icon = "&#127760;";
+        } else if (f.name.endsWith(".mpy")) {
+            icon = "<img src='blinka.png'/>";
         }
         td[0].innerHTML = icon;
         td[1].innerHTML = f.file_size;
@@ -88,21 +90,6 @@ async function find_devices() {
     const data = await response.json();
     refresh_list();
 }
-// async function find_devices() {
-//     const version_response = await fetch("/cp/version.json");
-//     if (version_response.ok) {
-//         url_base = new URL("/", window.location).href;
-//     } else {
-//         // TODO: Remove this when we've settled things. It is only used when this file isn't hosted
-//         // by a CP device.
-//         const response = await fetch("http://circuitpython.local/cp/devices.json");
-//         let url = new URL("/", response.url);
-//         url_base = url.href;
-//         const data = await response.json();
-//     }
-//     refresh_list();
-// }
-
 
 async function mkdir(e) {
     const response = await fetch(
