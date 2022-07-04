@@ -149,16 +149,7 @@ async function install_all() {
 		var button = $(line).find("button.upload");
 		var module_name = button.val();
 		if(modules.includes(module_name)) {
-			$(line).find(".status_icon").html(LOADING_IMAGE);
-			button.attr("disabled", true);
-		}
-	});
-	await install_modules(modules_to_update);
-	var the_libs = await get_lib_directory();
-	$("#circup tr.line").each((index, line) => {
-		var module_name = $(line).find("button.upload").val();
-		if(modules.includes(module_name)) {
-			update_line($(line), the_libs);
+			$(line).find("button.upload").click();
 		}
 	});
 }
@@ -189,16 +180,30 @@ async function get_module_version(module_name, libs_list) {
 		var file_response = await get_file("/" + file_name);
 		if(!file_response.ok) { continue }
 		var file_data = await file_response.text();
+		// empty MPY files are bad
+		if(file_data.length == 0 && file_name.endsWith(".mpy")) {
+			version = null;
+			break;
+		}
 		if(file_data.length > 0) {
-			if(file_data[1] == "\x05" && cpver[0] < 7
-				|| file_data[1] != "\x05" && cpver[0] > 6) {
-				verion = BAD_MPY;
-				break;
+			if(file_name.endsWith(".mpy")) {
+				// bad version of mpy files
+				if(file_data[0] != "C" || file_data[1] != "\x05") {
+					version = BAD_MPY;
+					break;
+				}
+				// find version in mpy file
+				var matches = file_data.match(/(\d+\.\d+\.\d+).+?__version__/);
+				if(matches && matches.length > 1) {
+					version = matches[1];
+				}
 			}
-			var matches = file_data.match(/(\d+\.\d+\.\d+).+?__version__/);
-			if(matches && matches.length > 1) {
-				version = matches[1];
-				break;
+			// find version in py file
+			if(file_name.endsWith(".py")) {
+				var matches = file_data.match(/__version__.+?(\d+\.\d+\.\d+)/);
+				if(matches && matches.length > 1) {
+					version = matches[1];
+				}
 			}
 		}
 	}
