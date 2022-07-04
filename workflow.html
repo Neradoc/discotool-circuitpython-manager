@@ -12,7 +12,7 @@
 	<link rel="stylesheet" href="workflow.css">
 </head>
 <body>
-	<h1 id="top_title"><span class="board_name"></span></h1>
+	<h1 id="top_title"><span class="board_name">Loading...</span></h1>
 	<content>
 	<div id="filelist">
 		<table>
@@ -31,26 +31,32 @@
 			<tbody></tbody>
 		<template id="row">
 			<tr>
-				<td></td>
-				<td></td>
-				<td><a></a></td>
-				<td></td>
-				<td>
+				<td class="type"></td>
+				<td class="size"></td>
+				<td class="path"><a></a></td>
+				<td class="modified"></td>
+				<td class="buttons">
 					<button class="delete">🗑️</button>
 					<button class="analyse">🔎</button>
 				</td>
 			</tr>
 		</template>
 		</table>
-		<img id="file_list_loading_image" src="loading_black_small.gif" />
-		<hr>
-		<input type="file" id="files" multiple />
-		<button type="submit" id="upload">Upload</button>
-		| <button type="submit" id="auto_install">Auto Install</button>
-		| <button type="submit" id="update_all">Update All</button>
-		<hr>
-		+📁&nbsp;<input type="text" id="name" />
-		<button type="submit" id="mkdir">Create Directory</button>
+		<img id="file_list_loading_image" src="loading_black.gif" />
+		<commands>
+		<group>
+			<input type="file" id="files" multiple />
+			<button type="submit" id="upload">Upload</button>
+		</group>
+		<group>
+			+📁&nbsp;<input type="text" placeholder="New Directory" id="name" />
+			<button type="submit" id="mkdir">Create Directory</button>
+		</group>
+		<group>
+			<button type="submit" id="auto_install">Auto Install</button>
+			| <button type="submit" id="update_all">Update All</button>
+		</group>
+		</command>
 	</div>
 	<div id="circup">
 		<p class="loading hide">Loading libraries...</p>
@@ -65,7 +71,7 @@
 			<template id="circup_row">
 				<tr class="line">
 					<td class="upload"><button class="upload" name="install" value="">Install</button></td>
-					<td class="icon"></td>
+					<!-- <td class="icon"></td> -->
 					<td class="name"></td>
 					<td class="board_version"></td>
 					<td class="bundle_version"></td>

@@ -8,7 +8,7 @@ SPDX-License-Identifier: MIT
 	--color-pair0: #EEF;
 	--color-pair1: #EFE;
 	--text-color: black;
-	--hover-background: #B84;
+	--hover-background: #48B;
 	--hover-color: black;
 }
 body {
@@ -29,10 +29,20 @@ body {
 		color: white;
 	}
 }
+
+h1 { text-align: center; }
+
 content {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
+	/* display: grid; */
+	/* grid-template-columns: 1fr 1fr; */
+	display: block;
+	max-width: 800px;
+	margin: auto;
 }
+#filelist, #circup {
+	padding: 4px;
+}
+
 a {
 	color: #BBF;
 }
@@ -54,17 +64,40 @@ tr.odd { background: var(--color-pair1); }
 
 #filelist table {
 	/* border: 2px solid grey; */
-	border-radius: 32px 32px 0px 0px;
+	border-radius: 32px 32px 16px 16px;
 	overflow: hidden;
 }
 #filelist table {
 	width: 100%;
 }
-#filelist td:first-child {
-	text-align: center;
+#filelist td.type { text-align: center; }
+#filelist td.size { text-align: right; }
+#filelist td.path { text-align: left; }
+#filelist td.modified { text-align: right; }
+#filelist td.buttons { text-align: center; }
+
+#filelist commands {
+	display: block;
+	overflow: auto;
+	margin-top: 2px;
 }
-#filelist, #circup {
-	padding: 4px;
+#filelist group {
+	display: block;
+	width: calc(50% - 2 * 8px - 4px);
+	float: left;
+	padding: 8px 8px;
+	margin: 2px 2px;
+	border-radius: 8px;
+	background: var(--color-pair1);
+}
+#file_list_loading_image {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#circup {
+	min-height: 800px;
 }
 #circup .hide,
 #circup .title .version_info {
