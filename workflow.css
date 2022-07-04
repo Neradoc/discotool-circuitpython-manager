@@ -7,6 +7,10 @@ body {
 	background: #222;
 	color: white;
 }
+content {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+}
 a {
 	color: #BBF;
 }
@@ -29,23 +33,20 @@ tr.even {
 tr.odd {
 	background: transparent;
 }
-content {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-}
 #filelist, #circup {
 	padding: 4px;
+}
+#circup .hide,
+#circup .title .version_info {
+	display: none;
+}
+#pwd {
+	font-size: 120%;
+	padding: 8px;
 }
 #circup .line {
 	margin: 0px;
 }
 #circup .line.exists {
 	opacity: 0.5;
-}
-#circup .buttons {
-	display: none;
-}
-#pwd {
-	font-size: 120%;
-	padding: 8px;
 }

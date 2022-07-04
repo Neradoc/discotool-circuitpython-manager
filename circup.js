@@ -4,7 +4,7 @@ SPDX-License-Identifier: MIT
 */
 
 class Circup {
-	constructor(use_proxy=false) {
+	constructor(use_proxy=false, cpvcer=7) {
 		this.USE_PROXY = use_proxy;
 		this.base_github = "https://github.com/";
 		this.bundles_config = [
@@ -14,7 +14,7 @@ class Circup {
 			"Neradoc/Circuitpython_Keyboard_Layouts",
 		];
 		// circuitpython version here for URLs (7.x)
-		this.cp_version_url = "7.x";
+		this.cp_version_url = "${cpvcer}.x";
 		// full modules list from the github bundles
 		this.all_the_modules = null;
 		// the circuitpython bundles from github

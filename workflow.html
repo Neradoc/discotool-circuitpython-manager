@@ -12,7 +12,7 @@
 	<link rel="stylesheet" href="workflow.css">
 </head>
 <body>
-	<h1></h1>
+	<h1 id="top_title"><span class="board_name"></span></h1>
 	<content>
 	<div id="filelist">
 		<table>
@@ -46,13 +46,19 @@
 		<input type="file" id="files" multiple />
 		<button type="submit" id="upload">Upload</button>
 		| <button type="submit" id="auto_install">Auto Install</button>
+		| <button type="submit" id="update_all">Update All</button>
 		<hr>
 		+📁&nbsp;<input type="text" id="name" />
 		<button type="submit" id="mkdir">Create Directory</button>
 	</div>
 	<div id="circup">
-		<p><span class="title"></span></p>
-		<p class="buttons"><button onclick="install_all()" class="upload" name="install_all" value="">Update/Install All</button> <button onclick="$('#circup .exists').toggle()">Show/Hide Up-to-date.</button></p>
+		<p class="loading hide">Loading libraries...</p>
+		<p class="title hide">
+			Dependencies and updates for <b class="filename">???</b>
+			<span class="version_info"><br/>For Circuipython <span class="circuitpy_version"></span>.</span>
+		</p>
+		<p class="buttons hide"><button onclick="install_all()" class="upload" name="install_all" value="">Update/Install All</button> <button onclick="$('#circup .exists').toggle()">Show/Hide Up-to-date.</button></p>
+		<p class="all_up_to_date hide">All libraries are up to date.</p>
 		<div id="dependencies">
 			<table>
 			<template id="circup_row">
