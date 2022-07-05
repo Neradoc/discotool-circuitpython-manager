@@ -147,10 +147,10 @@ async function install_modules(dependencies) {
 async function install_all() {
 	var modules = Array.from(modules_to_update);
 	$("#circup tr.line").each((index, line) => {
-		var button = $(line).find("button.upload");
+		var button = $(line).find(".upload button");
 		var module_name = button.val();
 		if(modules.includes(module_name)) {
-			$(line).find("button.upload").click();
+			$(line).find(".upload button").click();
 		}
 	});
 }
@@ -236,7 +236,7 @@ async function pre_update_process() {
 }
 
 async function update_line(new_line, libs_list) {
-	var module_name = new_line.find("button.upload").val();
+	var module_name = new_line.find(".upload button").val();
 	var module = circup.get_module(module_name);
 	new_line.find(".status_icon").html(LOADING_IMAGE);
 	new_line.removeClass("bad_mpy_module new_module invalid_module module_exists major_update_module update_module");
@@ -280,7 +280,7 @@ async function update_line(new_line, libs_list) {
 		new_line.find(".status_icon").html("&#10071;&#65039;");
 		new_line.find(".status").html("Update available");
 	}
-	new_line.find("button.upload").attr("disabled", false);
+	new_line.find(".upload button").attr("disabled", false);
 }
 
 async function run_update_process(imports) {
@@ -308,7 +308,7 @@ async function run_update_process(imports) {
 		var icon = module.package ? "&#128193;" : "&#128196;";
 		var template = $("#circup_row").html();
 		var new_line = $(template);
-		new_line.find("button.upload").on("click",async (e) => {
+		new_line.find(".upload button").on("click",async (e) => {
 			var target_module = $(e.target).val();
 			var line = $(e.target).parents("tr.line");
 			$(e.target).attr("disabled", true);
@@ -317,11 +317,16 @@ async function run_update_process(imports) {
 			var the_libs = await get_lib_directory();
 			await update_line(line, the_libs);
 		});
-		new_line.find("button.upload").val(dependency);
+		new_line.find(".upload button").val(dependency);
 		new_line.find(".icon").html(icon);
 		new_line.find(".name").html(dependency);
 		new_line.find(".bundle_version").html(module.version);
 		new_line.find(".board_version").html("...");
+		if (imports.includes(dependency)) {
+			new_line.find(".upload").css({
+				"background-color": "#002244"
+			});
+		}
 		$("#dependencies table").append(new_line);
 
 		await update_line(new_line, libs_list);
