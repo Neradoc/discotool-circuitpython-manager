@@ -4,6 +4,7 @@ SPDX-License-Identifier: MIT
 */
 const BAD_MPY = -1;
 const LOADING_IMAGE = '<img class="small_load_image" src="loading_black_small.gif" />';
+const LINE_HIDE_DELAY = 1000;
 
 var workflow_url_base = "http://circuitpython.local";
 var modules_to_install = [];
@@ -221,16 +222,31 @@ function dont_need_update(module_name) {
 	}
 }
 
-function update_odd_even() {
+function update_circup_table() {
 	$('#circup .line').removeClass("odd even");
-	$('#circup .line:visible:odd').addClass("odd");
-	$('#circup .line:visible:even').addClass("even");
+	if (show_up_to_date) {
+		$('#circup .line:odd').addClass("odd");
+		$('#circup .line:even').addClass("even");
+		if ($('#circup .line').length > 0) {
+			$("#dependencies table thead").show(LINE_HIDE_DELAY);
+		} else {
+			$("#dependencies table thead").hide(LINE_HIDE_DELAY);
+		}
+	} else {
+		$('#circup .line').not(".module_exists").odd().addClass("odd");
+		$('#circup .line').not(".module_exists").even().addClass("even");
+		if($('#circup .line').not(".module_exists").length > 0) {
+			$("#dependencies table thead").show(LINE_HIDE_DELAY);
+		} else {
+			$("#dependencies table thead").hide(LINE_HIDE_DELAY);
+		}
+	}
 }
 
 async function pre_update_process() {
 	$("#circup .hide").hide();
 	$("#circup .loading").show();
-	$("#dependencies table tr").remove();
+	$("#dependencies table tbody tr").remove();
 	// setup circup
 	await start();
 }
@@ -249,36 +265,36 @@ async function update_line(new_line, libs_list) {
 		// bad mpy file
 		new_line.addClass("bad_mpy_module");
 		new_line.find(".status_icon").html("&#9888;&#65039;");
-		new_line.find(".status").html("Bad MPY format");
+		new_line.find(".status").html("Bad MPY Format");
 	} else if(version === null) {
 		// no file
 		new_line.addClass("new_module");
 		new_line.find(".status_icon").html("&#10069;");
-		new_line.find(".status").html("New dependency");
+		new_line.find(".status").html("Missing Module");
 	} else if(version === false) {
 		// invalid file, replace
 		new_line.addClass("invalid_module");
 		new_line.find(".status_icon").html("&#9888;&#65039;");
-		new_line.find(".status").html("Module invalid");
+		new_line.find(".status").html("Module Invalid");
 	} else if(module.version == version) {
 		// no need to update
 		new_line.addClass("module_exists");
 		new_line.find(".status_icon").html("&#10004;&#65038;");
-		new_line.find(".status").html("Up to date");
+		new_line.find(".status").html("Up To Date");
 		if (!show_up_to_date) {
-			new_line.hide(2000, update_odd_even);
+			new_line.hide(LINE_HIDE_DELAY, update_circup_table);
 		}
 		dont_need_update(module_name);
 	} else if(semver(module.version)[0] != semver(version)[0]) {
 		// this is a major update
 		new_line.addClass("major_update_module");
 		new_line.find(".status_icon").html("&#8252;&#65039;");
-		new_line.find(".status").html("Major update");
+		new_line.find(".status").html("Major Update");
 	} else {
 		// this is a normal update
 		new_line.addClass("update_module");
 		new_line.find(".status_icon").html("&#10071;&#65039;");
-		new_line.find(".status").html("Update available");
+		new_line.find(".status").html("Update Available");
 	}
 	new_line.find(".upload button").attr("disabled", false);
 }
@@ -298,6 +314,9 @@ async function run_update_process(imports) {
 	$("#circup .title .circuitpy_version").html(await cp_version());
 	$("#circup .title").show();
 	$("#circup .title .version_info").show();
+	$("#circup .button_install_all").attr("disabled", true);
+	$("#circup .buttons").show();
+	$("#dependencies table thead").show();
 
 	modules_to_install = Array.from(dependencies);
 	modules_to_update = Array.from(dependencies);
@@ -323,15 +342,13 @@ async function run_update_process(imports) {
 		new_line.find(".bundle_version").html(module.version);
 		new_line.find(".board_version").html("...");
 		if (imports.includes(dependency)) {
-			new_line.find(".upload").css({
-				"background-color": "#002244"
-			});
+			new_line.addClass("imported");
 		}
-		$("#dependencies table").append(new_line);
+		$("#dependencies table tbody").append(new_line);
 
 		await update_line(new_line, libs_list);
 	}
-	$("#circup .buttons").show();
+	$("#circup .button_install_all").attr("disabled", false);
 }
 
 async function auto_install(file_name) {
@@ -393,14 +410,17 @@ $("#auto_install").on("click", (e) => {
 $("#update_all").on("click", (e) => {
 	run_exclusively(() => update_all());
 });
+$("#button_install_all").on("click", (e) => {
+	install_all();
+});
 $("#toggle_updates").on("click", async (e) => {
-	if (show_up_to_date) {
-		await $('#circup .module_exists').hide(1000);
-	} else {
-		await $('#circup .module_exists').show(1000);
-	}
 	show_up_to_date = !show_up_to_date;
-	update_odd_even();
+	if (show_up_to_date) {
+		$('#circup .module_exists').show(LINE_HIDE_DELAY);
+	} else {
+		$('#circup .module_exists').hide(LINE_HIDE_DELAY);
+	}
+	update_circup_table();
 });
 
 init_page();

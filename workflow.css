@@ -8,6 +8,7 @@ SPDX-License-Identifier: MIT
 	--color-pair0: #EEF;
 	--color-pair1: #EFE;
 	--text-color: black;
+	--disabled-color: #888;
 	--hover-background: #48B;
 	--hover-color: black;
 }
@@ -23,6 +24,7 @@ body {
 		--color-pair0: #181818;
 		--color-pair1: #202020;
 		--text-color: white;
+		--disabled-color: #777;
 	}
 	body {
 		background: #15141a;
@@ -62,12 +64,14 @@ tr:nth-child(odd) { background: var(--color-pair1); }
 tr.even { background: var(--color-pair0); }
 tr.odd { background: var(--color-pair1); }
 
-#filelist table {
+table {
 	/* border: 2px solid grey; */
 	border-radius: 32px 32px 16px 16px;
 	overflow: hidden;
 }
-#filelist table {
+#filelist table,
+#circup table
+{
 	width: 100%;
 }
 #filelist td.type { text-align: center; }
@@ -97,7 +101,7 @@ tr.odd { background: var(--color-pair1); }
 }
 
 #circup {
-	min-height: 800px;
+	min-height: 400px;
 }
 #circup .hide,
 #circup .title .version_info {
@@ -107,16 +111,37 @@ tr.odd { background: var(--color-pair1); }
 	font-size: 120%;
 	padding: 8px;
 }
+
+#dependencies table thead { display: none; }
 #circup .line {
 	margin: 0px;
 }
 
-#circup .line.module_exists { opacity: 0.5; }
+#circup table td { padding: 4px; }
+
+#circup table .upload { width: 50px; }
+#circup table .name { width: 100%; }
+#circup table .board_version { white-space:nowrap; }
+#circup table .bundle_version { white-space:nowrap; }
+#circup table .status_icon {}
+#circup table .status { white-space:nowrap; }
+
+#circup .line.module_exists {
+	color: var(--disabled-color);
+}
+#circup .line.module_exists button {
+	opacity: 0.5;
+}
 #circup .line.update_module { }
 #circup .line.major_update_module { }
 #circup .line.new_module { }
 #circup .line.invalid_module { }
 #circup .line.bad_mpy_module { }
+
+#circup .imported .status_icon {
+	background-color: #002244;
+}
+
 
 .small_load_image {
 	height: 14px;
