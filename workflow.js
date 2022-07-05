@@ -11,6 +11,7 @@ var modules_to_update = [];
 var cpver = null;
 var circup = null;
 var install_running = false;
+var show_up_to_date = false;
 
 function semver(str) {
 	return str.split("-")[0].split(/\./).map((x) => parseInt(x));
@@ -264,7 +265,9 @@ async function update_line(new_line, libs_list) {
 		new_line.addClass("module_exists");
 		new_line.find(".status_icon").html("&#10004;&#65038;");
 		new_line.find(".status").html("Up to date");
-		new_line.hide(2000, update_odd_even);
+		if (!show_up_to_date) {
+			new_line.hide(2000, update_odd_even);
+		}
 		dont_need_update(module_name);
 	} else if(semver(module.version)[0] != semver(version)[0]) {
 		// this is a major update
@@ -385,8 +388,13 @@ $("#auto_install").on("click", (e) => {
 $("#update_all").on("click", (e) => {
 	run_exclusively(() => update_all());
 });
-$("#toggle_updates").on("click", (e) => {
-	$('#circup .module_exists').toggle();
+$("#toggle_updates").on("click", async (e) => {
+	if (show_up_to_date) {
+		await $('#circup .module_exists').hide(1000);
+	} else {
+		await $('#circup .module_exists').show(1000);
+	}
+	show_up_to_date = !show_up_to_date;
 	update_odd_even();
 });
 
