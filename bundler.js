@@ -3,8 +3,8 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
-var DEBUG = false;
 circup = new Circup(true);
+var DEBUG = (document.location.hash.match(/debug/) != null);
 
 /***************************************************************
 *** NOTE THE UI PART
@@ -29,8 +29,6 @@ into the target board's "lib" directory inside the CIRCUITPY drive.
 More information on Circuitpython librairies:
 https://circuitpython.org/libraries
 `;
-
-
 
 /***************************************************************
 *** NOTE Colorize list of modules
