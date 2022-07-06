@@ -108,7 +108,7 @@ tr.odd { background: var(--color-pair1); }
 }
 
 #circup {
-	min-height: 400px;
+	min-height: 640px;
 }
 #circup .hide,
 #circup .title .version_info {

@@ -2,6 +2,8 @@
 SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
+var url_params = new URLSearchParams(document.location.search)
+var DEBUG = url_params.get("debug", false) ? true : false;
 const BAD_MPY = -1;
 const LOADING_IMAGE = '<img class="small_load_image" src="loading_black_small.gif" />';
 const LINE_HIDE_DELAY = 1000;
@@ -148,14 +150,16 @@ async function install_modules(dependencies) {
 }
 
 async function install_all() {
+	$(".install_buttons").attr("disabled", true);
 	var modules = Array.from(modules_to_update);
-	$("#circup tr.line").each((index, line) => {
+	for (line of $("#circup tr.line")) {
 		var button = $(line).find(".upload button");
 		var module_name = button.val();
 		if(modules.includes(module_name)) {
-			$(line).find(".upload button").click();
+			await upload_button_call({ "target":button });
 		}
-	});
+	}
+	$(".install_buttons").attr("disabled", false);
 }
 
 async function get_module_version(module_name, libs_list) {
@@ -221,6 +225,7 @@ function dont_need_update(module_name) {
 	}
 	if(modules_to_update.length == 0) {
 		$("#circup .all_up_to_date").show()
+		$("#circup .loading").hide();
 	}
 }
 
@@ -303,9 +308,10 @@ async function update_line(new_line, libs_list) {
 }
 
 async function upload_button_call(e) {
-	var target_module = $(e.target).val();
-	var line = $(e.target).parents("tr.line");
-	$(e.target).attr("disabled", true);
+	var button = $(e.target);
+	var target_module = button.val();
+	var line = button.parents("tr.line");
+	button.attr("disabled", true);
 	line.find(".status_icon").html(LOADING_IMAGE);
 	await install_modules([target_module])
 	var the_libs = await get_lib_directory();
@@ -324,7 +330,9 @@ async function run_update_process(imports) {
 	// list them
 	dependencies.sort();
 
-	$("#circup .loading").hide(1000);
+	if (!DEBUG) {
+		$("#circup .loading").hide(1000);
+	}
 	$("#circup .title .circuitpy_version").html(await cp_version());
 	$("#circup .title").show();
 	$("#circup .title .version_info").show();
