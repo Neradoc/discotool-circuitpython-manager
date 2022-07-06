@@ -32,7 +32,14 @@ body {
 	}
 }
 
-h1 { text-align: center; }
+#top_title {
+	text-align: center;
+	margin-bottom: 0px;
+}
+.version_info {
+	text-align: center;
+	margin-top: 0px;
+}
 
 content {
 	/* display: grid; */
@@ -43,6 +50,16 @@ content {
 }
 #filelist, #circup {
 	padding: 4px;
+}
+#filelist table {
+	border-radius: 32px 32px 16px 16px;
+	overflow: hidden;
+	width: 100%;
+}
+#circup table {
+	border-radius: 16px 16px 8px 8px;
+	overflow: hidden;
+	width: 100%;
 }
 
 a {
@@ -64,17 +81,6 @@ tr:nth-child(odd) { background: var(--color-pair1); }
 tr.even { background: var(--color-pair0); }
 tr.odd { background: var(--color-pair1); }
 
-#filelist table {
-	border-radius: 32px 32px 16px 16px;
-	overflow: hidden;
-	width: 100%;
-}
-#circup table
-{
-	border-radius: 16px 16px 8px 8px;
-	overflow: hidden;
-	width: 100%;
-}
 #filelist td.type { text-align: center; }
 #filelist td.size { text-align: right; }
 #filelist td.path { text-align: left; }
@@ -119,13 +125,17 @@ tr.odd { background: var(--color-pair1); }
 }
 
 #circup table td { padding: 4px; }
+#circup table th { padding: 8px; }
 
 #circup table .upload { width: 50px; }
 #circup table .name { width: 100%; }
-#circup table .board_version { white-space:nowrap; }
-#circup table .bundle_version { white-space:nowrap; }
+#circup table .board_version { white-space: nowrap; }
+#circup table .bundle_version { white-space: nowrap; }
 #circup table .status_icon {}
-#circup table .status { white-space:nowrap; }
+#circup table .status {
+	white-space: nowrap;
+	min-width: 128px;
+}
 
 #circup .line.module_exists {
 	color: var(--disabled-color);
@@ -140,7 +150,7 @@ tr.odd { background: var(--color-pair1); }
 #circup .line.bad_mpy_module { }
 
 #circup .imported .status_icon {
-	background-color: #002244;
+	/* background-color: #002244; */
 }
 
 
