@@ -64,14 +64,15 @@ tr:nth-child(odd) { background: var(--color-pair1); }
 tr.even { background: var(--color-pair0); }
 tr.odd { background: var(--color-pair1); }
 
-table {
-	/* border: 2px solid grey; */
+#filelist table {
 	border-radius: 32px 32px 16px 16px;
 	overflow: hidden;
+	width: 100%;
 }
-#filelist table,
 #circup table
 {
+	border-radius: 16px 16px 8px 8px;
+	overflow: hidden;
 	width: 100%;
 }
 #filelist td.type { text-align: center; }
