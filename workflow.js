@@ -38,12 +38,14 @@ function headers() {
 
 async function get_file(filepath) {
 	var heads = headers();
-	heads.append("Accept", "application/json")
+	heads.append("Accept", "application/json");
+	console.log(workflow_url_base + "/fs" + filepath);
+	var url = new URL("/fs"+filepath, workflow_url_base);
 	return await fetch(
-		new URL("/fs"+filepath, workflow_url_base),
+		url,
 		{
 			headers: heads,
-			credentials: "include"
+			credentials: "include",
 		}
 	);
 }
@@ -53,10 +55,12 @@ async function cp_version_json() {
 	if(_version_info !== null) {
 		return _version_info;
 	}
+	console.log(new URL("/cp/version.json", workflow_url_base));
 	var response = await fetch(
 		new URL("/cp/version.json", workflow_url_base),
 	);
 	_version_info = await response.json();
+	console.log(_version_info);
 	return _version_info;
 }
 
@@ -66,6 +70,7 @@ async function cp_version() {
 }
 
 async function is_editable() {
+	console.log(new URL("/fs/", workflow_url_base));
 	const status = await fetch(new URL("/fs/", workflow_url_base),
 		{
 			method: "OPTIONS",
@@ -89,10 +94,12 @@ async function get_lib_directory() {
 async function start() {
 	if (circup == null) {
 		// setup the actual URL
-		const response = await fetch(new URL("/cp/devices.json", workflow_url_base));
-		let url = new URL("/", response.url);
+		const url_test = new URL("/", workflow_url_base);
+		console.log(url_test);
+		const response = await fetch(url_test);
+		const url = new URL("/", response.url);
 		workflow_url_base = url.href;
-		console.log(`Board Full ULR: ${workflow_url_base}`);
+		console.log(`Board Full URL: ${workflow_url_base}`);
 		// get the version data
 		cpver = semver(await cp_version());
 		// init circup with the CP version
@@ -102,12 +109,13 @@ async function start() {
 }
 
 async function upload_file(upload_path, file) {
-	let file_path = new URL("/fs" + upload_path, workflow_url_base);
 	var heads = headers();
 	heads.append('Content-Type', 'application/octet-stream');
 	heads.append('X-Timestamp', file.lastModified);
 	var file_data = await file.async("blob");
-	const response = await fetch(file_path,
+	const file_url = new URL("/fs" + upload_path, workflow_url_base);
+	console.log(file_url);
+	const response = await fetch(file_url,
 		{
 			method: "PUT",
 			headers: heads,
@@ -120,6 +128,7 @@ async function upload_file(upload_path, file) {
 async function create_dir(dir_path) {
 	var heads = headers();
 	heads.append('X-Timestamp', Date.now());
+	console.log(new URL("/fs" + dir_path, workflow_url_base));
 	const response = await fetch(
 		new URL("/fs" + dir_path, workflow_url_base),
 		{
@@ -255,7 +264,6 @@ async function pre_update_process() {
 	$("#dependencies table tbody tr").remove();
 	// setup circup
 	$("#circup .loading").html(`Loading library bundles...`).show();
-	await start();
 }
 
 async function update_line(new_line, libs_list) {
@@ -409,6 +417,7 @@ async function update_all() {
 }
 
 async function init_page() {
+	await start();
 	var vinfo = await cp_version_json();
 	$(".board_name").html(vinfo.board_name);
 	$(".circuitpy_version").html(vinfo.version);

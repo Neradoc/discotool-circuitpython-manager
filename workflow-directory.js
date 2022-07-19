@@ -7,11 +7,20 @@ var current_path;
 const HIDDEN = [".fseventsd", ".metadata_never_index",".Trashes"];
 const SECRETS = [".env", "secrets.py"];
 
+function headers() {
+	var username = "";
+	var password = "123456"; // $("#password").val();
+	return new Headers({
+		"Authorization": 'Basic ' + btoa(username + ":" + password),
+	});
+}
+
 async function refresh_list() {
     current_path = window.location.hash.substr(1);
     if (current_path == "") {
         current_path = "/";
     }
+    console.log(new URL("/fs" + current_path, url_base));
     const response = await fetch(new URL("/fs" + current_path, url_base),
         {
             headers: {
@@ -104,14 +113,18 @@ async function refresh_list() {
 }
 
 async function find_devices() {
-    const response = await fetch("http://circuitpython.local/cp/devices.json");
+    console.log("http://circuitpython.local/cp/devices.json");
+    var response = await fetch("http://circuitpython.local/cp/devices.json");
     let url = new URL("/", response.url);
     url_base = url.href;
+    console.log(`${url_base}/cp/devices.json`);
+    var response = await fetch(new URL("/cp/devices.json", url_base));
     const data = await response.json();
     refresh_list();
 }
 
 async function mkdir(e) {
+    console.log(new URL("/fs" + current_path + new_directory_name.value + "/", url_base));
     const response = await fetch(
         new URL("/fs" + current_path + new_directory_name.value + "/", url_base),
         {
@@ -133,6 +146,7 @@ async function upload(e) {
     for (const file of files.files) {
         console.log(file);
         let file_path = new URL("/fs" + current_path + file.name, url_base);
+        console.log(file_path);
         const response = await fetch(file_path,
             {
                 method: "PUT",
@@ -163,9 +177,11 @@ async function del(e) {
         prompt += "?";
     }
     if (confirm(prompt)) {
+        console.log(e.target.value);
         const response = await fetch(e.target.value,
             {
-                method: "DELETE"
+                method: "DELETE",
+                headers: headers(),
             }
         )
         if (response.ok) {
