@@ -2,11 +2,15 @@
 SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
+
+// proxy from neradoc.me, so it works when running locally without php
+const PROXY_URL = "https://neradoc.me/bundler/proxy.php";
+const LINE_HIDE_DELAY = 1000;
+
 var url_params = new URLSearchParams(document.location.search)
 var DEBUG = url_params.get("debug", false) ? true : false;
-const BAD_MPY = -1;
 const LOADING_IMAGE = '<img class="small_load_image" src="loading_black_small.gif" />';
-const LINE_HIDE_DELAY = 1000;
+const BAD_MPY = -1;
 
 var workflow_url_base = "http://circuitpython.local";
 var modules_to_install = [];
@@ -103,7 +107,7 @@ async function start() {
 		// get the version data
 		cpver = semver(await cp_version());
 		// init circup with the CP version
-		circup = new Circup(true, cpver);
+		circup = new Circup(PROXY_URL, cpver);
 		await circup.setup_the_modules_list();
 	}
 }

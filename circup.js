@@ -5,7 +5,11 @@ SPDX-License-Identifier: MIT
 
 class Circup {
 	constructor(use_proxy=false, cpvcer=7) {
-		this.USE_PROXY = use_proxy;
+		if(use_proxy === true) {
+			this.PROXY_URL = "proxy.php";
+		} else {
+			this.PROXY_URL = use_proxy;
+		}
 		this.base_github = "https://github.com/";
 		this.bundles_config = [
 			"adafruit/Adafruit_CircuitPython_Bundle",
@@ -51,8 +55,8 @@ class Circup {
 	async get_bundle_json_url(repo) {
 		var user = repo.split("/")[0];
 		var repo_name = repo.split("/")[1];
-		if(this.USE_PROXY) {
-			return `proxy.php?action=json&user=${user}&repo=${repo_name}`;
+		if(this.PROXY_URL !== false) {
+			return `${this.PROXY_URL}?action=json&user=${user}&repo=${repo_name}`;
 		} else {
 			var bundle_tag = await this.get_bundle_tag(repo);
 			var base_name = repo_name.toLowerCase().replaceAll("_","-");
@@ -65,8 +69,8 @@ class Circup {
 	async get_bundle_zip_url(repo) {
 		var user = repo.split("/")[0];
 		var repo_name = repo.split("/")[1];
-		if(this.USE_PROXY) {
-			return `proxy.php?action=zip&user=${user}&repo=${repo_name}`;
+		if(this.PROXY_URL !== false) {
+			return `${this.PROXY_URL}?action=zip&user=${user}&repo=${repo_name}`;
 		} else {
 			var bundle_tag = await this.get_bundle_tag(repo);
 			var base_name = repo_name.toLowerCase().replaceAll("_","-");
