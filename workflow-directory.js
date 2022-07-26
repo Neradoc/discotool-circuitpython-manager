@@ -1,3 +1,5 @@
+import * as base from "./workflow-base.js";
+
 const HIDDEN = [".fseventsd", ".metadata_never_index",".Trashes"];
 const SECRETS = [".env", "secrets.py"];
 
@@ -10,8 +12,8 @@ async function refresh_list() {
     if (current_path == "") {
         current_path = "/";
     }
-    console.log(new URL("/fs" + current_path, workflow_url_base));
-    const response = await fetch(new URL("/fs" + current_path, workflow_url_base),
+    console.log(new URL("/fs" + current_path, base.workflow_url_base));
+    const response = await fetch(new URL("/fs" + current_path, base.workflow_url_base),
         {
             headers: {
                 "Accept": "application/json"
@@ -56,7 +58,7 @@ async function refresh_list() {
         var clone = template.content.cloneNode(true);
         var td = clone.querySelectorAll("td");
         var file_path = current_path + f.name;
-        let api_url = new URL("/fs" + file_path, workflow_url_base);
+        let api_url = new URL("/fs" + file_path, base.workflow_url_base);
         if (f.directory) {
             file_path = "#" + file_path + "/";
             api_url += "/";
@@ -103,14 +105,14 @@ async function refresh_list() {
 }
 
 async function find_devices() {
-    var response = await fetch(new URL("/cp/devices.json", workflow_url_base));
+    var response = await fetch(new URL("/cp/devices.json", base.workflow_url_base));
     const data = await response.json();
     refresh_list();
 }
 
 async function mkdir(e) {
     const response = await fetch(
-        new URL("/fs" + current_path + new_directory_name.value + "/", workflow_url_base),
+        new URL("/fs" + current_path + new_directory_name.value + "/", base.workflow_url_base),
         {
             method: "PUT",
             headers: {
@@ -129,7 +131,7 @@ async function upload(e) {
     console.log("upload");
     for (const file of files.files) {
         console.log(file);
-        let file_path = new URL("/fs" + current_path + file.name, workflow_url_base);
+        let file_path = new URL("/fs" + current_path + file.name, base.workflow_url_base);
         console.log(file_path);
         const response = await fetch(file_path,
             {
@@ -165,7 +167,7 @@ async function del(e) {
         const response = await fetch(e.target.value,
             {
                 method: "DELETE",
-                headers: headers(),
+                headers: base.headers(),
             }
         )
         if (response.ok) {
@@ -174,22 +176,26 @@ async function del(e) {
     }
 }
 
-let mkdir_button = document.getElementById("mkdir");
-mkdir_button.onclick = mkdir;
+async function setup_directory() {
+	let mkdir_button = document.getElementById("mkdir");
+	mkdir_button.onclick = mkdir;
 
-let upload_button = document.getElementById("upload");
-upload_button.onclick = upload;
+	let upload_button = document.getElementById("upload");
+	upload_button.onclick = upload;
 
-upload_button.disabled = files.files.length == 0;
+	upload_button.disabled = files.files.length == 0;
 
-files.onchange = () => {
-    upload_button.disabled = files.files.length == 0;
+	files.onchange = () => {
+		upload_button.disabled = files.files.length == 0;
+	}
+
+	mkdir_button.disabled = new_directory_name.value.length == 0;
+
+	new_directory_name.oninput = () => {
+		mkdir_button.disabled = new_directory_name.value.length == 0;
+	}
+
+	window.onhashchange = refresh_list;
 }
 
-mkdir_button.disabled = new_directory_name.value.length == 0;
-
-new_directory_name.oninput = () => {
-    mkdir_button.disabled = new_directory_name.value.length == 0;
-}
-
-window.onhashchange = refresh_list;
+export { setup_directory, find_devices };

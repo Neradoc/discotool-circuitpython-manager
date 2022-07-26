@@ -3,8 +3,12 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
-// proxy from neradoc.me, so it works when running locally without php
-const BUNDLE_ACCESS = "proxy:https://neradoc.me/bundler/proxy.php";
+import { BUNDLE_ACCESS } from "./workflow-config.js";
+import * as base from "./workflow-base.js";
+import { setup_directory, find_devices } from "./workflow-directory.js";
+import { Circup } from "./circup.js";
+
+const DEBUG = base.DEBUG;
 const LINE_HIDE_DELAY = 1000;
 const LOADING_IMAGE = '<img class="small_load_image" src="loading_black_small.gif" />';
 const BAD_MPY = -1;
@@ -29,10 +33,9 @@ function semver_compare(a,b) {
 }
 
 async function get_file(filepath) {
-	var heads = headers();
-	heads.append("Accept", "application/json");
-	console.log(workflow_url_base + "/fs" + filepath);
-	var url = new URL("/fs"+filepath, workflow_url_base);
+	var heads = new Headers({"Accept": "application/json"});
+	console.log(base.workflow_url_base, "/fs", filepath);
+	var url = new URL("/fs"+filepath, base.workflow_url_base);
 	return await fetch(
 		url,
 		{
@@ -47,9 +50,9 @@ async function cp_version_json() {
 	if(_version_info !== null) {
 		return _version_info;
 	}
-	console.log(new URL("/cp/version.json", workflow_url_base));
+	console.log(new URL("/cp/version.json", base.workflow_url_base));
 	var response = await fetch(
-		new URL("/cp/version.json", workflow_url_base),
+		new URL("/cp/version.json", base.workflow_url_base),
 	);
 	_version_info = await response.json();
 	console.log(_version_info);
@@ -62,11 +65,10 @@ async function cp_version() {
 }
 
 async function is_editable() {
-	console.log(new URL("/fs/", workflow_url_base));
-	const status = await fetch(new URL("/fs/", workflow_url_base),
+	console.log(new URL("/fs/", base.workflow_url_base));
+	const status = await fetch(new URL("/fs/", base.workflow_url_base),
 		{
 			method: "OPTIONS",
-			headers: headers(),
 			credentials: "include",
 		}
 	);
@@ -89,16 +91,17 @@ async function start_circup() {
 		cpver = semver(await cp_version());
 		// init circup with the CP version
 		circup = new Circup(BUNDLE_ACCESS, cpver);
+		// circup = new Circup(true, cpver);
 		await circup.setup_the_modules_list();
 	}
 }
 
 async function upload_file(upload_path, file) {
-	var heads = headers();
+	var heads = new Headers();
 	heads.append('Content-Type', 'application/octet-stream');
 	heads.append('X-Timestamp', file.lastModified);
 	var file_data = await file.async("blob");
-	const file_url = new URL("/fs" + upload_path, workflow_url_base);
+	const file_url = new URL("/fs" + upload_path, base.workflow_url_base);
 	console.log(file_url);
 	const response = await fetch(file_url,
 		{
@@ -111,11 +114,11 @@ async function upload_file(upload_path, file) {
 }
 
 async function create_dir(dir_path) {
-	var heads = headers();
+	var heads = new Headers();
 	heads.append('X-Timestamp', Date.now());
-	console.log(new URL("/fs" + dir_path, workflow_url_base));
+	console.log(new URL("/fs" + dir_path, base.workflow_url_base));
 	const response = await fetch(
-		new URL("/fs" + dir_path, workflow_url_base),
+		new URL("/fs" + dir_path, base.workflow_url_base),
 		{
 			method: "PUT",
 			headers: heads,
@@ -365,25 +368,18 @@ async function auto_install(file_name) {
 	await pre_update_process();
 	$("#circup .loading").append(`<br/>Loading <b>${file_name}</b>...`);
 	$("#circup .title .filename").html(file_name);
-	// list the files, check that file_name is there
-	var directory = (("/"+file_name).replace(/\/[^\/]+$/,"/"));
-	var response = await get_file(directory);
-	var data = await response.json();
-	var file_list = data.map((item) => item.name);
-	if(!file_list.includes(file_name)) {
-		console.log(`Error: ${file_name} not found.`);
-		return;
-	}
-	// get code.py
+	// get the file
 	const code_response = await get_file("/" + file_name);
 	if(!code_response.ok) {
 		console.log(`Error: ${file_name} not found.`);
+		// TODO: make sure to exit gracefully
 		return;
 	}
 	const code_content = await code_response.text();
 	// get the list
 	$("#circup .loading").append(`<br/>Loading modules from <b>${file_name}</b>...`);
 	const imports = circup.get_imports_from_python(code_content);
+	console.log("imports", imports);
 	// do the thing
 	await run_update_process(imports);
 }
@@ -402,7 +398,8 @@ async function update_all() {
 }
 
 async function init_page() {
-	await start();
+	await base.start();
+	await setup_directory();
 	await find_devices();
 	await start_circup();
 	var vinfo = await cp_version_json();

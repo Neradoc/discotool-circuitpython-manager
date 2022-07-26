@@ -245,5 +245,6 @@ class Circup {
 			});
 		});
 	}
-
 }
+
+export { Circup };
