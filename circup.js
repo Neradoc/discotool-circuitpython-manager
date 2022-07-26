@@ -3,13 +3,33 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
+const AccessMode = {
+	NONE: 0,
+	GITHUB: 1,
+	PROXY: 2,
+	LINK: 3,
+};
 class Circup {
-	constructor(use_proxy=false, cpvcer=7) {
-		if(use_proxy === true) {
-			this.PROXY_URL = "proxy.php";
+	constructor(bundle_access=null, cpvcer=7) {
+		if(bundle_access == null) {
+			this.BUNDLE_ACCESS = AccessMode.GITHUB;
+			this.BUNDLE_URL = "https://github.com/";
+		} else if(typeof(bundle_access) == "string") {
+			if(bundle_access.match(/^proxy:/)) {
+				this.BUNDLE_ACCESS = AccessMode.PROXY;
+				this.BUNDLE_URL = bundle_access.substr(6);
+			} else if(bundle_access.match(/^https?:\/\//)) {
+				this.BUNDLE_ACCESS = AccessMode.LINK;
+				this.BUNDLE_URL = bundle_access;
+			} else {
+				this.BUNDLE_ACCESS = AccessMode.LINK;
+				this.BUNDLE_URL = ".";
+			}
 		} else {
-			this.PROXY_URL = use_proxy;
+			this.BUNDLE_ACCESS = AccessMode.PROXY;
+			this.BUNDLE_URL = "proxy.php";
 		}
+		// Github configuration
 		this.base_github = "https://github.com/";
 		this.bundles_config = [
 			"adafruit/Adafruit_CircuitPython_Bundle",
@@ -36,7 +56,7 @@ class Circup {
 	*/
 
 
-	async get_bundle_tag(repo) {
+	async get_bundle_tag_github(repo) {
 		if( this.bundles_tags.get(repo) != false ) {
 			return this.bundles_tags.get(repo);
 		}
@@ -55,28 +75,41 @@ class Circup {
 	async get_bundle_json_url(repo) {
 		var user = repo.split("/")[0];
 		var repo_name = repo.split("/")[1];
-		if(this.PROXY_URL !== false) {
-			return `${this.PROXY_URL}?action=json&user=${user}&repo=${repo_name}`;
-		} else {
-			var bundle_tag = await this.get_bundle_tag(repo);
+		switch(this.BUNDLE_ACCESS) {
+		case AccessMode.PROXY:
+			return `${this.BUNDLE_URL}?action=json&user=${user}&repo=${repo_name}`;
+		case AccessMode.GITHUB:
+			var bundle_tag = await this.get_bundle_tag_github(repo);
 			var base_name = repo_name.toLowerCase().replaceAll("_","-");
 			var json_name = `${base_name}-${bundle_tag}.json`;
 			var json_url = `${this.base_github}/${repo}/releases/download/${bundle_tag}/${json_name}`;
 			return json_url;
+		case AccessMode.LINK:
+			var json_url = `${this.BUNDLE_URL}/${repo_name}-latest.json`
+			return json_url
 		}
+		// todo: raise
+		return null;
 	}
 
 	async get_bundle_zip_url(repo) {
 		var user = repo.split("/")[0];
 		var repo_name = repo.split("/")[1];
-		if(this.PROXY_URL !== false) {
-			return `${this.PROXY_URL}?action=zip&user=${user}&repo=${repo_name}`;
-		} else {
-			var bundle_tag = await this.get_bundle_tag(repo);
+		switch(this.BUNDLE_ACCESS) {
+		case AccessMode.PROXY:
+			return `${this.BUNDLE_URL}?action=zip&user=${user}&repo=${repo_name}`;
+		case AccessMode.GITHUB:
+			var bundle_tag = await this.get_bundle_tag_github(repo);
 			var base_name = repo_name.toLowerCase().replaceAll("_","-");
 			var zip_name = `${base_name}-${this.cp_version_url}-mpy-${bundle_tag}.zip`;
 			return `${this.base_github}/${repo}/releases/download/${bundle_tag}/${zip_name}`;
+		case AccessMode.LINK:
+			var bundle_tag = "latest";
+			var zip_url = `${this.BUNDLE_URL}/${repo_name}-${this.cp_version_url}-mpy-${bundle_tag}.zip`;
+			return zip_url;
 		}
+		// todo: raise
+		return null;
 	}
 
 	async get_bundle_module_contents(module) {
