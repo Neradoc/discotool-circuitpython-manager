@@ -4,15 +4,11 @@ SPDX-License-Identifier: MIT
 */
 
 // proxy from neradoc.me, so it works when running locally without php
-const PROXY_URL = "https://neradoc.me/bundler/proxy.php";
+const BUNDLE_ACCESS = "proxy:https://neradoc.me/bundler/proxy.php";
 const LINE_HIDE_DELAY = 1000;
-
-var url_params = new URLSearchParams(document.location.search)
-var DEBUG = url_params.get("debug", false) ? true : false;
 const LOADING_IMAGE = '<img class="small_load_image" src="loading_black_small.gif" />';
 const BAD_MPY = -1;
 
-var workflow_url_base = "http://circuitpython.local";
 var modules_to_install = [];
 var modules_to_update = [];
 var cpver = null;
@@ -30,14 +26,6 @@ function semver_compare(a,b) {
 		|| (parseInt(a.split(".")[1]) - parseInt(b.split(".")[1]))
 		|| (parseInt(a.split(".")[2]) - parseInt(b.split(".")[2]))
 	);
-}
-
-function headers() {
-	var username = "";
-	var password = "123456"; // $("#password").val();
-	return new Headers({
-		"Authorization": 'Basic ' + btoa(username + ":" + password),
-	});
 }
 
 async function get_file(filepath) {
@@ -95,19 +83,12 @@ async function get_lib_directory() {
 	return data.map((item) => item.name);
 }
 
-async function start() {
+async function start_circup() {
 	if (circup == null) {
-		// setup the actual URL
-		const url_test = new URL("/", workflow_url_base);
-		console.log(url_test);
-		const response = await fetch(url_test);
-		const url = new URL("/", response.url);
-		workflow_url_base = url.href;
-		console.log(`Board Full URL: ${workflow_url_base}`);
 		// get the version data
 		cpver = semver(await cp_version());
 		// init circup with the CP version
-		circup = new Circup(PROXY_URL, cpver);
+		circup = new Circup(BUNDLE_ACCESS, cpver);
 		await circup.setup_the_modules_list();
 	}
 }
@@ -422,6 +403,8 @@ async function update_all() {
 
 async function init_page() {
 	await start();
+	await find_devices();
+	await start_circup();
 	var vinfo = await cp_version_json();
 	$(".board_name").html(vinfo.board_name);
 	$(".circuitpy_version").html(vinfo.version);

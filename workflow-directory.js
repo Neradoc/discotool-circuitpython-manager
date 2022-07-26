@@ -1,27 +1,17 @@
-let new_directory_name = document.getElementById("name");
-let files = document.getElementById("files");
-
-var url_base = window.location;
-var current_path;
-
 const HIDDEN = [".fseventsd", ".metadata_never_index",".Trashes"];
 const SECRETS = [".env", "secrets.py"];
 
-function headers() {
-	var username = "";
-	var password = "123456"; // $("#password").val();
-	return new Headers({
-		"Authorization": 'Basic ' + btoa(username + ":" + password),
-	});
-}
+let new_directory_name = document.getElementById("name");
+let files = document.getElementById("files");
+var current_path;
 
 async function refresh_list() {
     current_path = window.location.hash.substr(1);
     if (current_path == "") {
         current_path = "/";
     }
-    console.log(new URL("/fs" + current_path, url_base));
-    const response = await fetch(new URL("/fs" + current_path, url_base),
+    console.log(new URL("/fs" + current_path, workflow_url_base));
+    const response = await fetch(new URL("/fs" + current_path, workflow_url_base),
         {
             headers: {
                 "Accept": "application/json"
@@ -66,7 +56,7 @@ async function refresh_list() {
         var clone = template.content.cloneNode(true);
         var td = clone.querySelectorAll("td");
         var file_path = current_path + f.name;
-        let api_url = new URL("/fs" + file_path, url_base);
+        let api_url = new URL("/fs" + file_path, workflow_url_base);
         if (f.directory) {
             file_path = "#" + file_path + "/";
             api_url += "/";
@@ -113,20 +103,14 @@ async function refresh_list() {
 }
 
 async function find_devices() {
-    console.log("http://circuitpython.local/cp/devices.json");
-    var response = await fetch("http://circuitpython.local/cp/devices.json");
-    let url = new URL("/", response.url);
-    url_base = url.href;
-    console.log(`${url_base}/cp/devices.json`);
-    var response = await fetch(new URL("/cp/devices.json", url_base));
+    var response = await fetch(new URL("/cp/devices.json", workflow_url_base));
     const data = await response.json();
     refresh_list();
 }
 
 async function mkdir(e) {
-    console.log(new URL("/fs" + current_path + new_directory_name.value + "/", url_base));
     const response = await fetch(
-        new URL("/fs" + current_path + new_directory_name.value + "/", url_base),
+        new URL("/fs" + current_path + new_directory_name.value + "/", workflow_url_base),
         {
             method: "PUT",
             headers: {
@@ -145,7 +129,7 @@ async function upload(e) {
     console.log("upload");
     for (const file of files.files) {
         console.log(file);
-        let file_path = new URL("/fs" + current_path + file.name, url_base);
+        let file_path = new URL("/fs" + current_path + file.name, workflow_url_base);
         console.log(file_path);
         const response = await fetch(file_path,
             {
@@ -189,8 +173,6 @@ async function del(e) {
         }
     }
 }
-
-find_devices();
 
 let mkdir_button = document.getElementById("mkdir");
 mkdir_button.onclick = mkdir;
