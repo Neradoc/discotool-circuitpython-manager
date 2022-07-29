@@ -23,12 +23,11 @@ var zipping = false;
 
 function color_the_lists() {
 	function color_list(i,that) {
-		$(that).removeClass("pair0");
-		$(that).removeClass("pair1");
+		$(that).removeClass("pair0 pair1");
 		$(that).addClass(`pair${i%2}`);
 	}
-	$("#bundle_modules p:visible").each(color_list);
-	$("#bundle_dependencies p:visible").each(color_list);
+	$("#bundle_modules p").not(".hide").each(color_list);
+	$("#bundle_dependencies p").not(".hide").each(color_list);
 }
 
 /***************************************************************
@@ -71,7 +70,7 @@ function filter_the_modules() {
 	var search_string = that.val().trim();
 	if(search_string == "") {
 		$("#bundle_clear_search").removeClass("enabled");
-		$("#bundle_modules p").show();
+		$("#bundle_modules p").removeClass("hide");
 		color_the_lists();
 		return;
 	}
@@ -86,9 +85,9 @@ function filter_the_modules() {
 			}
 		});
 		if(!matches) {
-			$(item).hide();
+			$(item).addClass("hide");
 		} else {
-			$(item).show();
+			$(item).removeClass("hide");
 		}
 	});
 	color_the_lists();

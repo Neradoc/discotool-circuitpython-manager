@@ -20,6 +20,10 @@ SPDX-License-Identifier: MIT
 	--enabled-border: #888;
 	--disabled-border: #444;
 	--enabled-border: #CCC;
+	--select-background-pair0: #030;
+	--select-background-pair1: #040;
+	--select-text-pair0: white;
+	--select-text-pair1: white;
 }
 body {
 	background: white;
@@ -174,6 +178,11 @@ commands group {
 	margin-left: auto;
 	margin-right: auto;
 }
+#file_list_error_image {
+	display: none;
+	font-size: 500%;
+	text-align: center;
+}
 
 #circup {
 	min-height: 640px;
@@ -250,11 +259,24 @@ commands group {
 	margin: 0px;
 	padding: 2px 4px;
 }
+#bundle_list .liste p.hide { display: none; }
 .pair0 {
 	background: var(--color-pair0);
 }
 .pair1 {
 	background: var(--color-pair1);
+}
+#bundle_list .liste p.pair0.selected {
+	background: var(--select-background-pair0);
+	color: var(--select-text-pair0);
+}
+#bundle_list .liste p.pair1.selected {
+	background: var(--select-background-pair1);
+	color: var(--select-text-pair1);
+}
+#bundle_list .loading_image {
+	display: block;
+	margin: auto;
 }
 #bundle_filter {
 	width: calc(100% - 2 * 2 * 4px);
