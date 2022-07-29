@@ -3,6 +3,7 @@
 SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
+header("Access-Control-Allow-Origin: *");
 
 $base_github = "https://github.com/";
 $bundles_config = [
