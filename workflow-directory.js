@@ -6,100 +6,133 @@ const SECRETS = [".env", "secrets.py"];
 let new_directory_name = document.getElementById("name");
 let files = document.getElementById("files");
 var current_path = common.current_path;
+var refreshing = false;
 
 async function refresh_list() {
-	if (current_path == "") {
-		current_path = "/";
+	if (refreshing) {
+		return;
 	}
-	const response = await fetch(new URL("/fs" + current_path, common.workflow_url_base),
-		{
-			headers: {
-				"Accept": "application/json"
-			},
-			credentials: "include"
+	refreshing = true;
+	try {
+		$('#file_list_loading_image').show();
+		$('#file_list_error_image').hide();
+		if (current_path == "") {
+			current_path = "/";
 		}
-	);
-	const data = await response.json();
-	var new_children = [];
-	var template = document.querySelector('#row');
 
-	if (current_path != "/") {
-		var clone = template.content.cloneNode(true);
-		var td = clone.querySelectorAll("td");
-		td[0].innerHTML = "&#128190;";
-		var path = clone.querySelector("a");
-		let parent = new URL("..", "file://" + current_path);
-		path.href = `?path=${parent.pathname}` + window.location.hash;
-		path.innerHTML = "..";
-		// Remove the delete button
-		td[4].replaceChildren();
-		new_children.push(clone);
+		var pwd = document.querySelector('#pwd');
+		var pwd_link = `<a href="?path=/${window.location.hash}" data-path="/">CIRCUITPY</a>/`
+		var fullpath = "/";
+		for(var path of current_path.split("/")) {
+			if(path != "") {
+				fullpath += path + "/";
+				pwd_link += `<a href="?path=${fullpath}${window.location.hash}" data-path="${fullpath}" class="dir">${path}</a>/`;
+			}
+		}
+		pwd.innerHTML = pwd_link;
+
+		var heads = common.headers({"Accept": "application/json"});
+		const response = await fetch(new URL("/fs" + current_path, common.workflow_url_base),
+			{
+				headers: heads,
+				credentials: "include"
+			}
+		);
+		if (! response.ok) {
+			$('#file_list_loading_image').hide();
+			$('#file_list_error_image').show();
+		
+			const message = `Dir list failed`;
+			const status = await response.status;
+			const error = await response.statusText;
+			switch(status) {
+			case 401:
+				console.log(`${message}: Bad password !`);
+				break;
+			case 403:
+				console.log(`${message}: Not authorized !`);
+				break;
+			case 409:
+				console.log(`${message}: Drive read-only !`);
+				break;
+			default:
+				console.log(`${message}: ${error} !`);
+			}
+			return;
+		}
+		const data = await response.json();
+		var new_children = [];
+		var template = document.querySelector('#row');
+
+		if (current_path != "/") {
+			var clone = template.content.cloneNode(true);
+			var td = clone.querySelectorAll("td");
+			td[0].innerHTML = "&#128190;";
+			var path = clone.querySelector("a");
+			let parent = new URL("..", "file://" + current_path);
+			path.href = `?path=${parent.pathname}` + window.location.hash;
+			path.innerHTML = "..";
+			// Remove the delete button
+			td[4].replaceChildren();
+			new_children.push(clone);
+		}
+
+		data.sort((a,b) => {
+			return a.name.localeCompare(b.name);
+		})
+
+		for (const f of data) {
+			// Clone the new row and insert it into the table
+			var clone = template.content.cloneNode(true);
+			var td = clone.querySelectorAll("td");
+			var file_path = current_path + f.name;
+			let api_url = new URL("/fs" + file_path, common.workflow_url_base);
+			if (f.directory) {
+				file_path = `?path=${file_path}/`;
+				api_url += "/";
+			} else {
+				file_path = api_url;
+			}
+			var icon = "&#10067;";
+			if (current_path == "/" && SECRETS.includes(f.name)) {
+				icon = "🔐";
+			} else if (HIDDEN.includes(f.name)) {
+				continue;
+			} else if (f.name.startsWith(".")) {
+				icon = "🚫";
+			} else if (current_path == "/" && f.name == "lib") {
+				icon = "📚";
+			} else if (f.directory) {
+				icon = "📁";
+			} else if(f.name.endsWith(".txt") ||
+					  f.name.endsWith(".py") ||
+					  f.name.endsWith(".js") ||
+					  f.name.endsWith(".json")) {
+				icon = "📄";
+			} else if (f.name.endsWith(".html")) {
+				icon = "🌐";
+			} else if (f.name.endsWith(".mpy")) {
+				icon = "🐍"; // <img src='blinka.png'/>
+			}
+			td[0].innerHTML = icon;
+			td[1].innerHTML = f.file_size;
+			var path = clone.querySelector("a");
+			path.href = file_path + window.location.hash;
+			path.innerHTML = f.name;
+			td[3].innerHTML = (new Date(f.modified_ns / 1000000)).toLocaleString();
+			var delete_button = clone.querySelector("button.delete");
+			delete_button.value = api_url;
+			delete_button.onclick = del;
+
+			new_children.push(clone);
+		}
+		var tbody = document.querySelector("tbody");
+		tbody.replaceChildren(...new_children);
+		$('#file_list_loading_image').hide();
+	} finally {
+		refreshing = false;
+		$('#file_list_loading_image').hide();
 	}
-
-	var pwd = document.querySelector('#pwd');
-	var pwd_link = `<a href="?path=/${window.location.hash}" data-path="/">CIRCUITPY</a>/`
-	var fullpath = "/";
-	for(var path of current_path.split("/")) {
-		if(path != "") {
-			fullpath += path + "/";
-			pwd_link += `<a href="?path=${fullpath}${window.location.hash}" data-path="${fullpath}" class="dir">${path}</a>/`;
-		}
-	}
-	pwd.innerHTML = pwd_link;
-
-	data.sort((a,b) => {
-		return a.name.localeCompare(b.name);
-	})
-
-	for (const f of data) {
-		// Clone the new row and insert it into the table
-		var clone = template.content.cloneNode(true);
-		var td = clone.querySelectorAll("td");
-		var file_path = current_path + f.name;
-		let api_url = new URL("/fs" + file_path, common.workflow_url_base);
-		if (f.directory) {
-			file_path = `?path=${file_path}/`;
-			api_url += "/";
-		} else {
-			file_path = api_url;
-		}
-		var icon = "&#10067;";
-		if (current_path == "/" && SECRETS.includes(f.name)) {
-			icon = "🔐";
-		} else if (HIDDEN.includes(f.name)) {
-			continue;
-		} else if (f.name.startsWith(".")) {
-			icon = "🚫";
-		} else if (current_path == "/" && f.name == "lib") {
-			icon = "📚";
-		} else if (f.directory) {
-			icon = "📁";
-		} else if(f.name.endsWith(".txt") ||
-				  f.name.endsWith(".py") ||
-				  f.name.endsWith(".js") ||
-				  f.name.endsWith(".json")) {
-			icon = "📄";
-		} else if (f.name.endsWith(".html")) {
-			icon = "🌐";
-		} else if (f.name.endsWith(".mpy")) {
-			icon = "🐍"; // <img src='blinka.png'/>
-		}
-		td[0].innerHTML = icon;
-		td[1].innerHTML = f.file_size;
-		var path = clone.querySelector("a");
-		path.href = file_path + window.location.hash;
-		path.innerHTML = f.name;
-		td[3].innerHTML = (new Date(f.modified_ns / 1000000)).toLocaleString();
-		var delete_button = clone.querySelector("button.delete");
-		delete_button.value = api_url;
-		delete_button.onclick = del;
-
-		new_children.push(clone);
-	}
-	var tbody = document.querySelector("tbody");
-	tbody.replaceChildren(...new_children);
-	var loading = document.querySelector('#file_list_loading_image');
-	loading.style.display = "none";
 }
 
 async function find_devices() {
@@ -171,7 +204,7 @@ async function del(e) {
 		if (response.ok) {
 			refresh_list();
 		} else {
-			const message = `Deleting ${fn.pathname.substr(3)} failed`
+			const message = `Deleting ${fn.pathname.substr(3)} failed`;
 			const status = await response.status;
 			const error = await response.statusText;
 			switch(status) {
@@ -216,6 +249,12 @@ async function setup_directory() {
 		refresh_list();
 		return false;
 	});
+	$(document).on("click", ".refresh_list", (e) => {
+		refresh_list();
+	});
+	$(document).on("change", "#password", (e) => {
+		refresh_list();
+	});
 }
 
-export { setup_directory, find_devices };
+export { setup_directory, find_devices, refresh_list };

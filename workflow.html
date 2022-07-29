@@ -43,7 +43,8 @@ SPDX-License-Identifier: MIT
 		<table>
 			<thead>
 				<tr>
-					<th id="pwd" colspan="5"></th>
+					<th id="pwd" colspan="4"></th>
+					<th id="pwd" colspan="1"><button class="refresh_list">🔄</button></th>
 				</tr>
 				<tr>
 					<th>Type</th>
@@ -68,6 +69,7 @@ SPDX-License-Identifier: MIT
 		</template>
 		</table>
 		<img id="file_list_loading_image" src="loading_black.gif" />
+		<div id="file_list_error_image">&#9888;&#65039;</div>
 		<commands>
 		<group>
 			<input type="file" id="files" multiple />
