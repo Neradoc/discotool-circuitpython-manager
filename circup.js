@@ -38,7 +38,7 @@ class Circup {
 			"Neradoc/Circuitpython_Keyboard_Layouts",
 		];
 		// circuitpython version here for URLs (7.x)
-		this.cp_version_url = "${cpvcer}.x";
+		this.cp_version_url = `${cpvcer}.x`;
 		// full modules list from the github bundles
 		this.all_the_modules = null;
 		// the circuitpython bundles from github

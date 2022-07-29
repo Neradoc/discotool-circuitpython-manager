@@ -4,8 +4,9 @@ SPDX-License-Identifier: MIT
 */
 
 import { Circup } from "./circup.js";
-circup = new Circup(true);
+const BUNDLE_ACCESS = "proxy:https://neradoc.me/bundler/proxy.php";
 var DEBUG = true;
+var circup = new Circup(BUNDLE_ACCESS);
 
 /***************************************************************
 *** NOTE THE UI PART
@@ -125,7 +126,7 @@ $(document).on("click", "#clear_search", (event) => {
 */
 
 function toggle_deselect() {
-	nselected = $(".selected").length;
+	var nselected = $(".selected").length;
 	if(nselected > 0) {
 		$("#deselect_all").addClass("enabled");
 		$("#nselected").html(`(${nselected} selected)`);
@@ -389,12 +390,13 @@ $(document).on("click", "#erase_drop", (event) => {
 	$("#drop_message").show();
 	$("#dropped_files_list").hide().html("");
 });
+$(document).on("click", "#zip_button", zipit);
 
 /***************************************************************
 *** NOTE Init the content of the modules list
 */
 
-$(() => {
+async function start() {
 	$("#modules .loading_image").show();
 	circup.setup_the_modules_list().then(() => {
 		var keys = Object.keys(circup.all_the_modules);
@@ -414,4 +416,6 @@ $(() => {
 		});
 		filter_the_modules();
 	});
-});
+}
+
+start();
