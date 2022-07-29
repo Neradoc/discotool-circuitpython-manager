@@ -4,16 +4,16 @@ SPDX-License-Identifier: MIT
 */
 
 import { BUNDLE_ACCESS } from "./workflow-config.js";
-import * as base from "./workflow-base.js";
+import * as common from "./workflow-common.js";
 import { setup_directory, find_devices } from "./workflow-directory.js";
 import { Circup } from "./circup.js";
+import * as bundler from "./workflow-bundler.js";
 
-const DEBUG = base.DEBUG;
+const DEBUG = common.DEBUG;
 const LINE_HIDE_DELAY = 1000;
 const LOADING_IMAGE = '<img class="small_load_image" src="loading_black_small.gif" />';
 const BAD_MPY = -1;
 
-var modules_to_install = [];
 var modules_to_update = [];
 var cpver = null;
 var circup = null;
@@ -34,8 +34,8 @@ function semver_compare(a,b) {
 
 async function get_file(filepath) {
 	var heads = new Headers({"Accept": "application/json"});
-	console.log(base.workflow_url_base, "/fs", filepath);
-	var url = new URL("/fs"+filepath, base.workflow_url_base);
+	console.log(common.workflow_url_base, "/fs", filepath);
+	var url = new URL("/fs"+filepath, common.workflow_url_base);
 	return await fetch(
 		url,
 		{
@@ -50,9 +50,9 @@ async function cp_version_json() {
 	if(_version_info !== null) {
 		return _version_info;
 	}
-	console.log(new URL("/cp/version.json", base.workflow_url_base));
+	console.log(new URL("/cp/version.json", common.workflow_url_base));
 	var response = await fetch(
-		new URL("/cp/version.json", base.workflow_url_base),
+		new URL("/cp/version.json", common.workflow_url_base),
 	);
 	_version_info = await response.json();
 	console.log(_version_info);
@@ -65,8 +65,8 @@ async function cp_version() {
 }
 
 async function is_editable() {
-	console.log(new URL("/fs/", base.workflow_url_base));
-	const status = await fetch(new URL("/fs/", base.workflow_url_base),
+	console.log(new URL("/fs/", common.workflow_url_base));
+	const status = await fetch(new URL("/fs/", common.workflow_url_base),
 		{
 			method: "OPTIONS",
 			credentials: "include",
@@ -97,11 +97,11 @@ async function start_circup() {
 }
 
 async function upload_file(upload_path, file) {
-	var heads = new Headers();
+	var heads = common.headers();
 	heads.append('Content-Type', 'application/octet-stream');
 	heads.append('X-Timestamp', file.lastModified);
 	var file_data = await file.async("blob");
-	const file_url = new URL("/fs" + upload_path, base.workflow_url_base);
+	const file_url = new URL("/fs" + upload_path, common.workflow_url_base);
 	console.log(file_url);
 	const response = await fetch(file_url,
 		{
@@ -114,11 +114,11 @@ async function upload_file(upload_path, file) {
 }
 
 async function create_dir(dir_path) {
-	var heads = new Headers();
+	var heads = common.headers();
 	heads.append('X-Timestamp', Date.now());
-	console.log(new URL("/fs" + dir_path, base.workflow_url_base));
+	console.log(new URL("/fs" + dir_path, common.workflow_url_base));
 	const response = await fetch(
-		new URL("/fs" + dir_path, base.workflow_url_base),
+		new URL("/fs" + dir_path, common.workflow_url_base),
 		{
 			method: "PUT",
 			headers: heads,
@@ -128,16 +128,14 @@ async function create_dir(dir_path) {
 }
 
 async function install_modules(dependencies) {
-	for(pos in dependencies) {
-		var module_name = dependencies[pos];
+	for(var module_name of dependencies) {
 		console.log("Installing", module_name);
 		var module = circup.get_module(module_name);
 		var module_files = await circup.list_module_files(module);
 		if(module.package) {
 			await create_dir(`/lib/${module.name}/`);
 		}
-		for(var ii in module_files) {
-			var file = module_files[ii];
+		for(var file of module_files) {
 			var upload_path = file.name.replace(/^[^\/]+\//, "/");
 			// var upload_path = file.name.replace(/^.+?\/lib\//, "/lib/");
 			await upload_file(upload_path, file);
@@ -331,12 +329,10 @@ async function run_update_process(imports) {
 	}
 	$("#circup .title .circuitpy_version").html(await cp_version());
 	$("#circup .title").show();
-	$("#circup .title .version_info").show();
 	$("#circup #button_install_all").attr("disabled", true);
 	$("#circup .buttons").show();
 	$("#dependencies table thead").show();
 
-	modules_to_install = Array.from(dependencies);
 	modules_to_update = Array.from(dependencies);
 
 	var new_lines = [];
@@ -397,17 +393,35 @@ async function update_all() {
 	await run_update_process(libs_list);
 }
 
+async function bundle_install() {
+	await pre_update_process();
+	$("#circup .loading").append(`<br/>Loading libraries selected from the bundles...`);
+	$("#circup .title .filename").html("selected bundle modules");
+	// get the list of libraries from the board
+	var libs_list = bundler.modules_list;
+	// do the thing
+	await run_update_process(libs_list);
+}
+
 async function init_page() {
-	await base.start();
+	var tab = window.location.hash.substr(1);
+	try {
+		$(`.tab_link_${tab}`).click();
+	} catch(e) {
+		$(".tab_link_welcome").click();
+	}
+	await common.start();
 	await setup_directory();
 	await find_devices();
 	await start_circup();
+	await bundler.start(circup);
 	var vinfo = await cp_version_json();
 	$(".board_name").html(vinfo.board_name);
 	$(".circuitpy_version").html(vinfo.version);
+	$("#version_info_subtitle .subtitle_text").show();
 }
 
-const running_buttons = "#auto_install, #update_all";
+const running_buttons = ".auto_install, .update_all";
 async function run_exclusively(command) {
 	if(!install_running) {
 		$(running_buttons).attr("disabled", true);
@@ -418,11 +432,17 @@ async function run_exclusively(command) {
 	}
 }
 
-$("#auto_install").on("click", (e) => {
+$(".auto_install").on("click", (e) => {
+	$(".tab_link_circup").click();
 	run_exclusively(() => auto_install("code.py"));
 });
-$("#update_all").on("click", (e) => {
+$(".update_all").on("click", (e) => {
+	$(".tab_link_circup").click();
 	run_exclusively(() => update_all());
+});
+$("#bundle_list #bundle_install").on("click", (e) => {
+	$(".tab_link_circup").click();
+	run_exclusively(() => bundle_install());
 });
 
 $("#button_install_all").on("click", (e) => {
@@ -436,6 +456,15 @@ $("#toggle_updates").on("click", async (e) => {
 		await $('#circup .module_exists').hide(LINE_HIDE_DELAY).promise();
 	}
 	await update_circup_table();
+});
+
+$(".tab_link").on("click", (e) => {
+	var target = e.target.value;
+	$(".tab_page").hide();
+	$(".tab_link").removeClass("active")
+	window.location.hash = `#${target}`;
+	$(`.tab_page_${target}`).show();
+	$(`.tab_link_${target}`).addClass("active");
 });
 
 init_page();

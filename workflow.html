@@ -14,12 +14,32 @@ SPDX-License-Identifier: MIT
 	<link rel="stylesheet" href="workflow.css">
 </head>
 <body>
+	<header>
 	<h1 id="top_title"><span class="board_name">Loading...</span></h1>
-	<p class="version_info">
-		With Circuipython <span class="circuitpy_version"></span>.
+	<p id="version_info_subtitle">
+		<span class="subtitle_text">With Circuipython <span class="circuitpy_version"></span>.</span>
 	</p>
+	</header>
 	<content>
-	<div id="filelist">
+	<div id="tablist">
+		<button class="tab_link tab_link_welcome active"
+			value="welcome">Welcome</button>
+		<button class="tab_link tab_link_files"
+			value="files">Files Browser</button>
+		<button class="tab_link tab_link_bundle"
+			value="bundle">Library Bundles</button>
+		<button class="tab_link tab_link_circup"
+			value="circup">Installer</button>
+	</div>
+	<div id="welcome" class="tab_page tab_page_welcome">
+		<h3>Welcome !</h3>
+		<p>Todo.</p>
+		<p>Link to the board's own web workflow.</p>
+		<p>Link to the serial REPL thingamabob.</p>
+		<p>Info about version and all that.</p>
+		<p>API password (&#9888;&#65039; transmitted unencrypted) <input name="password" id="password" type="password"/></p>
+	</div>
+	<div id="filelist" class="tab_page tab_page_files">
 		<table>
 			<thead>
 				<tr>
@@ -58,12 +78,38 @@ SPDX-License-Identifier: MIT
 			<button type="submit" id="mkdir">Create Directory</button>
 		</group>
 		<group>
-			<button type="submit" id="auto_install">Auto Install</button>
-			| <button type="submit" id="update_all">Update All</button>
+			<button type="submit" class="auto_install">Auto Install</button>
+			| <button type="submit" class="update_all">Update All</button>
 		</group>
 		</command>
 	</div>
-	<div id="circup">
+	<div id="bundle_list" class="tab_page tab_page_bundle">
+		<h3>Bundle Library Installer</h3>
+
+		<div id="bundle_filter">
+			<input name="bundle_filter" value="" placeholder="Enter library name to filter"/>
+			<button id="bundle_clear_search">Clear</button>
+			<button id="bundle_deselect_all">Deselect All</button>
+			<button id="bundle_install">Install The Dependencies</button>
+		</div>
+
+		<div class="lists">
+			<div class="title">Modules <span id="nselected"></span></div>
+			<div class="title">Dependencies (<span class="num_deps">0</span>)</div>
+			<div id="bundle_modules" class="liste"><img class="loading_image" src="loading_black_small.gif"/></div>
+			<div id="bundle_dependencies" class="liste"></div>
+		</div>
+	</div>
+	<div id="circup" class="tab_page tab_page_circup">
+		<h3>Circup Library Manager</h3>
+		<p>
+			<commands>
+			<group>
+				<button type="submit" class="auto_install">Auto Install</button>
+				| <button type="submit" class="update_all">Update All</button>
+			</group>
+			</command>
+		</p>
 		<p class="loading hide">Loading libraries...</p>
 		<p class="title hide">
 			Dependencies and updates for <b class="filename">???</b>

@@ -5,15 +5,27 @@ SPDX-License-Identifier: MIT
 
 import {BUNDLE_ACCESS, WORKFLOW_USERNAME, WORKFLOW_PASSWORD} from "./workflow-config.js";
 
-var url_params = new URLSearchParams(document.location.search)
-export const DEBUG = url_params.get("debug", false) ? true : false;
+export var hash = window.location.hash.substr(1);
+export var url_params = new URLSearchParams(document.location.search)
 export var workflow_url_base = "http://circuitpython.local";
+
+export const DEBUG = url_params.get("debug") ? true : false;
+export const current_path = url_params.get("path") || "/";
 
 export function headers() {
 	var username = WORKFLOW_USERNAME;
-	var password = WORKFLOW_PASSWORD; // $("#password").val();
+	var password = WORKFLOW_PASSWORD;
+	var password_field = $("#password").val();
+	if (password_field) {
+		password = password_field;
+	} else {
+		alert("The workflow password must be set.");
+		$(".tab_link_home").click();
+	}
+	// throw 'This is not used anymore !';
+	var encoded = btoa(username + ":" + password);
 	return new Headers({
-		"Authorization": 'Basic ' + btoa(username + ":" + password),
+		"Authorization": 'Basic ' + encoded,
 	});
 }
 

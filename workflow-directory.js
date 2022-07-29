@@ -1,19 +1,17 @@
-import * as base from "./workflow-base.js";
+import * as common from "./workflow-common.js";
 
 const HIDDEN = [".fseventsd", ".metadata_never_index",".Trashes"];
 const SECRETS = [".env", "secrets.py"];
 
 let new_directory_name = document.getElementById("name");
 let files = document.getElementById("files");
-var current_path;
+var current_path = common.current_path;
 
 async function refresh_list() {
-    current_path = window.location.hash.substr(1);
     if (current_path == "") {
         current_path = "/";
     }
-    console.log(new URL("/fs" + current_path, base.workflow_url_base));
-    const response = await fetch(new URL("/fs" + current_path, base.workflow_url_base),
+    const response = await fetch(new URL("/fs" + current_path, common.workflow_url_base),
         {
             headers: {
                 "Accept": "application/json"
@@ -31,7 +29,7 @@ async function refresh_list() {
         td[0].innerHTML = "&#128190;";
         var path = clone.querySelector("a");
         let parent = new URL("..", "file://" + current_path);
-        path.href = "#" + parent.pathname;
+        path.href = `?path=${parent.pathname}` + window.location.hash;
         path.innerHTML = "..";
         // Remove the delete button
         td[4].replaceChildren();
@@ -39,12 +37,12 @@ async function refresh_list() {
     }
 
     var pwd = document.querySelector('#pwd');
-    var pwd_link = `<a href="#/">CIRCUITPY</a>/`
+    var pwd_link = `<a href="?path=/${window.location.hash}" data-path="/">CIRCUITPY</a>/`
     var fullpath = "/";
     for(var path of current_path.split("/")) {
         if(path != "") {
             fullpath += path + "/";
-            pwd_link += `<a href="#${fullpath}">${path}</a>/`;
+            pwd_link += `<a href="?path=${fullpath}${window.location.hash}" data-path="${fullpath}" class="dir">${path}</a>/`;
         }
     }
     pwd.innerHTML = pwd_link;
@@ -58,9 +56,9 @@ async function refresh_list() {
         var clone = template.content.cloneNode(true);
         var td = clone.querySelectorAll("td");
         var file_path = current_path + f.name;
-        let api_url = new URL("/fs" + file_path, base.workflow_url_base);
+        let api_url = new URL("/fs" + file_path, common.workflow_url_base);
         if (f.directory) {
-            file_path = "#" + file_path + "/";
+            file_path = `?path=${file_path}/`;
             api_url += "/";
         } else {
             file_path = api_url;
@@ -89,7 +87,7 @@ async function refresh_list() {
         td[0].innerHTML = icon;
         td[1].innerHTML = f.file_size;
         var path = clone.querySelector("a");
-        path.href = file_path;
+        path.href = file_path + window.location.hash;
         path.innerHTML = f.name;
         td[3].innerHTML = (new Date(f.modified_ns / 1000000)).toLocaleString();
         var delete_button = clone.querySelector("button.delete");
@@ -105,14 +103,14 @@ async function refresh_list() {
 }
 
 async function find_devices() {
-    var response = await fetch(new URL("/cp/devices.json", base.workflow_url_base));
+    var response = await fetch(new URL("/cp/devices.json", common.workflow_url_base));
     const data = await response.json();
     refresh_list();
 }
 
 async function mkdir(e) {
     const response = await fetch(
-        new URL("/fs" + current_path + new_directory_name.value + "/", base.workflow_url_base),
+        new URL("/fs" + current_path + new_directory_name.value + "/", common.workflow_url_base),
         {
             method: "PUT",
             headers: {
@@ -131,7 +129,7 @@ async function upload(e) {
     console.log("upload");
     for (const file of files.files) {
         console.log(file);
-        let file_path = new URL("/fs" + current_path + file.name, base.workflow_url_base);
+        let file_path = new URL("/fs" + current_path + file.name, common.workflow_url_base);
         console.log(file_path);
         const response = await fetch(file_path,
             {
@@ -153,7 +151,7 @@ async function upload(e) {
 }
 
 async function del(e) {
-    console.log("delete");
+    console.log("delete", e.target.value);
     console.log(e);
     let fn = new URL(e.target.value);
     var prompt = "Delete " + fn.pathname.substr(3);
@@ -167,7 +165,7 @@ async function del(e) {
         const response = await fetch(e.target.value,
             {
                 method: "DELETE",
-                headers: base.headers(),
+                headers: common.headers(),
             }
         )
         if (response.ok) {
@@ -195,7 +193,12 @@ async function setup_directory() {
 		mkdir_button.disabled = new_directory_name.value.length == 0;
 	}
 
-	window.onhashchange = refresh_list;
+	$(document).on("click", "a.dir", (e) => {
+		var self = $(e.target);
+		current_path = self.data("path");
+		refresh_list();
+		return false;
+	});
 }
 
 export { setup_directory, find_devices };
