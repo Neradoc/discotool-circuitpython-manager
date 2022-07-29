@@ -170,6 +170,23 @@ async function del(e) {
         )
         if (response.ok) {
             refresh_list();
+        } else {
+            const message = `Deleting ${fn.pathname.substr(3)} failed`
+            const status = await response.status;
+            const error = await response.statusText;
+            switch(status) {
+            case 401:
+                console.log(`${message}: Bad password !`);
+                break;
+            case 403:
+                console.log(`${message}: Not authorized !`);
+                break;
+            case 409:
+                console.log(`${message}: Drive read-only !`);
+                break;
+            default:
+                console.log(`${message}: ${error} !`);
+            }
         }
     }
 }

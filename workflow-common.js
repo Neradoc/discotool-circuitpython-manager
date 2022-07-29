@@ -18,7 +18,7 @@ export function headers() {
 	var password_field = $("#password").val();
 	if (password_field) {
 		password = password_field;
-	} else {
+	} else if (WORKFLOW_PASSWORD == null) {
 		alert("The workflow password must be set.");
 		$(".tab_link_home").click();
 	}
