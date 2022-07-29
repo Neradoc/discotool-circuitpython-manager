@@ -3,8 +3,9 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
+import { Circup } from "./circup.js";
 circup = new Circup(true);
-var DEBUG = (document.location.hash.match(/debug/) != null);
+var DEBUG = true;
 
 /***************************************************************
 *** NOTE THE UI PART
@@ -13,7 +14,7 @@ var DEBUG = (document.location.hash.match(/debug/) != null);
 // the zip code is running, the button won't respond
 var zipping = false;
 // list of files added to the drop zone
-this.dropped_files_list = [];
+var dropped_files_list = [];
 // list of modules found in the files
 var dropped_modules_list = [];
 // limit to the list of files names before cut to "..."
