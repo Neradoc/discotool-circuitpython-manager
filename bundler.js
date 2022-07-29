@@ -247,7 +247,7 @@ function zipit() {
 	// start the following as an async
 	async_zipit().then(async (base64) => {
 		// hide "in progress"
-		data_url = "data:application/zip;base64," + base64;
+		var data_url = "data:application/zip;base64," + base64;
 		// window.location = data_url;
 		var link = $("#zip_a");
 		link.attr("href", data_url);

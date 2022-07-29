@@ -12,7 +12,7 @@ export var workflow_url_base = "http://circuitpython.local";
 export const DEBUG = url_params.get("debug") ? true : false;
 export const current_path = url_params.get("path") || "/";
 
-export function headers() {
+export function headers(others=null) {
 	var username = WORKFLOW_USERNAME;
 	var password = WORKFLOW_PASSWORD;
 	var password_field = $("#password").val();
@@ -24,9 +24,15 @@ export function headers() {
 	}
 	// throw 'This is not used anymore !';
 	var encoded = btoa(username + ":" + password);
-	return new Headers({
+	var head = new Headers({
 		"Authorization": 'Basic ' + encoded,
 	});
+	if (others) {
+		for (var key in others) {
+			head.append(key, others[key]);
+		}
+	}
+	return head;
 }
 
 export async function start() {

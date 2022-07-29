@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 import { BUNDLE_ACCESS } from "./workflow-config.js";
 import * as common from "./workflow-common.js";
-import { setup_directory, find_devices } from "./workflow-directory.js";
+import { setup_directory, find_devices, refresh_list } from "./workflow-directory.js";
 import { Circup } from "./circup.js";
 import * as bundler from "./workflow-bundler.js";
 
@@ -33,7 +33,7 @@ function semver_compare(a,b) {
 }
 
 async function get_file(filepath) {
-	var heads = new Headers({"Accept": "application/json"});
+	var heads = common.headers({"Accept": "application/json"});
 	console.log(common.workflow_url_base, "/fs", filepath);
 	var url = new URL("/fs"+filepath, common.workflow_url_base);
 	return await fetch(
@@ -97,9 +97,10 @@ async function start_circup() {
 }
 
 async function upload_file(upload_path, file) {
-	var heads = common.headers();
-	heads.append('Content-Type', 'application/octet-stream');
-	heads.append('X-Timestamp', file.lastModified);
+	var heads = common.headers({
+		'Content-Type': 'application/octet-stream',
+		'X-Timestamp': file.lastModified,
+	});
 	var file_data = await file.async("blob");
 	const file_url = new URL("/fs" + upload_path, common.workflow_url_base);
 	console.log(file_url);
@@ -114,8 +115,7 @@ async function upload_file(upload_path, file) {
 }
 
 async function create_dir(dir_path) {
-	var heads = common.headers();
-	heads.append('X-Timestamp', Date.now());
+	var heads = common.headers({'X-Timestamp': Date.now()});
 	console.log(new URL("/fs" + dir_path, common.workflow_url_base));
 	const response = await fetch(
 		new URL("/fs" + dir_path, common.workflow_url_base),
@@ -147,7 +147,7 @@ async function install_modules(dependencies) {
 async function install_all() {
 	$(".install_buttons").attr("disabled", true);
 	var modules = Array.from(modules_to_update);
-	for (line of $("#circup tr.line")) {
+	for (var line of $("#circup tr.line")) {
 		var button = $(line).find(".upload button");
 		var module_name = button.val();
 		if(modules.includes(module_name)) {
@@ -411,14 +411,23 @@ async function init_page() {
 		$(".tab_link_welcome").click();
 	}
 	await common.start();
-	await setup_directory();
-	await find_devices();
-	await start_circup();
-	await bundler.start(circup);
-	var vinfo = await cp_version_json();
-	$(".board_name").html(vinfo.board_name);
-	$(".circuitpy_version").html(vinfo.version);
-	$("#version_info_subtitle .subtitle_text").show();
+	// this is in parallel to the board ones
+	var prom1 = (async () => {
+		await start_circup();
+		await bundler.start(circup);
+	})();
+	// board inits
+	var prom2 = (async () => {
+		await setup_directory();
+		await find_devices();
+		var vinfo = await cp_version_json();
+		$(".board_name").html(vinfo.board_name);
+		$(".circuitpy_version").html(vinfo.version);
+		$("#version_info_subtitle .subtitle_text").show();
+	})();
+	//
+	await prom1;
+	await prom2;
 }
 
 const running_buttons = ".auto_install, .update_all";
