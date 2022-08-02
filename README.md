@@ -1,7 +1,21 @@
 How to use the Web Workflow
 ===========================
 
-- Get all the files locally.
+Quick start
+-----------
+
+```sh
+git clone https://github.com/Neradoc/circuitpython-web-packager
+cd circuitpython-web-packager
+python3 -m http.server
+echo "http://localhost:8000/workflow.html"
+```
+Connect to [http://localhost:8000/workflow.html](http://localhost:8000/workflow.html).
+
+How to with human words
+-----------------------
+
+- Get all the files of the repository locally.
 - Start a server on localhost in the repository's directory.
 - Connect to `/workflow.html` on that server.
 
