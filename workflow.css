@@ -163,16 +163,22 @@ commands {
 	overflow: auto;
 	clear: both;
 	margin-top: 2px;
+	font-size: 12px;
+	display: grid;
+	grid-template-columns: 50% 50%;
 }
 commands group {
 	display: block;
-	width: calc(50% - 2 * 8px - 4px);
 	float: left;
 	padding: 8px 8px;
 	margin: 2px 2px;
 	border-radius: 8px;
 	background: var(--color-pair1);
 }
+group.install_buttons button {
+	font-size: 120%;
+}
+
 #file_list_loading_image {
 	display: block;
 	margin-left: auto;
