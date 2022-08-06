@@ -209,9 +209,7 @@ group.install_buttons button {
 }
 
 #file_list_loading_image {
-	display: block;
-	margin-left: auto;
-	margin-right: auto;
+	text-align: center;
 }
 #file_list_error_image {
 	display: none;

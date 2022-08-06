@@ -65,7 +65,13 @@ SPDX-License-Identifier: MIT
 					<th></th>
 				</tr>
 			</thead>
-			<tbody></tbody>
+			<tbody>
+				<tr>
+				<td id="file_list_loading_image" colspan="5"><img src="loading_black.gif" /></td>
+				<td id="file_list_error_image" colspan="5">&#9888;&#65039;</td>
+				</tr>
+			</tbody>
+			<tbody id="file_list_body"></tbody>
 		<template id="row">
 			<tr>
 				<td class="type"></td>
@@ -79,11 +85,9 @@ SPDX-License-Identifier: MIT
 			</tr>
 		</template>
 		</table>
-		<img id="file_list_loading_image" src="loading_black.gif" />
-		<div id="file_list_error_image">&#9888;&#65039;</div>
 		<commands>
 		<group>
-			<input type="file" id="files" multiple />
+			<input type="file" id="files_upload" name="files" multiple />
 			<button type="submit" id="upload">Upload</button>
 		</group>
 		<group>

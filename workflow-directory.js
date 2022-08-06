@@ -4,7 +4,7 @@ const HIDDEN = [".fseventsd", ".metadata_never_index",".Trashes"];
 const SECRETS = [".env", "secrets.py"];
 
 let new_directory_name = document.getElementById("name");
-let files = document.getElementById("files");
+let files = document.getElementById("files_upload");
 var current_path = common.current_path;
 var refreshing = false;
 
@@ -16,17 +16,19 @@ async function refresh_list() {
 	try {
 		$('#file_list_loading_image').show();
 		$('#file_list_error_image').hide();
+		$('#file_list_body tr').css("opacity", "0.4");
+
 		if (current_path == "") {
 			current_path = "/";
 		}
 
 		var pwd = document.querySelector('#pwd');
-		var pwd_link = `<a href="?path=/#files" data-path="/">CIRCUITPY</a>/`
+		var pwd_link = `<a class="files_list_dir dir" href="?path=/#files" data-path="/">CIRCUITPY</a>/`
 		var fullpath = "/";
 		for(var path of current_path.split("/")) {
 			if(path != "") {
 				fullpath += path + "/";
-				pwd_link += `<a href="?path=${fullpath}#files" data-path="${fullpath}" class="dir">${path}</a>/`;
+				pwd_link += `<a href="?path=${fullpath}#files" data-path="${fullpath}" class="dir files_list_dir">${path}</a>/`;
 			}
 		}
 		pwd.innerHTML = pwd_link;
@@ -41,6 +43,7 @@ async function refresh_list() {
 		if (! response.ok) {
 			$('#file_list_loading_image').hide();
 			$('#file_list_error_image').show();
+			$('#file_list_body tr').remove();
 		
 			const message = `Dir list failed`;
 			const status = await response.status;
@@ -71,6 +74,7 @@ async function refresh_list() {
 			var path = clone.querySelector("a");
 			let parent = new URL("..", "file://" + current_path);
 			path.href = `?path=${parent.pathname}` + window.location.hash;
+			path.class = "files_list_dir";
 			path.innerHTML = "..";
 			// Remove the delete button
 			td[4].replaceChildren();
@@ -88,7 +92,7 @@ async function refresh_list() {
 			var file_path = current_path + f.name;
 			let api_url = new URL("/fs" + file_path, common.workflow_url_base);
 			if (f.directory) {
-				file_path = `?path=${file_path}/`;
+				file_path += "/";
 				api_url += "/";
 			} else {
 				file_path = api_url;
@@ -117,16 +121,26 @@ async function refresh_list() {
 			td[0].innerHTML = icon;
 			td[1].innerHTML = f.file_size;
 			var path = clone.querySelector("a");
-			path.href = file_path + window.location.hash;
 			path.innerHTML = f.name;
+			if(f.directory) {
+				path.href = `?path=${file_path}/${window.location.hash}`;
+				path.classList.add("files_list_dir");
+				path.setAttribute("data-path", file_path);
+			} else {
+				path.href = api_url;
+			}
 			td[3].innerHTML = (new Date(f.modified_ns / 1000000)).toLocaleString();
 			var delete_button = clone.querySelector("button.delete");
 			delete_button.value = api_url;
 			delete_button.onclick = del;
+			
+			console.log("file");
+			console.log(api_url);
+			console.log(file_path);
 
 			new_children.push(clone);
 		}
-		var tbody = document.querySelector("tbody");
+		var tbody = document.querySelector("#file_list_body");
 		tbody.replaceChildren(...new_children);
 		$('#file_list_loading_image').hide();
 	} finally {
@@ -243,7 +257,7 @@ async function setup_directory() {
 		mkdir_button.disabled = new_directory_name.value.length == 0;
 	}
 
-	$(document).on("click", "a.dir", (e) => {
+	$(document).on("click", "a.files_list_dir", (e) => {
 		var self = $(e.target);
 		current_path = self.data("path");
 		refresh_list();
