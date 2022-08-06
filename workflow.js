@@ -147,7 +147,7 @@ async function install_modules(dependencies) {
 async function install_all() {
 	$(".install_buttons").attr("disabled", true);
 	var modules = Array.from(modules_to_update);
-	for (var line of $("#circup tr.line")) {
+	for (var line of $("#circup_page tr.line")) {
 		var button = $(line).find(".upload button");
 		var module_name = button.val();
 		if(modules.includes(module_name)) {
@@ -219,37 +219,37 @@ function dont_need_update(module_name) {
 		modules_to_update.splice(index, 1);
 	}
 	if(modules_to_update.length == 0) {
-		$("#circup .all_up_to_date").show()
-		$("#circup .loading").hide();
+		$("#circup_page .all_up_to_date").show()
+		$("#circup_page .loading").hide();
 	}
 }
 
 async function update_circup_table() {
-	$('#circup .line').removeClass("odd even");
+	$('#circup_page .line').removeClass("odd even");
 	if (show_up_to_date) {
-		if ($('#circup .line').length > 0) {
+		if ($('#circup_page .line').length > 0) {
 			await $("#dependencies table thead").show(LINE_HIDE_DELAY).promise();
 		} else {
 			await $("#dependencies table thead").hide(LINE_HIDE_DELAY).promise();
 		}
-		$('#circup .line:odd').addClass("odd");
-		$('#circup .line:even').addClass("even");
+		$('#circup_page .line:odd').addClass("odd");
+		$('#circup_page .line:even').addClass("even");
 	} else {
-		if($('#circup .line').not(".module_exists").length > 0) {
+		if($('#circup_page .line').not(".module_exists").length > 0) {
 			await $("#dependencies table thead").show(LINE_HIDE_DELAY).promise();
 		} else {
 			await $("#dependencies table thead").hide(LINE_HIDE_DELAY).promise();
 		}
-		$('#circup .line').not(".module_exists").odd().addClass("odd");
-		$('#circup .line').not(".module_exists").even().addClass("even");
+		$('#circup_page .line').not(".module_exists").odd().addClass("odd");
+		$('#circup_page .line').not(".module_exists").even().addClass("even");
 	}
 }
 
 async function pre_update_process() {
-	$("#circup .hide").hide();
+	$("#circup_page .hide").hide();
 	$("#dependencies table tbody tr").remove();
 	// setup circup
-	$("#circup .loading").html(`Loading library bundles...`).show();
+	$("#circup_page .loading").html(`Loading library bundles...`).show();
 }
 
 async function update_line(new_line, libs_list) {
@@ -313,7 +313,7 @@ async function upload_button_call(e) {
 }
 
 async function run_update_process(imports) {
-	$("#circup .loading").append(`<br/>Loading dependencies...`);
+	$("#circup_page .loading").append(`<br/>Loading dependencies...`);
 	// list the libs, to know which are missing
 	var libs_list = await get_lib_directory();
 	// get the dependencies
@@ -325,12 +325,12 @@ async function run_update_process(imports) {
 	dependencies.sort();
 
 	if (!DEBUG) {
-		$("#circup .loading").hide(1000);
+		$("#circup_page .loading").hide(1000);
 	}
-	$("#circup .title .circuitpy_version").html(await cp_version());
-	$("#circup .title").show();
-	$("#circup #button_install_all").attr("disabled", true);
-	$("#circup .buttons").show();
+	$("#circup_page .title .circuitpy_version").html(await cp_version());
+	$("#circup_page .title").show();
+	$("#circup_page #button_install_all").attr("disabled", true);
+	$("#circup_page .buttons").show();
 	$("#dependencies table thead").show();
 
 	modules_to_update = Array.from(dependencies);
@@ -357,13 +357,13 @@ async function run_update_process(imports) {
 	for(var new_line of new_lines) {
 		await update_line(new_line, libs_list);
 	}
-	$("#circup #button_install_all").attr("disabled", false);
+	$("#circup_page #button_install_all").attr("disabled", false);
 }
 
 async function auto_install(file_name) {
 	await pre_update_process();
-	$("#circup .loading").append(`<br/>Loading <b>${file_name}</b>...`);
-	$("#circup .title .filename").html(file_name);
+	$("#circup_page .loading").append(`<br/>Loading <b>${file_name}</b>...`);
+	$("#circup_page .title .filename").html(file_name);
 	// get the file
 	const code_response = await get_file("/" + file_name);
 	if(!code_response.ok) {
@@ -373,7 +373,7 @@ async function auto_install(file_name) {
 	}
 	const code_content = await code_response.text();
 	// get the list
-	$("#circup .loading").append(`<br/>Loading modules from <b>${file_name}</b>...`);
+	$("#circup_page .loading").append(`<br/>Loading modules from <b>${file_name}</b>...`);
 	const imports = circup.get_imports_from_python(code_content);
 	console.log("imports", imports);
 	// do the thing
@@ -382,8 +382,8 @@ async function auto_install(file_name) {
 
 async function update_all() {
 	await pre_update_process();
-	$("#circup .loading").append(`<br/>Loading libraries from <b>/lib</b> directory...`);
-	$("#circup .title .filename").html("/lib/");
+	$("#circup_page .loading").append(`<br/>Loading libraries from <b>/lib</b> directory...`);
+	$("#circup_page .title .filename").html("/lib/");
 	// get the list of libraries from the board
 	var libs_list = await get_lib_directory();
 	libs_list = libs_list
@@ -395,8 +395,8 @@ async function update_all() {
 
 async function bundle_install() {
 	await pre_update_process();
-	$("#circup .loading").append(`<br/>Loading libraries selected from the bundles...`);
-	$("#circup .title .filename").html("selected bundle modules");
+	$("#circup_page .loading").append(`<br/>Loading libraries selected from the bundles...`);
+	$("#circup_page .title .filename").html("selected bundle modules");
 	// get the list of libraries from the board
 	var libs_list = bundler.modules_list;
 	// do the thing
@@ -460,9 +460,9 @@ $("#button_install_all").on("click", (e) => {
 $("#toggle_updates").on("click", async (e) => {
 	show_up_to_date = !show_up_to_date;
 	if (show_up_to_date) {
-		await $('#circup .module_exists').show(LINE_HIDE_DELAY).promise();
+		await $('#circup_page .module_exists').show(LINE_HIDE_DELAY).promise();
 	} else {
-		await $('#circup .module_exists').hide(LINE_HIDE_DELAY).promise();
+		await $('#circup_page .module_exists').hide(LINE_HIDE_DELAY).promise();
 	}
 	await update_circup_table();
 });

@@ -108,17 +108,25 @@ content {
 	color: var(--hover-color);
 }
 
-#filelist, #circup, #bundle_list {
+#filelist, #circup_page, #bundle_list {
 	display: none;
 }
 
-#welcome, #filelist, #circup, #bundle_list {
+#welcome_page, #filelist, #circup_page, #bundle_list {
 	padding: 4px;
+}
+
+#welcome_page p {
+	border-radius: 16px;
+	background: var(--input-background);
+	padding: 8px 22px;
+	margin: 4px;
 }
 
 #password {
 	font-size: inherit;
 	width: 240px;
+	font-family: Monaco, Menlo, monospace;
 }
 
 #filelist table {
@@ -127,7 +135,7 @@ content {
 	width: 100%;
 }
 
-#circup table {
+#circup_page table {
 	border-radius: 16px 16px 8px 8px;
 	overflow: hidden;
 	width: 100%;
@@ -190,10 +198,10 @@ group.install_buttons button {
 	text-align: center;
 }
 
-#circup {
+#circup_page {
 	min-height: 640px;
 }
-#circup .hide {
+#circup_page .hide {
 	display: none;
 }
 #pwd {
@@ -202,36 +210,36 @@ group.install_buttons button {
 }
 
 #dependencies table thead { display: none; }
-#circup .line {
+#circup_page .line {
 	margin: 0px;
 }
 
-#circup table td { padding: 4px; }
-#circup table th { padding: 8px; }
+#circup_page table td { padding: 4px; }
+#circup_page table th { padding: 8px; }
 
-#circup table .upload { width: 50px; }
-#circup table .name { width: 100%; }
-#circup table .board_version { white-space: nowrap; }
-#circup table .bundle_version { white-space: nowrap; }
-#circup table .status_icon {}
-#circup table .status {
+#circup_page table .upload { width: 50px; }
+#circup_page table .name { width: 100%; }
+#circup_page table .board_version { white-space: nowrap; }
+#circup_page table .bundle_version { white-space: nowrap; }
+#circup_page table .status_icon {}
+#circup_page table .status {
 	white-space: nowrap;
 	min-width: 128px;
 }
 
-#circup .line.module_exists {
+#circup_page .line.module_exists {
 	color: var(--disabled-color);
 }
-#circup .line.module_exists button {
+#circup_page .line.module_exists button {
 	opacity: 0.5;
 }
-#circup .line.update_module { }
-#circup .line.major_update_module { }
-#circup .line.new_module { }
-#circup .line.invalid_module { }
-#circup .line.bad_mpy_module { }
+#circup_page .line.update_module { }
+#circup_page .line.major_update_module { }
+#circup_page .line.new_module { }
+#circup_page .line.invalid_module { }
+#circup_page .line.bad_mpy_module { }
 
-#circup .imported .status_icon {
+#circup_page .imported .status_icon {
 	/* background-color: #002244; */
 }
 

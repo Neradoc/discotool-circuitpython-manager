@@ -31,13 +31,17 @@ SPDX-License-Identifier: MIT
 		<button class="tab_link tab_link_circup"
 			value="circup">Installer</button>
 	</div>
-	<div id="welcome" class="tab_page tab_page_welcome">
+	<div id="welcome_page" class="tab_page tab_page_welcome">
 		<h3>Welcome !</h3>
 		<p>Todo.</p>
+		<p>Other boards list (use URL parameter to select board).</p>
 		<p>Link to the board's own web workflow.</p>
 		<p>Link to the serial REPL thingamabob.</p>
 		<p>Info about version and all that.</p>
-		<p>API password (&#9888;&#65039; transmitted unencrypted) <input name="password" id="password" type="password"/></p>
+		<p>
+			API password (&#9888;&#65039; transmitted unencrypted)<br/>
+			<input name="password" id="password" type="password" placeholder="passw0rd"/>
+		</p>
 	</div>
 	<div id="filelist" class="tab_page tab_page_files">
 		<table>
@@ -102,7 +106,7 @@ SPDX-License-Identifier: MIT
 			<div id="bundle_dependencies" class="liste"></div>
 		</div>
 	</div>
-	<div id="circup" class="tab_page tab_page_circup">
+	<div id="circup_page" class="tab_page tab_page_circup">
 		<h3>Circup Library Manager</h3>
 		<p>
 			<commands>

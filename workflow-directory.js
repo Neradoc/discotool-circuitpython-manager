@@ -21,12 +21,12 @@ async function refresh_list() {
 		}
 
 		var pwd = document.querySelector('#pwd');
-		var pwd_link = `<a href="?path=/${window.location.hash}" data-path="/">CIRCUITPY</a>/`
+		var pwd_link = `<a href="?path=/#files" data-path="/">CIRCUITPY</a>/`
 		var fullpath = "/";
 		for(var path of current_path.split("/")) {
 			if(path != "") {
 				fullpath += path + "/";
-				pwd_link += `<a href="?path=${fullpath}${window.location.hash}" data-path="${fullpath}" class="dir">${path}</a>/`;
+				pwd_link += `<a href="?path=${fullpath}#files" data-path="${fullpath}" class="dir">${path}</a>/`;
 			}
 		}
 		pwd.innerHTML = pwd_link;
