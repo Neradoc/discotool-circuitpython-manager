@@ -411,19 +411,39 @@ async function init_page() {
 		$(".tab_link_welcome").click();
 	}
 	await common.start();
-	// this is in parallel to the board ones
+	// circup loading
 	var prom1 = (async () => {
 		await start_circup();
 		await bundler.start(circup);
 	})();
 	// board inits
 	var prom2 = (async () => {
-		await setup_directory();
-		await find_devices();
+		// *** title
 		var vinfo = await cp_version_json();
 		$(".board_name").html(vinfo.board_name);
 		$(".circuitpy_version").html(vinfo.version);
 		$("#version_info_subtitle .subtitle_text").show();
+		// *** file list
+		await setup_directory();
+		await refresh_list();
+		// *** welcome page information
+		$("a.board_name").attr("href", `https://circuitpython.org/board/${vinfo.board_id}/`);
+		$("a.board_link").attr("href", common.workflow_url_base);
+		$("a.board_link").html(common.workflow_url_base);
+		var repl_url = new URL("/cp/serial/", common.workflow_url_base);
+		$("a.board_repl").attr("href", repl_url);
+		$("a.board_repl").html(repl_url.href);
+		$("a.board_ip").attr("href", `http://${vinfo.ip}`);
+		$("a.board_ip").html(vinfo.ip);
+		// other boards
+		var boards_list = await find_devices();
+		console.log(boards_list);
+		$(".boards_list .boards_list_default").hide();
+		if(boards_list.count > 0) {
+			$(".boards_list .boards_list_list").show().html(boards_list);
+		} else {
+			$(".boards_list .boards_list_empty").show();
+		}
 	})();
 	//
 	await prom1;

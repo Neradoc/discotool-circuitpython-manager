@@ -138,7 +138,7 @@ async function refresh_list() {
 async function find_devices() {
 	var response = await fetch(new URL("/cp/devices.json", common.workflow_url_base));
 	const data = await response.json();
-	refresh_list();
+	return data;
 }
 
 async function mkdir(e) {

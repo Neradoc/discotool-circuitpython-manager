@@ -28,8 +28,6 @@ SPDX-License-Identifier: MIT
 body {
 	background: white;
 	color: black;
-	font-family: Verdana;
-	font-size: 16px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -46,6 +44,13 @@ body {
 		background: #15141a;
 		color: white;
 	}
+}
+
+body {
+	font-family: Verdana;
+	font-size: 16px;
+	padding: 0px;
+	height: 100%;
 }
 
 input
@@ -74,10 +79,16 @@ h3 {
 	display: none;
 }
 
+/* 
+header, content {
+	background: #15141a;
+}
+ */
 header {
 	display: block;
 	max-width: 800px;
-	margin: auto;
+	margin: 0px auto;
+	padding: 10px 0px;
 }
 content {
 	/* display: grid; */
@@ -85,6 +96,7 @@ content {
 	display: block;
 	max-width: 800px;
 	margin: auto;
+	height: 100%;
 }
 
 #tablist {
@@ -116,12 +128,21 @@ content {
 	padding: 4px;
 }
 
-#welcome_page p {
+#welcome_page > div {
 	border-radius: 16px;
 	background: var(--input-background);
 	padding: 8px 22px;
 	margin: 4px;
 }
+#welcome_page > div:nth-child(even) {
+	background: var(--color-pair0);
+}
+#welcome_page > div:nth-child(odd) {
+	background: var(--color-pair1);
+}
+
+.boards_list .boards_list_empty { display: none; }
+.boards_list .boards_list_list { display: none; }
 
 #password {
 	font-size: inherit;
