@@ -24,6 +24,7 @@ SPDX-License-Identifier: MIT
 	--select-background-pair1: #040;
 	--select-text-pair0: white;
 	--select-text-pair1: white;
+	--contrast-clear: #BBB;
 }
 body {
 	background: white;
@@ -121,12 +122,12 @@ content {
 	color: var(--hover-color);
 }
 
-#filelist, #circup_page, #bundle_list {
+#file_list, #circup_page, #bundle_list {
 	display: none;
 	position: relative;
 }
 
-#welcome_page, #filelist, #circup_page, #bundle_list {
+#welcome_page, #file_list, #circup_page, #bundle_list {
 	padding: 4px;
 }
 
@@ -152,7 +153,7 @@ content {
 	font-family: Monaco, Menlo, monospace;
 }
 
-#filelist table {
+#file_list table {
 	border-radius: 32px 32px 16px 16px;
 	overflow: hidden;
 	width: 100%;
@@ -170,24 +171,51 @@ a {
 td {
 	padding: 2px 4px;
 }
-td a {
-	display: block;
-	padding: 2px 4px;
-}
-td a:hover {
-	background: var(--hover-background);
-	color: var(--hover-color);
-}
 tr:nth-child(even) { background: var(--color-pair0); }
 tr:nth-child(odd) { background: var(--color-pair1); }
 tr.even { background: var(--color-pair0); }
 tr.odd { background: var(--color-pair1); }
 
-#filelist td.type { text-align: center; }
-#filelist td.size { text-align: right; }
-#filelist td.path { text-align: left; }
-#filelist td.modified { text-align: right; }
-#filelist td.buttons { text-align: center; }
+#file_list td.type { text-align: center; }
+#file_list td.size { text-align: right; }
+#file_list td.path {
+	text-align: left;
+	width: 100%;
+}
+#file_list td.modified {
+	text-align: right;
+	white-space: nowrap;
+}
+#file_list td.buttons {
+	text-align: left;
+	white-space: nowrap;
+}
+
+#file_list td a.path {
+	display: block;
+	padding: 2px 4px;
+}
+#file_list td a.path:hover {
+	background: var(--hover-background);
+	color: var(--hover-color);
+}
+#file_list td.buttons a,
+#file_list td.buttons button
+{
+	cursor: pointer;
+	font: inherit;
+	line-height: inherit;
+	display: inline-block;
+	height: 24px;
+	width: 24px;
+	vertical-align: middle;
+	background: var(--contrast-clear);
+	border: 1px solid black;
+	border-radius: 4px;
+	padding: 0px;
+	margin: 0px;
+	text-align: center;
+}
 
 commands {
 	display: block;

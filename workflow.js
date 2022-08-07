@@ -34,7 +34,6 @@ function semver_compare(a,b) {
 
 async function get_file(filepath) {
 	var heads = common.headers({"Accept": "application/json"});
-	console.log(common.workflow_url_base, "/fs", filepath);
 	var url = new URL("/fs"+filepath, common.workflow_url_base);
 	return await fetch(
 		url,
@@ -50,7 +49,6 @@ async function cp_version_json() {
 	if(_version_info !== null) {
 		return _version_info;
 	}
-	console.log(new URL("/cp/version.json", common.workflow_url_base));
 	var response = await fetch(
 		new URL("/cp/version.json", common.workflow_url_base),
 	);
@@ -65,7 +63,6 @@ async function cp_version() {
 }
 
 async function is_editable() {
-	console.log(new URL("/fs/", common.workflow_url_base));
 	const status = await fetch(new URL("/fs/", common.workflow_url_base),
 		{
 			method: "OPTIONS",
@@ -76,6 +73,7 @@ async function is_editable() {
 		.get("Access-Control-Allow-Methods")
 		.toLowerCase()
 		.includes("delete");
+	console.log("IS EDITABLE", editable);
 	return editable;
 }
 
@@ -103,7 +101,7 @@ async function upload_file(upload_path, file) {
 	});
 	var file_data = await file.async("blob");
 	const file_url = new URL("/fs" + upload_path, common.workflow_url_base);
-	console.log(file_url);
+	console.log("UPLOAD", file_url);
 	const response = await fetch(file_url,
 		{
 			method: "PUT",
@@ -116,7 +114,6 @@ async function upload_file(upload_path, file) {
 
 async function create_dir(dir_path) {
 	var heads = common.headers({'X-Timestamp': Date.now()});
-	console.log(new URL("/fs" + dir_path, common.workflow_url_base));
 	const response = await fetch(
 		new URL("/fs" + dir_path, common.workflow_url_base),
 		{
@@ -411,6 +408,7 @@ async function init_page() {
 		$(".tab_link_welcome").click();
 	}
 	await common.start();
+	var vinfo = await cp_version_json();
 	// circup loading
 	var prom1 = (async () => {
 		await start_circup();
@@ -419,7 +417,6 @@ async function init_page() {
 	// board inits
 	var prom2 = (async () => {
 		// *** title
-		var vinfo = await cp_version_json();
 		$(".board_name").html(vinfo.board_name);
 		$(".circuitpy_version").html(vinfo.version);
 		$("#version_info_subtitle .subtitle_text").show();
@@ -437,7 +434,6 @@ async function init_page() {
 		$("a.board_ip").html(vinfo.ip);
 		// other boards
 		var boards_list = await find_devices();
-		console.log(boards_list);
 		$(".boards_list .boards_list_default").hide();
 		if(boards_list.count > 0) {
 			$(".boards_list .boards_list_list").show().html(boards_list);
@@ -472,6 +468,12 @@ $(".update_all").on("click", (e) => {
 $("#bundle_list #bundle_install").on("click", (e) => {
 	$(".tab_link_circup").click();
 	run_exclusively(() => bundle_install());
+});
+$(document).on("click", "#file_list_list .analyse", (e) => {
+	var path = $(e.target).data("path");
+	$(".tab_link_circup").click();
+	run_exclusively(() => auto_install(path));
+	return false;
 });
 
 $("#button_install_all").on("click", (e) => {

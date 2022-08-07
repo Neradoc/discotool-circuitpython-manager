@@ -50,7 +50,7 @@ SPDX-License-Identifier: MIT
 			<input name="password" id="password" type="password" placeholder="passw0rd"/>
 		</div>
 	</div>
-	<div id="filelist" class="tab_page tab_page_files">
+	<div id="file_list" class="tab_page tab_page_files">
 		<table id="file_list_list">
 			<thead>
 				<tr>
@@ -74,11 +74,12 @@ SPDX-License-Identifier: MIT
 				<tr>
 					<td class="type"></td>
 					<td class="size"></td>
-					<td class="path"><a></a></td>
+					<td class="path"><a class="path"></a></td>
 					<td class="modified"></td>
 					<td class="buttons">
-						<button class="delete">🗑️</button>
-						<button class="analyse">🔎</button>
+						<a class="delete">🗑️</a>
+						<a href="" target="_blank" class="edit">📝</a>
+						<a class="analyse">🔎</a>
 					</td>
 				</tr>
 			</template>

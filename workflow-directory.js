@@ -108,8 +108,6 @@ async function refresh_list() {
 			if (f.directory) {
 				file_path += "/";
 				api_url += "/";
-			} else {
-				file_path = api_url;
 			}
 			var icon = "&#10067;";
 			if (current_path == "/" && SECRETS.includes(f.name)) {
@@ -134,23 +132,38 @@ async function refresh_list() {
 			}
 			td[0].innerHTML = icon;
 			td[1].innerHTML = f.file_size;
-			var path = clone.querySelector("a");
+
+			var path = clone.querySelector("a.path");
 			path.innerHTML = f.name;
 			if(f.directory) {
-				path.href = url_here({"path": `${file_path}/`});
+				path.href = url_here({"path": `${file_path}`});
 				path.classList.add("files_list_dir");
 				path.setAttribute("data-path", file_path);
 			} else {
 				path.href = api_url;
 			}
 			td[3].innerHTML = (new Date(f.modified_ns / 1000000)).toLocaleString();
-			var delete_button = clone.querySelector("button.delete");
+			var delete_button = clone.querySelector(".delete");
+			path.setAttribute("data-path", api_url);
 			delete_button.value = api_url;
 			delete_button.onclick = del;
-			
-// 			console.log("file");
-// 			console.log(api_url);
-// 			console.log(file_path);
+
+			var edit_button = clone.querySelector("a.edit");
+			if(f.directory) {
+				edit_button.remove()
+			} else {
+				var edit_url = new URL("/edit/", common.workflow_url_base);
+				edit_url.hash = `#${file_path}`;
+				edit_button.href = edit_url;
+			}
+
+			var analyse_button = clone.querySelector(".analyse");
+			if(f.name.endsWith(".py")) {  // || search("requirement") >= 0 ?
+				path.setAttribute("data-path", api_url);
+				analyse_button.value = api_url;
+			} else {
+				analyse_button.remove()
+			}
 
 			new_children.push(clone);
 		}
@@ -214,18 +227,18 @@ async function upload(e) {
 }
 
 async function del(e) {
-	console.log("delete", e.target.value);
-	console.log(e);
-	let fn = new URL(e.target.value);
+	var path = $(e.target).data("path");
+	console.log("delete", path);
+	let fn = new URL(path);
 	var prompt = "Delete " + fn.pathname.substr(3);
-	if (e.target.value.endsWith("/")) {
+	if (path.endsWith("/")) {
 		prompt += " and all of its contents?";
 	} else {
 		prompt += "?";
 	}
 	if (confirm(prompt)) {
-		console.log(e.target.value);
-		const response = await fetch(e.target.value,
+		console.log(path);
+		const response = await fetch(path,
 			{
 				method: "DELETE",
 				headers: common.headers(),
@@ -252,6 +265,7 @@ async function del(e) {
 			}
 		}
 	}
+	return false;
 }
 
 async function load_directory(path) {

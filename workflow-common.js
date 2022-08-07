@@ -38,8 +38,8 @@ export function headers(others=null) {
 export async function start() {
 	// setup the actual URL
 	const url_test = new URL("/", workflow_url_base);
-	console.log(url_test);
+	console.log(`Common Start ${url_test}`);
 	const response = await fetch(url_test);
 	workflow_url_base = response.url;
-	console.log(`Board Full URL: ${workflow_url_base}`);
+	console.log(`Board URL: ${workflow_url_base}`);
 }
