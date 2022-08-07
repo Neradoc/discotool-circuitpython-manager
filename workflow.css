@@ -123,6 +123,7 @@ content {
 
 #filelist, #circup_page, #bundle_list {
 	display: none;
+	position: relative;
 }
 
 #welcome_page, #filelist, #circup_page, #bundle_list {
@@ -210,10 +211,18 @@ group.install_buttons button {
 }
 
 #file_list_loading_image {
+	position: absolute;
+	top: 4px;
+	left: 0px;
+	right: 0px;
 	text-align: center;
 }
 #file_list_error_image {
 	display: none;
+	position: absolute;
+	top: 4px;
+	left: 0px;
+	right: 0px;
 	font-size: 500%;
 	text-align: center;
 }

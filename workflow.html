@@ -51,7 +51,7 @@ SPDX-License-Identifier: MIT
 		</div>
 	</div>
 	<div id="filelist" class="tab_page tab_page_files">
-		<table>
+		<table id="file_list_list">
 			<thead>
 				<tr>
 					<th id="pwd" colspan="4"></th>
@@ -67,24 +67,24 @@ SPDX-License-Identifier: MIT
 			</thead>
 			<tbody>
 				<tr>
-				<td id="file_list_loading_image" colspan="5"><img src="loading_black.gif" /></td>
-				<td id="file_list_error_image" colspan="5">&#9888;&#65039;</td>
 				</tr>
 			</tbody>
 			<tbody id="file_list_body"></tbody>
-		<template id="row">
-			<tr>
-				<td class="type"></td>
-				<td class="size"></td>
-				<td class="path"><a></a></td>
-				<td class="modified"></td>
-				<td class="buttons">
-					<button class="delete">🗑️</button>
-					<button class="analyse">🔎</button>
-				</td>
-			</tr>
-		</template>
+			<template id="row">
+				<tr>
+					<td class="type"></td>
+					<td class="size"></td>
+					<td class="path"><a></a></td>
+					<td class="modified"></td>
+					<td class="buttons">
+						<button class="delete">🗑️</button>
+						<button class="analyse">🔎</button>
+					</td>
+				</tr>
+			</template>
 		</table>
+		<div id="file_list_loading_image"><img src="loading_black.gif" /></div>
+		<div id="file_list_error_image">&#9888;&#65039;</div>
 		<commands>
 		<group>
 			<input type="file" id="files_upload" name="files" multiple />

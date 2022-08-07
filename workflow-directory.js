@@ -8,15 +8,28 @@ let files = document.getElementById("files_upload");
 var current_path = common.current_path;
 var refreshing = false;
 
+function url_here(parameters = {}, hash = null) {
+	var url = new URL(window.location);
+	for(var key in parameters) {
+		url.searchParams.set(key, parameters[key]);
+	}
+	if(hash != null) {
+		url.hash = `#${hash}`;
+	}
+	return url;
+}
+
 async function refresh_list() {
 	if (refreshing) {
 		return;
 	}
 	refreshing = true;
 	try {
+		var top = Math.floor($('#file_list_list').height() / 2 - $('#file_list_loading_image').height() / 2);
+		$('#file_list_loading_image').css("top", `${top}px`);
 		$('#file_list_loading_image').show();
 		$('#file_list_error_image').hide();
-		$('#file_list_body tr').css("opacity", "0.4");
+		$('#file_list_list').css("opacity", "0.30");
 
 		if (current_path == "") {
 			current_path = "/";
@@ -41,7 +54,6 @@ async function refresh_list() {
 			}
 		);
 		if (! response.ok) {
-			$('#file_list_loading_image').hide();
 			$('#file_list_error_image').show();
 			$('#file_list_body tr').remove();
 		
@@ -73,8 +85,10 @@ async function refresh_list() {
 			td[0].innerHTML = "&#128190;";
 			var path = clone.querySelector("a");
 			let parent = new URL("..", "file://" + current_path);
-			path.href = `?path=${parent.pathname}` + window.location.hash;
-			path.class = "files_list_dir";
+			var file_path = parent.pathname;
+			path.href = url_here({"path": parent.pathname});
+			path.classList.add("files_list_dir");
+			path.setAttribute("data-path", file_path);
 			path.innerHTML = "..";
 			// Remove the delete button
 			td[4].replaceChildren();
@@ -123,7 +137,7 @@ async function refresh_list() {
 			var path = clone.querySelector("a");
 			path.innerHTML = f.name;
 			if(f.directory) {
-				path.href = `?path=${file_path}/${window.location.hash}`;
+				path.href = url_here({"path": `${file_path}/`});
 				path.classList.add("files_list_dir");
 				path.setAttribute("data-path", file_path);
 			} else {
@@ -134,18 +148,20 @@ async function refresh_list() {
 			delete_button.value = api_url;
 			delete_button.onclick = del;
 			
-			console.log("file");
-			console.log(api_url);
-			console.log(file_path);
+// 			console.log("file");
+// 			console.log(api_url);
+// 			console.log(file_path);
 
 			new_children.push(clone);
 		}
+		$('#file_list_loading_image').hide();
 		var tbody = document.querySelector("#file_list_body");
 		tbody.replaceChildren(...new_children);
 		$('#file_list_loading_image').hide();
 	} finally {
 		refreshing = false;
 		$('#file_list_loading_image').hide();
+		$('#file_list_list').css("opacity", "1");
 	}
 }
 
@@ -238,6 +254,12 @@ async function del(e) {
 	}
 }
 
+async function load_directory(path) {
+	current_path = path;
+	window.history.pushState({}, '', url_here({'path': path}));
+	refresh_list();
+}
+
 async function setup_directory() {
 	let mkdir_button = document.getElementById("mkdir");
 	mkdir_button.onclick = mkdir;
@@ -259,8 +281,7 @@ async function setup_directory() {
 
 	$(document).on("click", "a.files_list_dir", (e) => {
 		var self = $(e.target);
-		current_path = self.data("path");
-		refresh_list();
+		load_directory(self.data("path"));
 		return false;
 	});
 	$(document).on("click", ".refresh_list", (e) => {
