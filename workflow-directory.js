@@ -83,13 +83,13 @@ async function refresh_list() {
 			var clone = template.content.cloneNode(true);
 			var td = clone.querySelectorAll("td");
 			td[0].innerHTML = "&#128190;";
-			var path = clone.querySelector("a");
+			var path_link = clone.querySelector("a");
 			let parent = new URL("..", "file://" + current_path);
 			var file_path = parent.pathname;
-			path.href = url_here({"path": parent.pathname});
-			path.classList.add("files_list_dir");
-			path.setAttribute("data-path", file_path);
-			path.innerHTML = "..";
+			path_link.href = url_here({"path": parent.pathname});
+			path_link.classList.add("files_list_dir");
+			path_link.setAttribute("data-path", file_path);
+			path_link.innerHTML = "..";
 			// Remove the delete button
 			td[4].replaceChildren();
 			new_children.push(clone);
@@ -144,11 +144,11 @@ async function refresh_list() {
 			}
 			td[3].innerHTML = (new Date(f.modified_ns / 1000000)).toLocaleString();
 			var delete_button = clone.querySelector(".delete");
-			path.setAttribute("data-path", api_url);
+			delete_button.setAttribute("data-path", api_url);
 			delete_button.value = api_url;
 			delete_button.onclick = del;
 
-			var edit_button = clone.querySelector("a.edit");
+			var edit_button = clone.querySelector(".edit");
 			if(f.directory) {
 				edit_button.remove()
 			} else {
@@ -157,12 +157,12 @@ async function refresh_list() {
 				edit_button.href = edit_url;
 			}
 
-			var analyse_button = clone.querySelector(".analyse");
+			var analyze_button = clone.querySelector(".analyze");
 			if(f.name.endsWith(".py")) {  // || search("requirement") >= 0 ?
-				path.setAttribute("data-path", api_url);
-				analyse_button.value = api_url;
+				analyze_button.setAttribute("data-path", file_path);
+				analyze_button.value = api_url;
 			} else {
-				analyse_button.remove()
+				analyze_button.remove()
 			}
 
 			new_children.push(clone);

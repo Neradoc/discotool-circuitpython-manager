@@ -469,7 +469,7 @@ $("#bundle_list #bundle_install").on("click", (e) => {
 	$(".tab_link_circup").click();
 	run_exclusively(() => bundle_install());
 });
-$(document).on("click", "#file_list_list .analyse", (e) => {
+$(document).on("click", "#file_list_list .analyze", (e) => {
 	var path = $(e.target).data("path");
 	$(".tab_link_circup").click();
 	run_exclusively(() => auto_install(path));
