@@ -8,17 +8,6 @@ let files = document.getElementById("files_upload");
 var current_path = common.current_path;
 var refreshing = false;
 
-function url_here(parameters = {}, hash = null) {
-	var url = new URL(window.location);
-	for(var key in parameters) {
-		url.searchParams.set(key, parameters[key]);
-	}
-	if(hash != null) {
-		url.hash = `#${hash}`;
-	}
-	return url;
-}
-
 async function refresh_list() {
 	if (refreshing) {
 		return;
@@ -86,7 +75,7 @@ async function refresh_list() {
 			var path_link = clone.querySelector("a");
 			let parent = new URL("..", "file://" + current_path);
 			var file_path = parent.pathname;
-			path_link.href = url_here({"path": parent.pathname});
+			path_link.href = common.url_here({"path": parent.pathname});
 			path_link.classList.add("files_list_dir");
 			path_link.setAttribute("data-path", file_path);
 			path_link.innerHTML = "..";
@@ -136,7 +125,7 @@ async function refresh_list() {
 			var path = clone.querySelector("a.path");
 			path.innerHTML = f.name;
 			if(f.directory) {
-				path.href = url_here({"path": `${file_path}`});
+				path.href = common.url_here({"path": `${file_path}`});
 				path.classList.add("files_list_dir");
 				path.setAttribute("data-path", file_path);
 			} else {
@@ -270,7 +259,7 @@ async function del(e) {
 
 async function load_directory(path) {
 	current_path = path;
-	window.history.pushState({}, '', url_here({'path': path}));
+	window.history.pushState({}, '', common.url_here({'path': path}));
 	refresh_list();
 }
 

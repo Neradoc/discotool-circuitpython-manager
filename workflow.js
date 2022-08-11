@@ -435,8 +435,17 @@ async function init_page() {
 		// other boards
 		var boards_list = await find_devices();
 		$(".boards_list .boards_list_default").hide();
-		if(boards_list.count > 0) {
-			$(".boards_list .boards_list_list").show().html(boards_list);
+		var devices = boards_list.devices;
+		if(devices.length > 0) {
+			var liste = $("<ul></ul>");
+			for(var device of devices) {
+				var link = $(`<a href="">${device.hostname} / ${device.ip}</a>`);
+				link.attr("href", common.url_here({"dev": device.ip}).href);
+				var line = $(`<li>${device.instance_name} at </li>`);
+				line.append(link);
+				liste.append(line);
+			}
+			$(".boards_list .boards_list_list").empty().append("Other boards:").append(liste).show();
 		} else {
 			$(".boards_list .boards_list_empty").show();
 		}

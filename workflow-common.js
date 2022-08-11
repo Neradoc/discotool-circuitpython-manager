@@ -37,9 +37,29 @@ export function headers(others=null) {
 
 export async function start() {
 	// setup the actual URL
-	const url_test = new URL("/", workflow_url_base);
-	console.log(`Common Start ${url_test}`);
-	const response = await fetch(url_test);
-	workflow_url_base = response.url;
+	var url = new URL(window.location);
+	var url_passed = url.searchParams.get("dev");
+	if(url_passed) {
+		console.log("Trying", url_passed);
+		var url_test = new URL("/", `http://${url_passed}`);
+		var response = await fetch(url_test);
+		workflow_url_base = response.url;
+	} else {
+		console.log("Trying", workflow_url_base);
+		var url_test = new URL("/", workflow_url_base);
+		var response = await fetch(url_test);
+		workflow_url_base = response.url;
+	}
 	console.log(`Board URL: ${workflow_url_base}`);
+}
+
+export function url_here(parameters = {}, hash = null) {
+	var url = new URL(window.location);
+	for(var key in parameters) {
+		url.searchParams.set(key, parameters[key]);
+	}
+	if(hash != null) {
+		url.hash = `#${hash}`;
+	}
+	return url;
 }
