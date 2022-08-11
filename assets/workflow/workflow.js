@@ -3,15 +3,15 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
-import { BUNDLE_ACCESS } from "./workflow-config.js";
-import * as common from "./workflow-common.js";
+import { BUNDLE_ACCESS } from "../../config.js";
+import * as common from "./common.js";
 import { setup_directory, find_devices, refresh_list } from "./workflow-directory.js";
-import { Circup } from "./circup.js";
+import { Circup } from "../lib/circup.js";
 import * as bundler from "./workflow-bundler.js";
 
 const DEBUG = common.DEBUG;
 const LINE_HIDE_DELAY = 1000;
-const LOADING_IMAGE = '<img class="small_load_image" src="loading_black_small.gif" />';
+const LOADING_IMAGE = $("#small_load_image").html();
 const BAD_MPY = -1;
 
 var modules_to_update = [];
@@ -101,7 +101,7 @@ async function upload_file(upload_path, file) {
 	});
 	var file_data = await file.async("blob");
 	const file_url = new URL("/fs" + upload_path, common.workflow_url_base);
-	console.log("UPLOAD", file_url);
+	console.log("UPLOAD", file_url.href);
 	const response = await fetch(file_url,
 		{
 			method: "PUT",
@@ -110,6 +110,11 @@ async function upload_file(upload_path, file) {
 			body: file_data,
 		}
 	);
+	if(response.status == 409) {
+		console.log("Error: Cannot write to the drive");
+		return false;
+	}
+	return true;
 }
 
 async function create_dir(dir_path) {
@@ -122,6 +127,11 @@ async function create_dir(dir_path) {
 			credentials: "include",
 		}
 	);
+	if(response.status == 409) {
+		console.log("Error: Cannot write to the drive");
+		return false;
+	}
+	return true;
 }
 
 async function install_modules(dependencies) {

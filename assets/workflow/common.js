@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
-import {WORKFLOW_USERNAME, WORKFLOW_PASSWORD} from "./workflow-config.js";
+import {WORKFLOW_USERNAME, WORKFLOW_PASSWORD} from "../../config.js";
 
 export var hash = window.location.hash.substr(1);
 export var url_params = new URLSearchParams(document.location.search)

@@ -1,6 +1,11 @@
-import * as common from "./workflow-common.js";
+import * as common from "./common.js";
 
-const HIDDEN = [".fseventsd", ".metadata_never_index",".Trashes"];
+const HIDDEN = [
+	".fseventsd",
+	".metadata_never_index",
+	".Trashes",
+	".TemporaryItems",
+];
 const SECRETS = [".env", "secrets.py"];
 
 let new_directory_name = document.getElementById("name");

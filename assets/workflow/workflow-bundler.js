@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
-import * as common from "./workflow-common.js";
+import * as common from "./common.js";
 
 export var modules_list = [];
 

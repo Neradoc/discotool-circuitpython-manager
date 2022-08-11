@@ -6,12 +6,12 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 -->
 	<title></title>
-	<link rel="shortcut icon" type="image/jpg" href="favicon.png"/>
+	<link rel="shortcut icon" type="image/jpg" href="assets/images/favicon.png"/>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8">
-	<link rel="stylesheet" href="workflow.css">
-	<script src="jquery.min.js" defer="true"></script>
-	<script src="jszip.min.js"></script>
-	<script src="workflow.js" defer="true" type="module"></script>
+	<link rel="stylesheet" href="assets/workflow/workflow.css">
+	<script src="assets/extlib/jquery.min.js" defer="true"></script>
+	<script src="assets/extlib/jszip.min.js"></script>
+	<script src="assets/workflow/workflow.js" defer="true" type="module"></script>
 </head>
 <body>
 	<header>
@@ -84,7 +84,7 @@ SPDX-License-Identifier: MIT
 				</tr>
 			</template>
 		</table>
-		<div id="file_list_loading_image"><img src="loading_black.gif" /></div>
+		<div id="file_list_loading_image"><img src="assets/images/loading_black.gif" /></div>
 		<div id="file_list_error_image">&#9888;&#65039;</div>
 		<commands>
 		<group>
@@ -114,7 +114,7 @@ SPDX-License-Identifier: MIT
 		<div class="lists">
 			<div class="title">Modules <span id="nselected"></span></div>
 			<div class="title">Dependencies (<span class="num_deps">0</span>)</div>
-			<div id="bundle_modules" class="liste"><img class="loading_image" src="loading_black_small.gif"/></div>
+			<div id="bundle_modules" class="liste"><img class="loading_image" src="assets/images/loading_black_small.gif"/></div>
 			<div id="bundle_dependencies" class="liste"></div>
 		</div>
 	</div>
@@ -161,6 +161,7 @@ SPDX-License-Identifier: MIT
 			</table>
 		</div>
 	</div>
+	<div id="small_load_image"><img class="small_load_image" src="assets/images/loading_black_small.gif" /></div>
 	</content>
 </body>
 </html>

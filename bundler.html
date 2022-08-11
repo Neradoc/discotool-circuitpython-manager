@@ -7,10 +7,10 @@ SPDX-License-Identifier: MIT
 <head>
 	<meta charset="utf-8" />
 	<title>Circuitpython Libraries Bundler</title>
-	<link rel="stylesheet" href="bundler.css">
-	<script src="jquery.min.js"></script>
-	<script src="jszip.min.js"></script>
-	<script src="bundler.js" defer="true" type="module"></script>
+	<link rel="stylesheet" href="assets/bundler/bundler.css">
+	<script src="assets/extlib/jquery.min.js"></script>
+	<script src="assets/extlib/jszip.min.js"></script>
+	<script src="assets/bundler/bundler.js" defer="true" type="module"></script>
 </head>
 <body>
 <div id="container">
@@ -32,13 +32,13 @@ SPDX-License-Identifier: MIT
 			Or drop your files here.
 		</p>
 		<p id="dropped_files_list"></p>
-		<img id="drop_loading" src="loading_black_small.gif" />
+		<img id="drop_loading" src="assets/images/loading_black_small.gif" />
 		<input id="select_files_input" type="file" multiple />
 	</div>
 
 	<div class="title">Modules <span id="nselected"></span></div>
 	<div class="title">Dependencies (<span class="num_deps">0</span>)</div>
-	<div id="modules" class="liste"><img class="loading_image" src="loading_black_small.gif"/></div>
+	<div id="modules" class="liste"><img class="loading_image" src="assets/images/loading_black_small.gif"/></div>
 	<div id="dependencies" class="liste"></div>
 	
 	<div></div>
