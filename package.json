@@ -1,23 +1,24 @@
 {
-  "name": "electron-quick-start",
+  "name": "circup-electron-app",
   "version": "1.0.0",
-  "description": "A minimal Electron application",
+  "description": "A Library manager for Circuitpython and more",
   "main": "main.cjs",
   "scripts": {
     "start": "electron ."
   },
-  "repository": "https://github.com/electron/electron-quick-start",
+  "repository": "https://github.com/Neradoc/circuitpython-web-packager",
   "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
+    "Circuitpython",
+    "circup"
   ],
-  "author": "GitHub",
-  "license": "CC0-1.0",
+  "author": "Neradoc",
+  "license": "MIT",
   "devDependencies": {
-    "electron": "^19.0.10"
+    "electron": "^19.0.10",
+    "electron-packager": "^15.5.1"
   },
-  "type":"module"
+  "type": "module",
+  "dependencies": {
+    "usb": "^2.5.0"
+  }
 }
