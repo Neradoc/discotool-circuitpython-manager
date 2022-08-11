@@ -45,6 +45,11 @@ async function start_circup() {
 	}
 }
 
+async function get_lib_directory() {
+	var the_libs = await backend.list_dir("/lib/");
+	return the_libs.map((item) => item.name);
+}
+
 async function install_modules(dependencies) {
 	for(var module_name of dependencies) {
 		console.log("Installing", module_name);
@@ -85,6 +90,7 @@ async function get_module_version(module_name, libs_list) {
 	if(pkg && libs_list.includes(module.name)) {
 		// look at all files in the package
 		module_files = await backend.list_dir(module_path + "/");
+		module_files = module_files.map((item) => module_path + "/" + item.name);
 	} else if(!pkg && libs_list.includes(module.name + ".py")) {
 		module_files = [module_path+".py"];
 	} else if(!pkg && libs_list.includes(module.name + ".mpy")) {
@@ -222,14 +228,14 @@ async function upload_button_call(e) {
 	button.attr("disabled", true);
 	line.find(".status_icon").html(LOADING_IMAGE);
 	await install_modules([target_module])
-	var the_libs = await backend.list_dir("/lib/");
+	var the_libs = await get_lib_directory();
 	await update_line(line, the_libs);
 }
 
 async function run_update_process(imports) {
 	$("#circup_page .loading").append(`<br/>Loading dependencies...`);
 	// list the libs, to know which are missing
-	var libs_list = await backend.list_dir("/lib/");
+	var libs_list = await get_lib_directory();
 	// get the dependencies
 	var dependencies = [];
 	imports.forEach((a_module) => {
@@ -298,7 +304,7 @@ async function update_all() {
 	$("#circup_page .loading").append(`<br/>Loading libraries from <b>/lib</b> directory...`);
 	$("#circup_page .title .filename").html("/lib/");
 	// get the list of libraries from the board
-	var libs_list = await backend.list_dir("/lib/");
+	var libs_list = await get_lib_directory();
 	libs_list = libs_list
 		.filter((item) => !item.startsWith("."))
 		.map((item) => item.replace(/\.m?py$/,""));
@@ -342,9 +348,9 @@ async function init_page() {
 		await refresh_list();
 		// *** welcome page information
 		$("a.board_name").attr("href", `https://circuitpython.org/board/${vinfo.board_id}/`);
-		$("a.board_link").attr("href", common.workflow_url_base);
-		$("a.board_link").html(common.workflow_url_base);
-		var repl_url = new URL("/cp/serial/", common.workflow_url_base);
+		$("a.board_link").attr("href", backend.workflow_url_base);
+		$("a.board_link").html(backend.workflow_url_base);
+		var repl_url = new URL("/cp/serial/", backend.workflow_url_base);
 		$("a.board_repl").attr("href", repl_url);
 		$("a.board_repl").html(repl_url.href);
 		$("a.board_ip").attr("href", `http://${vinfo.ip}`);

@@ -96,8 +96,8 @@ class WebWorkflow extends Workflow {
 			}
 		);
 		try {
-			var data = response.json();
-			return data.map((item) => dir_path + item.name);
+			var data = await response.json();
+			return data;
 		} catch {
 			return [];
 		}
