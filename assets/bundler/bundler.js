@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
-import { Circup } from "../lib/circup.js";
+import { Circup } from "../lib/bundle.js";
 const BUNDLE_ACCESS = "proxy:https://neradoc.me/bundler/proxy.php";
 var DEBUG = true;
 var circup = new Circup(BUNDLE_ACCESS);

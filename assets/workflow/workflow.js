@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 import { BUNDLE_ACCESS } from "../../config.js";
 import * as common from "./common.js";
 import { setup_directory, find_devices, refresh_list } from "./workflow-directory.js";
-import { Circup } from "../lib/circup.js";
+import { Circup } from "../lib/bundle.js";
 import * as bundler from "./workflow-bundler.js";
 
 const DEBUG = common.DEBUG;
