@@ -107,7 +107,7 @@ $(document).on("click", "#bundle_clear_search", (event) => {
 */
 
 function toggle_deselect() {
-	nselected = $(".selected").length;
+	var nselected = $(".selected").length;
 	if(nselected > 0) {
 		$("#bundle_deselect_all").addClass("enabled");
 		$("#nselected").html(`(${nselected} selected)`);
