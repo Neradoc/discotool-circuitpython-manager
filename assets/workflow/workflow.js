@@ -46,8 +46,8 @@ async function start_circup() {
 }
 
 async function get_lib_directory() {
-	var the_libs = await backend.list_dir("/lib/");
-	return the_libs.map((item) => item.name);
+	var response = await backend.list_dir("/lib/");
+	return response.content.map((item) => item.name);
 }
 
 async function install_modules(dependencies) {
@@ -56,7 +56,7 @@ async function install_modules(dependencies) {
 		var module = library_bundle.get_module(module_name);
 		var module_files = await library_bundle.list_module_files(module);
 		if(module.package) {
-			await backed.create_dir(`/lib/${module.name}/`);
+			await backend.create_dir(`/lib/${module.name}/`);
 		}
 		for(var file of module_files) {
 			var upload_path = file.name.replace(/^[^\/]+\//, "/");
@@ -89,7 +89,8 @@ async function get_module_version(module_name, libs_list) {
 
 	if(pkg && libs_list.includes(module.name)) {
 		// look at all files in the package
-		module_files = await backend.list_dir(module_path + "/");
+		var response = await backend.list_dir(module_path + "/");
+		module_files = response.content;
 		module_files = module_files.map((item) => module_path + "/" + item.name);
 	} else if(!pkg && libs_list.includes(module.name + ".py")) {
 		module_files = [module_path+".py"];
@@ -101,8 +102,9 @@ async function get_module_version(module_name, libs_list) {
 
 	var version = false;
 	for(var file_name of module_files) {
-		var file_data = await backend.get_file_content("/" + file_name);
-		if(!file_data) { continue }
+		var response = await backend.get_file_content("/" + file_name);
+		if(!response.ok) { continue }
+		var file_data = response.content;
 		// empty MPY files are bad
 		if(file_data.length == 0 && file_name.endsWith(".mpy")) {
 			version = null;
@@ -285,13 +287,14 @@ async function auto_install(file_name) {
 	$("#circup_page .loading").append(`<br/>Loading <b>${file_name}</b>...`);
 	$("#circup_page .title .filename").html(file_name);
 	// get the file
-	const code_content = await backend.get_file_content("/" + file_name);
-	if(!code_content) {
+	var code_response = await backend.get_file_content("/" + file_name);
+	if(!code_response.ok) {
 		console.log(`Error: ${file_name} not found.`);
 		// TODO: make sure to exit gracefully
 		return;
 	}
 	// get the list
+	const code_content = code_response.content;
 	$("#circup_page .loading").append(`<br/>Loading modules from <b>${file_name}</b>...`);
 	const imports = library_bundle.get_imports_from_python(code_content);
 	console.log("imports", imports);

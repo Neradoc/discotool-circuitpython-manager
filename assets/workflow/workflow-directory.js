@@ -74,7 +74,8 @@ async function refresh_list() {
 		}
 		const data = await response.json();
 		*/
-		var data = await backend.list_dir(current_path);
+		var response = await backend.list_dir(current_path);
+		var data = response.content;
 		var new_children = [];
 		var template = document.querySelector('#row');
 
@@ -93,8 +94,6 @@ async function refresh_list() {
 			td[4].replaceChildren();
 			new_children.push(clone);
 		}
-		
-		console.log(data);
 
 		data.sort((a,b) => {
 			return a.name.localeCompare(b.name);

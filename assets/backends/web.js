@@ -1,17 +1,13 @@
-import { Workflow } from "./workflow_base.js";
+import { Workflow, WorkflowResponse, WorkflowFile } from "./workflow_base.js";
 import { WORKFLOW_USERNAME, WORKFLOW_PASSWORD } from "../../config.js";
 
 var hash = window.location.hash.substr(1);
 var url_params = new URLSearchParams(document.location.search);
 
-class WorkflowStatus {
-	constructor(ok, status=200, statusText="OK", content=null) {
-		this.ok = ok;
-		this.status = status;
-		this.statusText = statusText;
-		this.content = content;
-		// have text and json ?
-		// rename json to array/dict ?
+class WebResponse extends WorkflowResponse {
+	constructor(response, content, ok=null) {
+		if(ok===null) ok = response.ok;
+		super(ok, content, response.status, response.statusText);
 	}
 }
 
@@ -77,9 +73,10 @@ class WebWorkflow extends Workflow {
 			}
 		);
 		try {
-			return response.text();
+			var file_content = await response.text();
+			return new WebResponse(response, file_content);
 		} catch {
-			return null;
+			return new WebResponse(response, null, false);
 		}
 	}
 	async list_dir(dir_path) {
@@ -97,9 +94,9 @@ class WebWorkflow extends Workflow {
 		);
 		try {
 			var data = await response.json();
-			return data;
+			return new WebResponse(response, data);
 		} catch {
-			return [];
+			return new WebResponse(response, [], false);
 		}
 	}
 	async upload_file(upload_path, file) {
@@ -120,9 +117,9 @@ class WebWorkflow extends Workflow {
 		);
 		if(response.status == 409) {
 			console.log("Error: Cannot write to the drive");
-			return WorkflowStatus(false, 409, "Error: Cannot write to the drive");
+			return new WorkflowResponse(false, null, 409, "Error: Cannot write to the drive");
 		}
-		return WorkflowStatus(true);
+		return new WorkflowResponse(true, null);
 	}
 	async create_dir(dir_path) {
 		var heads = this.headers({'X-Timestamp': Date.now()});
@@ -136,11 +133,18 @@ class WebWorkflow extends Workflow {
 		);
 		if(response.status == 409) {
 			console.log("Error: Cannot write to the drive");
-			return WorkflowStatus(false, 409, "Error: Cannot write to the drive");
+			return new WorkflowResponse(false, null, 409, "Error: Cannot write to the drive");
 		}
-		return WorkflowStatus(true);
+		return new WorkflowResponse(true, null);
 	}
 	async delete_file(file_path) {
+		const response = await fetch(file_path,
+			{
+				method: "DELETE",
+				headers: this.headers(),
+			}
+		)
+		return new WebResponse(response, "");
 	}
 
 	//##############################################################
