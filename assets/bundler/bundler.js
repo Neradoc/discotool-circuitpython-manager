@@ -3,10 +3,10 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
-import { Circup } from "../lib/bundle.js";
+import { LibraryBundle } from "../lib/bundle.js";
 const BUNDLE_ACCESS = "proxy:https://neradoc.me/bundler/proxy.php";
 var DEBUG = true;
-var circup = new Circup(BUNDLE_ACCESS);
+var library_bundle = new LibraryBundle(BUNDLE_ACCESS);
 
 /***************************************************************
 *** NOTE THE UI PART
@@ -54,10 +54,10 @@ function update_dependencies_list() {
 	var modules_list = [];
 	$("#modules .selected .module").each((i,that) => {
 		var module = $(that).html();
-		circup.get_dependencies(module, modules_list);
+		library_bundle.get_dependencies(module, modules_list);
 	});
 	dropped_modules_list.forEach((module) => {
-		circup.get_dependencies(module, modules_list);
+		library_bundle.get_dependencies(module, modules_list);
 	});
 	modules_list.sort();
 	$("#dependencies").html("");
@@ -65,7 +65,7 @@ function update_dependencies_list() {
 	for(var index in modules_list) {
 		pair = pair + 1;
 		var module_name = modules_list[index];
-		var module = circup.get_module(module_name);
+		var module = library_bundle.get_module(module_name);
 		if(module === false) { continue; } // skip external modules
 		var ext = "";
 		if(!module.package) {
@@ -185,8 +185,8 @@ async function async_zipit() {
 
 		var item = modules_bom[index];
 		var module_name = $(item).html();
-		var module = circup.all_the_modules[module_name];
-		var zip_contents = await circup.get_bundle_module_contents(module);
+		var module = library_bundle.all_the_modules[module_name];
+		var zip_contents = await library_bundle.get_bundle_module_contents(module);
 		var bundle_path = "";
 
 		bundle_path = Object.keys(zip_contents.files)[0].split("/")[0]+"/lib";
@@ -286,7 +286,7 @@ function update_the_selected_files() {
 	});
 	Promise.all(annoying_promises).then((values) => {
 		values.forEach((full_content) => {
-			var imports = circup.get_imports_from_python(full_content);
+			var imports = library_bundle.get_imports_from_python(full_content);
 			imports.forEach((item) => {
 				if(!dropped_modules_list.includes(item)) {
 					dropped_modules_list.push(item);
@@ -398,13 +398,13 @@ $(document).on("click", "#zip_button", zipit);
 
 async function start() {
 	$("#modules .loading_image").show();
-	circup.setup_the_modules_list().then(() => {
-		var keys = Object.keys(circup.all_the_modules);
+	library_bundle.setup_the_modules_list().then(() => {
+		var keys = Object.keys(library_bundle.all_the_modules);
 		$("#modules .loading_image").hide();
 		keys.sort();
 		keys.forEach((module_name, pair) => {
-			var nd1 = circup.all_the_modules[module_name].dependencies.length;
-			var nd2 = circup.all_the_modules[module_name].external_dependencies.length;
+			var nd1 = library_bundle.all_the_modules[module_name].dependencies.length;
+			var nd2 = library_bundle.all_the_modules[module_name].external_dependencies.length;
 			var num_deps = "";
 			if(DEBUG) { num_deps = `(${nd1+nd2})`; }
 			$("#modules").append(

@@ -5,9 +5,11 @@ SPDX-License-Identifier: MIT
 
 import { BUNDLE_ACCESS } from "../../config.js";
 import * as common from "./common.js";
-import { setup_directory, find_devices, refresh_list } from "./workflow-directory.js";
-import { Circup } from "../lib/bundle.js";
+import { setup_directory, refresh_list } from "./workflow-directory.js";
+import { LibraryBundle } from "../lib/bundle.js";
 import * as bundler from "./workflow-bundler.js";
+
+var backend = common.backend;
 
 const DEBUG = common.DEBUG;
 const LINE_HIDE_DELAY = 1000;
@@ -16,7 +18,7 @@ const BAD_MPY = -1;
 
 var modules_to_update = [];
 var cpver = null;
-var circup = null;
+var library_bundle = null;
 var install_running = false;
 var show_up_to_date = false;
 
@@ -32,120 +34,29 @@ function semver_compare(a,b) {
 	);
 }
 
-async function get_file(filepath) {
-	var heads = common.headers({"Accept": "application/json"});
-	var url = new URL("/fs"+filepath, common.workflow_url_base);
-	return await fetch(
-		url,
-		{
-			headers: heads,
-			credentials: "include",
-		}
-	);
-}
-
-var _version_info = null;
-async function cp_version_json() {
-	if(_version_info !== null) {
-		return _version_info;
-	}
-	var response = await fetch(
-		new URL("/cp/version.json", common.workflow_url_base),
-	);
-	_version_info = await response.json();
-	console.log(_version_info);
-	return _version_info;
-}
-
-async function cp_version() {
-	var version_data = await cp_version_json();
-	return version_data.version;
-}
-
-async function is_editable() {
-	const status = await fetch(new URL("/fs/", common.workflow_url_base),
-		{
-			method: "OPTIONS",
-			credentials: "include",
-		}
-	);
-	var editable = status.headers
-		.get("Access-Control-Allow-Methods")
-		.toLowerCase()
-		.includes("delete");
-	console.log("IS EDITABLE", editable);
-	return editable;
-}
-
-async function get_lib_directory() {
-	var response = await get_file("/lib/");
-	var data = await response.json();
-	return data.map((item) => item.name);
-}
-
 async function start_circup() {
-	if (circup == null) {
+	if (library_bundle == null) {
 		// get the version data
-		cpver = semver(await cp_version());
+		cpver = semver(await backend.cp_version());
 		// init circup with the CP version
-		circup = new Circup(BUNDLE_ACCESS, cpver);
-		// circup = new Circup(true, cpver);
-		await circup.setup_the_modules_list();
+		library_bundle = new LibraryBundle(BUNDLE_ACCESS, cpver);
+		// circup = new LibraryBundle(true, cpver);
+		await library_bundle.setup_the_modules_list();
 	}
-}
-
-async function upload_file(upload_path, file) {
-	var heads = common.headers({
-		'Content-Type': 'application/octet-stream',
-		'X-Timestamp': file.lastModified,
-	});
-	var file_data = await file.async("blob");
-	const file_url = new URL("/fs" + upload_path, common.workflow_url_base);
-	console.log("UPLOAD", file_url.href);
-	const response = await fetch(file_url,
-		{
-			method: "PUT",
-			headers: heads,
-			credentials: "include",
-			body: file_data,
-		}
-	);
-	if(response.status == 409) {
-		console.log("Error: Cannot write to the drive");
-		return false;
-	}
-	return true;
-}
-
-async function create_dir(dir_path) {
-	var heads = common.headers({'X-Timestamp': Date.now()});
-	const response = await fetch(
-		new URL("/fs" + dir_path, common.workflow_url_base),
-		{
-			method: "PUT",
-			headers: heads,
-			credentials: "include",
-		}
-	);
-	if(response.status == 409) {
-		console.log("Error: Cannot write to the drive");
-		return false;
-	}
-	return true;
 }
 
 async function install_modules(dependencies) {
 	for(var module_name of dependencies) {
 		console.log("Installing", module_name);
-		var module = circup.get_module(module_name);
-		var module_files = await circup.list_module_files(module);
+		var module = library_bundle.get_module(module_name);
+		var module_files = await library_bundle.list_module_files(module);
 		if(module.package) {
-			await create_dir(`/lib/${module.name}/`);
+			await backed.create_dir(`/lib/${module.name}/`);
 		}
 		for(var file of module_files) {
 			var upload_path = file.name.replace(/^[^\/]+\//, "/");
 			// var upload_path = file.name.replace(/^.+?\/lib\//, "/lib/");
-			await upload_file(upload_path, file);
+			await backend.upload_file(upload_path, file);
 		}
 	}
 	await refresh_list();
@@ -165,18 +76,15 @@ async function install_all() {
 }
 
 async function get_module_version(module_name, libs_list) {
-	var module = circup.get_module(module_name);
+	var module = library_bundle.get_module(module_name);
 	var module_path = `/lib/${module.name}`
 	var pkg = module.package;
 	var module_files = [];
-	var cpver = await cp_version();
+	var cpver = await backend.cp_version();
 
 	if(pkg && libs_list.includes(module.name)) {
 		// look at all files in the package
-		var response = await get_file(module_path + "/");
-		var data = await response.json();
-		// module_files = data.map((item) => item.name);
-		module_files = data.map((item) => module_path + "/" + item.name);
+		module_files = await backend.list_dir(module_path + "/");
 	} else if(!pkg && libs_list.includes(module.name + ".py")) {
 		module_files = [module_path+".py"];
 	} else if(!pkg && libs_list.includes(module.name + ".mpy")) {
@@ -187,9 +95,8 @@ async function get_module_version(module_name, libs_list) {
 
 	var version = false;
 	for(var file_name of module_files) {
-		var file_response = await get_file("/" + file_name);
-		if(!file_response.ok) { continue }
-		var file_data = await file_response.text();
+		var file_data = await backend.get_file_content("/" + file_name);
+		if(!file_data) { continue }
 		// empty MPY files are bad
 		if(file_data.length == 0 && file_name.endsWith(".mpy")) {
 			version = null;
@@ -261,7 +168,7 @@ async function pre_update_process() {
 
 async function update_line(new_line, libs_list) {
 	var module_name = new_line.find(".upload button").val();
-	var module = circup.get_module(module_name);
+	var module = library_bundle.get_module(module_name);
 	new_line.find(".status_icon").html(LOADING_IMAGE);
 	new_line.removeClass("bad_mpy_module new_module invalid_module module_exists major_update_module update_module");
 	// module versions from the board
@@ -315,18 +222,18 @@ async function upload_button_call(e) {
 	button.attr("disabled", true);
 	line.find(".status_icon").html(LOADING_IMAGE);
 	await install_modules([target_module])
-	var the_libs = await get_lib_directory();
+	var the_libs = await backend.list_dir("/lib/");
 	await update_line(line, the_libs);
 }
 
 async function run_update_process(imports) {
 	$("#circup_page .loading").append(`<br/>Loading dependencies...`);
 	// list the libs, to know which are missing
-	var libs_list = await get_lib_directory();
+	var libs_list = await backend.list_dir("/lib/");
 	// get the dependencies
 	var dependencies = [];
 	imports.forEach((a_module) => {
-		circup.get_dependencies(a_module, dependencies);
+		library_bundle.get_dependencies(a_module, dependencies);
 	});
 	// list them
 	dependencies.sort();
@@ -334,7 +241,7 @@ async function run_update_process(imports) {
 	if (!DEBUG) {
 		$("#circup_page .loading").hide(1000);
 	}
-	$("#circup_page .title .circuitpy_version").html(await cp_version());
+	$("#circup_page .title .circuitpy_version").html(await backend.cp_version());
 	$("#circup_page .title").show();
 	$("#circup_page #button_install_all").attr("disabled", true);
 	$("#circup_page .buttons").show();
@@ -344,7 +251,7 @@ async function run_update_process(imports) {
 
 	var new_lines = [];
 	for(var dependency of dependencies) {
-		var module = circup.get_module(dependency);
+		var module = library_bundle.get_module(dependency);
 		var file_name = module.name + (module.package ? "" : ".mpy");
 		var icon = module.package ? "&#128193;" : "&#128196;";
 		var template = $("#circup_row").html();
@@ -372,16 +279,15 @@ async function auto_install(file_name) {
 	$("#circup_page .loading").append(`<br/>Loading <b>${file_name}</b>...`);
 	$("#circup_page .title .filename").html(file_name);
 	// get the file
-	const code_response = await get_file("/" + file_name);
-	if(!code_response.ok) {
+	const code_content = await backend.get_file_content("/" + file_name);
+	if(!code_content) {
 		console.log(`Error: ${file_name} not found.`);
 		// TODO: make sure to exit gracefully
 		return;
 	}
-	const code_content = await code_response.text();
 	// get the list
 	$("#circup_page .loading").append(`<br/>Loading modules from <b>${file_name}</b>...`);
-	const imports = circup.get_imports_from_python(code_content);
+	const imports = library_bundle.get_imports_from_python(code_content);
 	console.log("imports", imports);
 	// do the thing
 	await run_update_process(imports);
@@ -392,7 +298,7 @@ async function update_all() {
 	$("#circup_page .loading").append(`<br/>Loading libraries from <b>/lib</b> directory...`);
 	$("#circup_page .title .filename").html("/lib/");
 	// get the list of libraries from the board
-	var libs_list = await get_lib_directory();
+	var libs_list = await backend.list_dir("/lib/");
 	libs_list = libs_list
 		.filter((item) => !item.startsWith("."))
 		.map((item) => item.replace(/\.m?py$/,""));
@@ -418,11 +324,12 @@ async function init_page() {
 		$(".tab_link_welcome").click();
 	}
 	await common.start();
-	var vinfo = await cp_version_json();
+	await backend.start();
+	var vinfo = await backend.device_info();
 	// circup loading
 	var prom1 = (async () => {
 		await start_circup();
-		await bundler.start(circup);
+		await bundler.start(library_bundle);
 	})();
 	// board inits
 	var prom2 = (async () => {
@@ -443,7 +350,7 @@ async function init_page() {
 		$("a.board_ip").attr("href", `http://${vinfo.ip}`);
 		$("a.board_ip").html(vinfo.ip);
 		// other boards
-		var boards_list = await find_devices();
+		var boards_list = await backend.find_devices(); // NOTE: web specific
 		$(".boards_list .boards_list_default").hide();
 		var devices = boards_list.devices;
 		if(devices.length > 0) {

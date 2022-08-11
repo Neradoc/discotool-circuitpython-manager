@@ -9,7 +9,7 @@ const AccessMode = {
 	PROXY: 2,
 	LINK: 3,
 };
-class Circup {
+class LibraryBundle {
 	constructor(bundle_access=null, cpvcer=7) {
 		if(bundle_access == null) {
 			this.BUNDLE_ACCESS = AccessMode.GITHUB;
@@ -247,4 +247,4 @@ class Circup {
 	}
 }
 
-export { Circup };
+export { LibraryBundle };

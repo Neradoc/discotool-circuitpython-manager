@@ -1,5 +1,7 @@
 import * as common from "./common.js";
 
+var backend = common.backend;
+
 const HIDDEN = [
 	".fseventsd",
 	".metadata_never_index",
@@ -40,6 +42,7 @@ async function refresh_list() {
 		}
 		pwd.innerHTML = pwd_link;
 
+		/*
 		var heads = common.headers({"Accept": "application/json"});
 		const response = await fetch(new URL("/fs" + current_path, common.workflow_url_base),
 			{
@@ -70,6 +73,8 @@ async function refresh_list() {
 			return;
 		}
 		const data = await response.json();
+		*/
+		var data = await backend.list_dir(current_path);
 		var new_children = [];
 		var template = document.querySelector('#row');
 
@@ -88,6 +93,8 @@ async function refresh_list() {
 			td[4].replaceChildren();
 			new_children.push(clone);
 		}
+		
+		console.log(data);
 
 		data.sort((a,b) => {
 			return a.name.localeCompare(b.name);
@@ -98,7 +105,11 @@ async function refresh_list() {
 			var clone = template.content.cloneNode(true);
 			var td = clone.querySelectorAll("td");
 			var file_path = current_path + f.name;
-			let api_url = new URL("/fs" + file_path, common.workflow_url_base);
+			// TODO: this is backend-specific
+			// -> make the backend cooperate with this to get the "direct reference"
+			// for web  workflow it is currently the direct URL, though it should
+			// to remain so in the future.
+			let api_url = new URL("/fs" + file_path, backend.workflow_url_base);
 			if (f.directory) {
 				file_path += "/";
 				api_url += "/";
@@ -146,7 +157,9 @@ async function refresh_list() {
 			if(f.directory) {
 				edit_button.remove()
 			} else {
-				var edit_url = new URL("/edit/", common.workflow_url_base);
+				// TODO: this is backend-specific
+				// we want an edit page that is backend agnostic.
+				var edit_url = new URL("/edit/", backend.workflow_url_base);
 				edit_url.hash = `#${file_path}`;
 				edit_button.href = edit_url;
 			}
@@ -172,22 +185,9 @@ async function refresh_list() {
 	}
 }
 
-async function find_devices() {
-	var response = await fetch(new URL("/cp/devices.json", common.workflow_url_base));
-	const data = await response.json();
-	return data;
-}
-
 async function mkdir(e) {
-	const response = await fetch(
-		new URL("/fs" + current_path + new_directory_name.value + "/", common.workflow_url_base),
-		{
-			method: "PUT",
-			headers: {
-				'X-Timestamp': Date.now()
-			}
-		}
-	);
+	var dir_path = current_path + new_directory_name.value + "/";
+	var response = await backend.create_dir(dir_path);
 	if (response.ok) {
 		refresh_list();
 		new_directory_name.value = "";
@@ -198,19 +198,8 @@ async function mkdir(e) {
 async function upload(e) {
 	console.log("upload");
 	for (const file of files.files) {
-		console.log(file);
-		let file_path = new URL("/fs" + current_path + file.name, common.workflow_url_base);
-		console.log(file_path);
-		const response = await fetch(file_path,
-			{
-				method: "PUT",
-				headers: {
-					'Content-Type': 'application/octet-stream',
-					'X-Timestamp': file.lastModified
-				},
-				body: file
-			}
-		)
+		console.log(file_path, file);
+		var response = await backend.upload_file(current_path + file.name, file);
 		if (response.ok) {
 			refresh_list();
 			console.log(files);
@@ -232,12 +221,7 @@ async function del(e) {
 	}
 	if (confirm(prompt)) {
 		console.log(path);
-		const response = await fetch(path,
-			{
-				method: "DELETE",
-				headers: common.headers(),
-			}
-		)
+		var response = await backend.delete_file(path);
 		if (response.ok) {
 			refresh_list();
 		} else {
@@ -300,4 +284,4 @@ async function setup_directory() {
 	});
 }
 
-export { setup_directory, find_devices, refresh_list };
+export { setup_directory, refresh_list };
