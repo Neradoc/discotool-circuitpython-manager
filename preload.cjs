@@ -1,5 +1,14 @@
 // All of the Node.js APIs are available in the preload process.
 // It has the same sandbox as a Chrome extension.
+
+const log = require('electron-log');
+window.log = log.functions;
+
+window.modulePath = require("path");
+window.moduleDrivelist = require("drivelist");
+window.moduleFs = require("fs/promises");
+window.moduleFsx = require("fs-extra");
+
 window.addEventListener('DOMContentLoaded', () => {
   const replaceText = (selector, text) => {
     const element = document.getElementById(selector)
