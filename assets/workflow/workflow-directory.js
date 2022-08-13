@@ -75,6 +75,7 @@ async function refresh_list() {
 		const data = await response.json();
 		*/
 		var response = await backend.list_dir(current_path);
+		console.log(response)
 		var data = response.content;
 		var new_children = [];
 		var template = document.querySelector('#row');
@@ -95,6 +96,7 @@ async function refresh_list() {
 			new_children.push(clone);
 		}
 
+		console.log(data)
 		data.sort((a,b) => {
 			return a.name.localeCompare(b.name);
 		})
@@ -106,9 +108,9 @@ async function refresh_list() {
 			var file_path = current_path + f.name;
 			// TODO: this is backend-specific
 			// -> make the backend cooperate with this to get the "direct reference"
-			// for web  workflow it is currently the direct URL, though it should
-			// to remain so in the future.
-			let api_url = new URL("/fs" + file_path, backend.workflow_url_base);
+			// for web workflow it is currently the direct URL, though it should
+			// not remain so in the future.
+			let api_url = backend.api_url(file_path)
 			if (f.directory) {
 				file_path += "/";
 				api_url += "/";
@@ -158,7 +160,7 @@ async function refresh_list() {
 			} else {
 				// TODO: this is backend-specific
 				// we want an edit page that is backend agnostic.
-				var edit_url = new URL("/edit/", backend.workflow_url_base);
+				var edit_url = backend.edit_url(file_path)
 				edit_url.hash = `#${file_path}`;
 				edit_button.href = edit_url;
 			}

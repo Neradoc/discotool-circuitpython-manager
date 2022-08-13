@@ -180,10 +180,10 @@ class LibraryBundle {
 
 	// gets the dependencies of module, adds them to dependencies
 	get_dependencies(module, dependencies) {
-		if(!dependencies.includes(module)) {
-			dependencies.push(module);
-		}
 		if(this.get_module(module) !== false) {
+			if(!dependencies.includes(module)) {
+				dependencies.push(module);
+			}
 			var deps = this.get_module(module).dependencies.concat(
 				this.get_module(module).external_dependencies
 			);

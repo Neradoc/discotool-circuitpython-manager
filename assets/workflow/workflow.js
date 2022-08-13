@@ -9,10 +9,12 @@ import { setup_directory, refresh_list } from "./workflow-directory.js";
 import { LibraryBundle } from "../lib/bundle.js";
 import * as bundler from "./workflow-bundler.js";
 
+// import { $ } from "../extlib/jquery.min.js";
+
 var backend = common.backend;
 
 const DEBUG = common.DEBUG;
-const LINE_HIDE_DELAY = 1000;
+const LINE_HIDE_DELAY = 800;
 const LOADING_IMAGE = $("#small_load_image").html();
 const BAD_MPY = -1;
 
@@ -42,6 +44,7 @@ async function start_circup() {
 		library_bundle = new LibraryBundle(BUNDLE_ACCESS, cpver);
 		// circup = new LibraryBundle(true, cpver);
 		await library_bundle.setup_the_modules_list();
+		console.log(library_bundle)
 	}
 }
 
@@ -256,6 +259,7 @@ async function run_update_process(imports) {
 	$("#dependencies table thead").show();
 
 	modules_to_update = Array.from(dependencies);
+	console.log(modules_to_update)
 
 	var new_lines = [];
 	for(var dependency of dependencies) {
@@ -353,7 +357,7 @@ async function init_page() {
 		$("a.board_name").attr("href", `https://circuitpython.org/board/${vinfo.board_id}/`);
 		$("a.board_link").attr("href", backend.workflow_url_base);
 		$("a.board_link").html(backend.workflow_url_base);
-		var repl_url = new URL("/cp/serial/", backend.workflow_url_base);
+		var repl_url = backend.repl_url()
 		$("a.board_repl").attr("href", repl_url);
 		$("a.board_repl").html(repl_url.href);
 		$("a.board_ip").attr("href", `http://${vinfo.ip}`);

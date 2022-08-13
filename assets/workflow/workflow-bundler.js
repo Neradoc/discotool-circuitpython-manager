@@ -4,6 +4,7 @@ SPDX-License-Identifier: MIT
 */
 
 import * as common from "./common.js";
+import * as jq from "../extlib/jquery.min.js";
 
 export var modules_list = [];
 

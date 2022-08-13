@@ -1,13 +1,21 @@
 import { Workflow, WorkflowResponse, WorkflowFile } from "./workflow_base.js";
 import { WORKFLOW_USERNAME, WORKFLOW_PASSWORD } from "../../config.js";
 
-var hash = window.location.hash.substr(1);
-var url_params = new URLSearchParams(document.location.search);
-
 class WebResponse extends WorkflowResponse {
 	constructor(response, content, ok=null) {
 		if(ok===null) ok = response.ok;
 		super(ok, content, response.status, response.statusText);
+	}
+}
+
+class WebWorkflowFile extends WorkflowFile {
+	constructor(result) {
+		super(
+			result.name,
+			result.directory,
+			result.file_size,
+			result.modified_ns,
+		);
 	}
 }
 
@@ -94,7 +102,7 @@ class WebWorkflow extends Workflow {
 		);
 		try {
 			var data = await response.json();
-			return new WebResponse(response, data);
+			return new WebResponse(response, WebWorkflowFile(data));
 		} catch {
 			return new WebResponse(response, [], false);
 		}
@@ -145,6 +153,15 @@ class WebWorkflow extends Workflow {
 			}
 		)
 		return new WebResponse(response, "");
+	}
+	api_url(file_path) {
+		return new URL("/fs" + file_path, this.workflow_url_base);
+	}
+	edit_url(file_path) {
+		return new URL("/edit/", this.workflow_url_base);
+	}
+	repl_url() {
+		new URL("/cp/serial/", this.workflow_url_base);
 	}
 
 	//##############################################################

@@ -1,5 +1,20 @@
 // WIP
 
+var version_example = {
+	"version": "8.0.0-alpha.1-131-gf9b9f5568",
+	"build_date": "2022-08-11",
+	"board_name": "Adafruit FunHouse",
+	"mcu_name": "ESP32S2",
+	"board_id": "adafruit_funhouse",
+	"creator_id": 9114,
+	"creation_id": 33018,
+	// web only
+	"hostname": "cpy-1737d6",
+	"port": 80,
+	"ip": "192.168.1.47",
+	"web_api_version": 1,
+}
+
 class WorkflowResponse {
 	constructor(ok, content, status=200, statusText="OK") {
 		this.ok = ok;
