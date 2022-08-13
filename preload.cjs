@@ -6,6 +6,7 @@ window.log = log.functions;
 
 window.modulePath = require("path");
 window.moduleDrivelist = require("drivelist");
+window.moduleFss = require("fs"); // sync
 window.moduleFs = require("fs/promises");
 window.moduleFsx = require("fs-extra");
 
