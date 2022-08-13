@@ -23,8 +23,6 @@
     "electron-log": "^4.4.8",
     "fs": "^0.0.1-security",
     "fs-extra": "^10.1.0",
-    "path": "^0.12.7",
-    "serialport": "^10.4.0",
-    "usb": "^2.5.0"
+    "path": "^0.12.7"
   }
 }
