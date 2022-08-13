@@ -30,9 +30,9 @@ class WorkflowFile {
 	constructor(name, directory, size, time, creation_time=0) {
 		this.name = name;
 		this.directory = directory;
-		this.size = size;
-		this.modification = time;
-		this.creation = creation_time || time;
+		this.file_size = size;
+		this.modified = time;
+		this.created = creation_time || time;
 	}
 }
 

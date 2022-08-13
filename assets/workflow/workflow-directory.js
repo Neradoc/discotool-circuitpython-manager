@@ -101,61 +101,61 @@ async function refresh_list() {
 			return a.name.localeCompare(b.name);
 		})
 
-		for (const f of data) {
+		for (const file_info of data) {
 			// Clone the new row and insert it into the table
 			var clone = template.content.cloneNode(true);
 			var td = clone.querySelectorAll("td");
-			var file_path = current_path + f.name;
+			var file_path = current_path + file_info.name;
 			// TODO: this is backend-specific
 			// -> make the backend cooperate with this to get the "direct reference"
 			// for web workflow it is currently the direct URL, though it should
 			// not remain so in the future.
 			let api_url = backend.api_url(file_path)
-			if (f.directory) {
+			if (file_info.directory) {
 				file_path += "/";
 				api_url += "/";
 			}
 			var icon = "&#10067;";
-			if (current_path == "/" && SECRETS.includes(f.name)) {
+			if (current_path == "/" && SECRETS.includes(file_info.name)) {
 				icon = "🔐";
-			} else if (HIDDEN.includes(f.name)) {
+			} else if (HIDDEN.includes(file_info.name)) {
 				continue;
-			} else if (f.name.startsWith(".")) {
+			} else if (file_info.name.startsWith(".")) {
 				icon = "🚫";
-			} else if (current_path == "/" && f.name == "lib") {
+			} else if (current_path == "/" && file_info.name == "lib") {
 				icon = "📚";
-			} else if (f.directory) {
+			} else if (file_info.directory) {
 				icon = "📁";
-			} else if(f.name.endsWith(".txt") ||
-					  f.name.endsWith(".py") ||
-					  f.name.endsWith(".js") ||
-					  f.name.endsWith(".json")) {
+			} else if(file_info.name.endsWith(".txt") ||
+					  file_info.name.endsWith(".py") ||
+					  file_info.name.endsWith(".js") ||
+					  file_info.name.endsWith(".json")) {
 				icon = "📄";
-			} else if (f.name.endsWith(".html")) {
+			} else if (file_info.name.endsWith(".html")) {
 				icon = "🌐";
-			} else if (f.name.endsWith(".mpy")) {
+			} else if (file_info.name.endsWith(".mpy")) {
 				icon = "🐍"; // <img src='blinka.png'/>
 			}
 			td[0].innerHTML = icon;
-			td[1].innerHTML = f.file_size;
+			td[1].innerHTML = file_info.file_size;
 
 			var path = clone.querySelector("a.path");
-			path.innerHTML = f.name;
-			if(f.directory) {
+			path.innerHTML = file_info.name;
+			if(file_info.directory) {
 				path.href = common.url_here({"path": `${file_path}`});
 				path.classList.add("files_list_dir");
 				path.setAttribute("data-path", file_path);
 			} else {
 				path.href = api_url;
 			}
-			td[3].innerHTML = (new Date(f.modified_ns / 1000000)).toLocaleString();
+			td[3].innerHTML = (new Date(file_info.modified)).toLocaleString();
 			var delete_button = clone.querySelector(".delete");
 			delete_button.setAttribute("data-path", api_url);
 			delete_button.value = api_url;
 			delete_button.onclick = del;
 
 			var edit_button = clone.querySelector(".edit");
-			if(f.directory) {
+			if(file_info.directory) {
 				edit_button.remove()
 			} else {
 				// TODO: this is backend-specific
@@ -166,7 +166,7 @@ async function refresh_list() {
 			}
 
 			var analyze_button = clone.querySelector(".analyze");
-			if(f.name.endsWith(".py")) {  // || search("requirement") >= 0 ?
+			if(file_info.name.endsWith(".py")) {  // || search("requirement") >= 0 ?
 				analyze_button.setAttribute("data-path", file_path);
 				analyze_button.value = api_url;
 			} else {

@@ -104,7 +104,7 @@ class USBWorkflow extends Workflow {
 			var wf = new WorkflowFile(
 				file_name,
 				file_stats.isDirectory(),
-				file_stats.size * file_stats.blksize,
+				file_stats.isDirectory() ? 0 : file_stats.size,
 				file_stats.mtimeMs,
 				file_stats.ctimeMs
 			);

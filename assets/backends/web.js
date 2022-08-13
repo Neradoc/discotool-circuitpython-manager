@@ -14,7 +14,7 @@ class WebWorkflowFile extends WorkflowFile {
 			result.name,
 			result.directory,
 			result.file_size,
-			result.modified_ns,
+			result.modified_ns * 1000000,
 		);
 	}
 }
