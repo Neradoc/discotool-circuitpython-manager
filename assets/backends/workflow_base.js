@@ -24,6 +24,10 @@ class WorkflowFile {
 	}
 }
 
+function semver(str) {
+	return str.split("-")[0].split(/\./).map((x) => parseInt(x));
+}
+
 class Workflow {
 
 	constructor() {
@@ -37,7 +41,7 @@ class Workflow {
 	}
 	async cp_version() {
 		var version_data = await this.device_info();
-		return version_data.version;
+		return semver(version_data.version);
 	}
 	async is_editable() {
 		return false;

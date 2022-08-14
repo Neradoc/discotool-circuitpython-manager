@@ -52,10 +52,6 @@ class WebWorkflow extends Workflow {
 		this.version_info = await response.json();
 		return this.version_info;
 	}
-	async cp_version() {
-		var version_data = await this.device_info();
-		return version_data.version;
-	}
 	async is_editable() {
 		const status = await fetch(new URL("/fs/", this.workflow_url_base),
 			{

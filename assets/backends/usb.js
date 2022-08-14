@@ -66,10 +66,6 @@ class USBWorkflow extends Workflow {
 		this._device_info = local_device_info;
 		return this._device_info;
 	}
-	async cp_version() {
-		var version_data = await this.device_info();
-		return version_data.version;
-	}
 	async is_editable() {
 		
 		return this._editable;
