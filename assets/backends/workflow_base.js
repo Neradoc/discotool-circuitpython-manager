@@ -1,19 +1,7 @@
-// WIP
-
-var version_example = {
-	"version": "8.0.0-alpha.1-131-gf9b9f5568",
-	"build_date": "2022-08-11",
-	"board_name": "Adafruit FunHouse",
-	"mcu_name": "ESP32S2",
-	"board_id": "adafruit_funhouse",
-	"creator_id": 9114,
-	"creation_id": 33018,
-	// web only
-	"hostname": "cpy-1737d6",
-	"port": 80,
-	"ip": "192.168.1.47",
-	"web_api_version": 1,
-}
+/*
+SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
+SPDX-License-Identifier: MIT
+*/
 
 class WorkflowResponse {
 	constructor(ok, content, status=200, statusText="OK") {
@@ -54,10 +42,6 @@ class Workflow {
 	async is_editable() {
 		return false;
 	}
-	set_credentials(user, password) {
-		this.user = user;
-		this.password = password;
-	}
 	async get_file_content(filepath, range=null) {
 		// return `print("Hello world")`;
 		return new WorkflowResponse(false, null);;
@@ -77,6 +61,18 @@ class Workflow {
 	async delete_file(file_path) {
 		console.log("Error: Cannot write to the drive");
 		return new WorkflowResponse(false, null, 409, "ERROR");
+	}
+	api_url(file_path) {
+		return new URL(`file://${file_path}`);
+	}
+	edit_url(file_path) {
+		return new URL(`file://${file_path}`);
+	}
+	repl_url() {
+		return "";
+	}
+	async find_devices() {
+		return { devices: [] };
 	}
 }
 

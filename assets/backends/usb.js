@@ -7,13 +7,6 @@ const fss = window.moduleFss;
 
 const DEFAULT_DRIVE = "CIRCUITPY";
 
-// class USBResponse extends WorkflowResponse {
-// 	constructor(response, content, ok=null) {
-// 		if(ok===null) ok = response.ok;
-// 		super(ok, content, response.status, response.statusText);
-// 	}
-// }
-
 class USBWorkflow extends Workflow {
 	constructor() {
 		super();
@@ -150,6 +143,9 @@ class USBWorkflow extends Workflow {
 			return new WorkflowResponse(false, null);
 		}
 	}
+
+	//##############################################################
+
 	api_url(file_path) {
 		return new URL(`file://${file_path}`);
 	}
@@ -159,9 +155,6 @@ class USBWorkflow extends Workflow {
 	repl_url() {
 		return "";
 	}
-
-	//##############################################################
-
 	async find_devices() {
 		var drives = await drivelist.list();
 		var devices_list = [];
@@ -180,6 +173,8 @@ class USBWorkflow extends Workflow {
 			devices: devices_list,
 		};
 	}
+
+	//##############################################################
 
 	async find_drive(needle, drives) {
 		for(var drive of drives) {
