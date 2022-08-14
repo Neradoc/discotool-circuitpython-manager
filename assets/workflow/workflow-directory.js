@@ -7,6 +7,7 @@ const HIDDEN = [
 	".metadata_never_index",
 	".Trashes",
 	".TemporaryItems",
+	"System Volume Information",
 ];
 const SECRETS = [".env", "secrets.py"];
 
@@ -14,6 +15,15 @@ let new_directory_name = document.getElementById("name");
 let files = document.getElementById("files_upload");
 var current_path = common.current_path;
 var refreshing = false;
+
+const HIDE = {
+	NOTHING: 0,
+	DEFAULT_SYSTEM_FILES: 1,
+	ALL_SYSTEM_FILES: 2,
+	ALL_DOTTED_FILES: 3,
+};
+
+var hide_level = HIDE.DEFAULT_SYSTEM_FILES;
 
 async function refresh_list() {
 	if (refreshing) {
@@ -75,7 +85,6 @@ async function refresh_list() {
 		const data = await response.json();
 		*/
 		var response = await backend.list_dir(current_path);
-		console.log(response)
 		var data = response.content;
 		var new_children = [];
 		var template = document.querySelector('#row');
@@ -96,7 +105,6 @@ async function refresh_list() {
 			new_children.push(clone);
 		}
 
-		console.log(data)
 		data.sort((a,b) => {
 			return a.name.localeCompare(b.name);
 		})
@@ -118,10 +126,15 @@ async function refresh_list() {
 			var icon = "&#10067;";
 			if (current_path == "/" && SECRETS.includes(file_info.name)) {
 				icon = "🔐";
-			} else if (HIDDEN.includes(file_info.name)) {
-				continue;
+			} else if (current_path == "/" && HIDDEN.includes(file_info.name)) {
+				// hidden names in root
+				if(hide_level >= HIDE.DEFAULT_SYSTEM_FILES) continue
+			} else if (file_info.name.startsWith("._")) {
+				icon = "🍎";
+				if(hide_level >= HIDE.ALL_SYSTEM_FILES) continue
 			} else if (file_info.name.startsWith(".")) {
 				icon = "🚫";
+				if(hide_level >= HIDE.ALL_DOTTED_FILES) continue
 			} else if (current_path == "/" && file_info.name == "lib") {
 				icon = "📚";
 			} else if (file_info.directory) {

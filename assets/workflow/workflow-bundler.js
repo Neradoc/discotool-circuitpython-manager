@@ -39,7 +39,7 @@ function update_dependencies_list() {
 	modules_list = [];
 	$("#bundle_modules .selected .module").each((i,that) => {
 		var module = $(that).html();
-		circup.get_dependencies(module, modules_list);
+		circup.get_dependencies([module], modules_list);
 	});
 	modules_list.sort();
 	$("#bundle_dependencies").html("");

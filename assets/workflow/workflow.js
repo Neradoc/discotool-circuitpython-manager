@@ -7,11 +7,13 @@ import { BUNDLE_ACCESS } from "../../config.js";
 import * as common from "./common.js";
 import { setup_directory, refresh_list } from "./workflow-directory.js";
 import { LibraryBundle } from "../lib/bundle.js";
+import { Circup } from "../lib/circup.js";
 import * as bundler from "./workflow-bundler.js";
 
 // import { $ } from "../extlib/jquery.min.js";
 
-var backend = common.backend;
+var board_control = common.backend;
+var circup = null
 
 const DEBUG = common.DEBUG;
 const LINE_HIDE_DELAY = 800;
@@ -24,50 +26,19 @@ var library_bundle = null;
 var install_running = false;
 var show_up_to_date = false;
 
-function semver(str) {
-	return str.split("-")[0].split(/\./).map((x) => parseInt(x));
-}
-
-function semver_compare(a,b) {
-	return (
-		(parseInt(a.split(".")[0]) - parseInt(b.split(".")[0]))
-		|| (parseInt(a.split(".")[1]) - parseInt(b.split(".")[1]))
-		|| (parseInt(a.split(".")[2]) - parseInt(b.split(".")[2]))
-	);
-}
-
 async function start_circup() {
-	if (library_bundle == null) {
+	if (circup == null) {
+		// 1 - setup the board control as selected if not already
 		// get the version data
-		cpver = semver(await backend.cp_version());
+		cpver = await board_control.cp_version()
+		// 2 - setup the library bundle with the version from the board
 		// init circup with the CP version
 		library_bundle = new LibraryBundle(BUNDLE_ACCESS, cpver);
-		// circup = new LibraryBundle(true, cpver);
 		await library_bundle.setup_the_modules_list();
-		console.log(library_bundle)
+		// 3 - setup the circup updates manager for the actions
+		circup = new Circup(library_bundle, board_control)
+		await circup.start()
 	}
-}
-
-async function get_lib_directory() {
-	var response = await backend.list_dir("/lib/");
-	return response.content.map((item) => item.name);
-}
-
-async function install_modules(dependencies) {
-	for(var module_name of dependencies) {
-		console.log("Installing", module_name);
-		var module = library_bundle.get_module(module_name);
-		var module_files = await library_bundle.list_module_files(module);
-		if(module.package) {
-			await backend.create_dir(`/lib/${module.name}/`);
-		}
-		for(var file of module_files) {
-			var upload_path = file.name.replace(/^[^\/]+\//, "/");
-			// var upload_path = file.name.replace(/^.+?\/lib\//, "/lib/");
-			await backend.upload_file(upload_path, file);
-		}
-	}
-	await refresh_list();
 }
 
 async function install_all() {
@@ -81,61 +52,6 @@ async function install_all() {
 		}
 	}
 	$(".install_buttons").attr("disabled", false);
-}
-
-async function get_module_version(module_name, libs_list) {
-	var module = library_bundle.get_module(module_name);
-	var module_path = `/lib/${module.name}`
-	var pkg = module.package;
-	var module_files = [];
-	var cpver = await backend.cp_version();
-
-	if(pkg && libs_list.includes(module.name)) {
-		// look at all files in the package
-		var response = await backend.list_dir(module_path + "/");
-		module_files = response.content;
-		module_files = module_files.map((item) => module_path + "/" + item.name);
-	} else if(!pkg && libs_list.includes(module.name + ".py")) {
-		module_files = [module_path+".py"];
-	} else if(!pkg && libs_list.includes(module.name + ".mpy")) {
-		module_files = [module_path+".mpy"];
-	} else {
-		return null;
-	}
-
-	var version = false;
-	for(var file_name of module_files) {
-		var response = await backend.get_file_content("/" + file_name);
-		if(!response.ok) { continue }
-		var file_data = response.content;
-		// empty MPY files are bad
-		if(file_data.length == 0 && file_name.endsWith(".mpy")) {
-			version = null;
-			break;
-		}
-		if(file_data.length > 0) {
-			if(file_name.endsWith(".mpy")) {
-				// bad version of mpy files
-				if(file_data[0] != "C" || file_data[1] != "\x05") {
-					version = BAD_MPY;
-					break;
-				}
-				// find version in mpy file
-				var matches = file_data.match(/(\d+\.\d+\.\d+).+?__version__/);
-				if(matches && matches.length > 1) {
-					version = matches[1];
-				}
-			}
-			// find version in py file
-			if(file_name.endsWith(".py")) {
-				var matches = file_data.match(/__version__.+?(\d+\.\d+\.\d+)/);
-				if(matches && matches.length > 1) {
-					version = matches[1];
-				}
-			}
-		}
-	}
-	return version;
 }
 
 function dont_need_update(module_name) {
@@ -177,13 +93,13 @@ async function pre_update_process() {
 	$("#circup_page .loading").html(`Loading library bundles...`).show();
 }
 
-async function update_line(new_line, libs_list) {
+async function update_line(new_line, board_libs) {
 	var module_name = new_line.find(".upload button").val();
 	var module = library_bundle.get_module(module_name);
 	new_line.find(".status_icon").html(LOADING_IMAGE);
 	new_line.removeClass("bad_mpy_module new_module invalid_module module_exists major_update_module update_module");
 	// module versions from the board
-	var version = await get_module_version(module_name, libs_list);
+	var version = await circup.get_module_version(module_name, board_libs);
 	if(version && version != BAD_MPY) {
 		new_line.find(".board_version").html(version);
 	}
@@ -208,7 +124,8 @@ async function update_line(new_line, libs_list) {
 		new_line.find(".status_icon").html("&#10004;&#65038;");
 		new_line.find(".status").html("Up To Date");
 		if (!show_up_to_date) {
-			await new_line.hide(LINE_HIDE_DELAY).promise();
+			// await new_line.hide(LINE_HIDE_DELAY).promise();
+			new_line.hide(LINE_HIDE_DELAY)
 			await update_circup_table();
 		}
 		dont_need_update(module_name);
@@ -232,27 +149,26 @@ async function upload_button_call(e) {
 	var line = button.parents("tr.line");
 	button.attr("disabled", true);
 	line.find(".status_icon").html(LOADING_IMAGE);
-	await install_modules([target_module])
-	var the_libs = await get_lib_directory();
-	await update_line(line, the_libs);
+	await circup.install_modules([target_module])
+	await refresh_list()
+	var board_libs = await board_control.get_lib_directory();
+	await update_line(line, board_libs);
 }
 
 async function run_update_process(imports) {
 	$("#circup_page .loading").append(`<br/>Loading dependencies...`);
 	// list the libs, to know which are missing
-	var libs_list = await get_lib_directory();
+	var board_libs = await board_control.get_lib_directory();
 	// get the dependencies
-	var dependencies = [];
-	imports.forEach((a_module) => {
-		library_bundle.get_dependencies(a_module, dependencies);
-	});
+	var dependencies = []
+	library_bundle.get_dependencies(imports, dependencies);
 	// list them
 	dependencies.sort();
 
 	if (!DEBUG) {
 		$("#circup_page .loading").hide(1000);
 	}
-	$("#circup_page .title .circuitpy_version").html(await backend.cp_version());
+	$("#circup_page .title .circuitpy_version").html(await board_control.cp_version());
 	$("#circup_page .title").show();
 	$("#circup_page #button_install_all").attr("disabled", true);
 	$("#circup_page .buttons").show();
@@ -281,17 +197,18 @@ async function run_update_process(imports) {
 		new_lines.push(new_line);
 	}
 	for(var new_line of new_lines) {
-		await update_line(new_line, libs_list);
+		await update_line(new_line, board_libs);
 	}
 	$("#circup_page #button_install_all").attr("disabled", false);
 }
 
 async function auto_install(file_name) {
+	// TODO: wait until the bundle and board are inited
 	await pre_update_process();
 	$("#circup_page .loading").append(`<br/>Loading <b>${file_name}</b>...`);
 	$("#circup_page .title .filename").html(file_name);
 	// get the file
-	var code_response = await backend.get_file_content("/" + file_name);
+	var code_response = await board_control.get_file_content("/" + file_name);
 	if(!code_response.ok) {
 		console.log(`Error: ${file_name} not found.`);
 		// TODO: make sure to exit gracefully
@@ -307,14 +224,12 @@ async function auto_install(file_name) {
 }
 
 async function update_all() {
+	// TODO: wait until the bundle and board are inited
 	await pre_update_process();
 	$("#circup_page .loading").append(`<br/>Loading libraries from <b>/lib</b> directory...`);
 	$("#circup_page .title .filename").html("/lib/");
 	// get the list of libraries from the board
-	var libs_list = await get_lib_directory();
-	libs_list = libs_list
-		.filter((item) => !item.startsWith("."))
-		.map((item) => item.replace(/\.m?py$/,""));
+	var libs_list = await board_control.get_lib_modules();
 	// do the thing
 	await run_update_process(libs_list);
 }
@@ -323,7 +238,7 @@ async function bundle_install() {
 	await pre_update_process();
 	$("#circup_page .loading").append(`<br/>Loading libraries selected from the bundles...`);
 	$("#circup_page .title .filename").html("selected bundle modules");
-	// get the list of libraries from the board
+	// get the list of libraries to install
 	var libs_list = bundler.modules_list;
 	// do the thing
 	await run_update_process(libs_list);
@@ -337,8 +252,8 @@ async function init_page() {
 		$(".tab_link_welcome").click();
 	}
 	await common.start();
-	await backend.start();
-	var vinfo = await backend.device_info();
+	await board_control.start();
+	var vinfo = await board_control.device_info();
 	// circup loading
 	var prom1 = (async () => {
 		await start_circup();
@@ -355,15 +270,15 @@ async function init_page() {
 		await refresh_list();
 		// *** welcome page information
 		$("a.board_name").attr("href", `https://circuitpython.org/board/${vinfo.board_id}/`);
-		$("a.board_link").attr("href", backend.workflow_url_base);
-		$("a.board_link").html(backend.workflow_url_base);
-		var repl_url = backend.repl_url()
+		$("a.board_link").attr("href", board_control.workflow_url_base);
+		$("a.board_link").html(board_control.workflow_url_base);
+		var repl_url = board_control.repl_url()
 		$("a.board_repl").attr("href", repl_url);
 		$("a.board_repl").html(repl_url.href);
 		$("a.board_ip").attr("href", `http://${vinfo.ip}`);
 		$("a.board_ip").html(vinfo.ip);
 		// other boards
-		var boards_list = await backend.find_devices(); // NOTE: web specific
+		var boards_list = await board_control.find_devices(); // NOTE: web specific
 		$(".boards_list .boards_list_default").hide();
 		var devices = boards_list.devices;
 		if(devices.length > 0) {

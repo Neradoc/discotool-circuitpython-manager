@@ -39,10 +39,6 @@ class Workflow {
 			"version": null
 		};
 	}
-	async cp_version() {
-		var version_data = await this.device_info();
-		return semver(version_data.version);
-	}
 	async is_editable() {
 		return false;
 	}
@@ -77,6 +73,25 @@ class Workflow {
 	}
 	async find_devices() {
 		return { devices: [] };
+	}
+	// default implementations that should be enough
+	async cp_version() {
+		var version_data = await this.device_info();
+		return semver(version_data.version);
+	}
+	async get_lib_directory() {
+		var response = await this.list_dir("/lib/");
+		return response.content
+			.map((item) => item.name)
+			.filter((item) => !item.startsWith("."));
+	}
+	async get_lib_modules() {
+		var response = await this.list_dir("/lib/");
+		var lib_list = response.content
+			.map((item) => item.name)
+			.filter((item) => !item.startsWith("."))
+			.map((item) => item.replace(/\.m?py$/,""));
+		return lib_list;
 	}
 }
 

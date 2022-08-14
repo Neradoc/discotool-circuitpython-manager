@@ -54,11 +54,9 @@ function update_dependencies_list() {
 	var modules_list = [];
 	$("#modules .selected .module").each((i,that) => {
 		var module = $(that).html();
-		library_bundle.get_dependencies(module, modules_list);
+		library_bundle.get_dependencies([module], modules_list);
 	});
-	dropped_modules_list.forEach((module) => {
-		library_bundle.get_dependencies(module, modules_list);
-	});
+	library_bundle.get_dependencies(dropped_modules_list, modules_list);
 	modules_list.sort();
 	$("#dependencies").html("");
 	var pair = 0;

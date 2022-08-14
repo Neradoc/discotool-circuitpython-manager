@@ -178,21 +178,23 @@ class LibraryBundle {
 		return false;
 	}
 
-	// gets the dependencies of module, adds them to dependencies
-	get_dependencies(module, dependencies) {
-		if(this.get_module(module) !== false) {
-			if(!dependencies.includes(module)) {
-				dependencies.push(module);
-			}
-			var deps = this.get_module(module).dependencies.concat(
-				this.get_module(module).external_dependencies
-			);
-			for(var index in deps) {
-				var depmodule = deps[index];
-				if(dependencies.includes(depmodule)) { continue; }
-				if(this.get_module(depmodule) === false) { continue; }
-				dependencies.push(depmodule);
-				this.get_dependencies(depmodule, dependencies);
+	// gets the dependencies of modules, adds them to dependencies
+	get_dependencies(modules, dependencies) {
+		for(module of modules) {
+			if(this.get_module(module) !== false) {
+				if(!dependencies.includes(module)) {
+					dependencies.push(module);
+				}
+				var deps = this.get_module(module).dependencies.concat(
+					this.get_module(module).external_dependencies
+				);
+				for(var index in deps) {
+					var depmodule = deps[index];
+					if(dependencies.includes(depmodule)) { continue; }
+					if(this.get_module(depmodule) === false) { continue; }
+					dependencies.push(depmodule);
+					this.get_dependencies([depmodule], dependencies);
+				}
 			}
 		}
 	}
