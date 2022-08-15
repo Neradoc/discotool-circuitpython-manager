@@ -1,3 +1,7 @@
+"""
+SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
+SPDX-License-Identifier: MIT
+"""
 from secrets import secrets
 
 import board

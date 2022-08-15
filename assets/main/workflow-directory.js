@@ -1,3 +1,8 @@
+/*
+SPDX-FileCopyrightText: Copyright (c) Scott Shawcroft for Adafruit
+SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
+SPDX-License-Identifier: MIT
+*/
 import * as common from "./common.js";
 
 const HIDDEN = [

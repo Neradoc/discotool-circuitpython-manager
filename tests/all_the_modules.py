@@ -1,3 +1,7 @@
+"""
+SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
+SPDX-License-Identifier: MIT
+"""
 import adafruit_24lc32
 import adafruit_74hc595
 import adafruit_ads1x15

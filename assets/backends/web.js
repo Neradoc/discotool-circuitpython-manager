@@ -1,3 +1,7 @@
+/*
+SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
+SPDX-License-Identifier: MIT
+*/
 import { Workflow, WorkflowResponse, WorkflowFile } from "./workflow_base.js";
 import { WORKFLOW_USERNAME, WORKFLOW_PASSWORD } from "../../config.js";
 
