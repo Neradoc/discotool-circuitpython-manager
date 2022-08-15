@@ -18,7 +18,6 @@ var circup = null
 const DEBUG = common.DEBUG;
 const LINE_HIDE_DELAY = 800;
 const LOADING_IMAGE = $("#small_load_image").html();
-const BAD_MPY = -1;
 
 var modules_to_update = [];
 var cpver = null;
@@ -100,10 +99,10 @@ async function update_line(new_line, board_libs) {
 	new_line.removeClass("bad_mpy_module new_module invalid_module module_exists major_update_module update_module");
 	// module versions from the board
 	var version = await circup.get_module_version(module_name, board_libs);
-	if(version && version != BAD_MPY) {
+	if(version && version != circup.BAD_MPY) {
 		new_line.find(".board_version").html(version);
 	}
-	if(version === BAD_MPY) {
+	if(version === circup.BAD_MPY) {
 		// bad mpy file
 		new_line.addClass("bad_mpy_module");
 		new_line.find(".status_icon").html("&#9888;&#65039;");

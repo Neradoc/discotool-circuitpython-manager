@@ -135,7 +135,6 @@ class USBWorkflow extends Workflow {
 	async delete_file(file_path) {
 		var full_path = path.join(this.root, file_path);
 		try {
-			console.log("Delete", this.root, file_path, full_path)
 			await fsx.remove(full_path);
 			return new WorkflowResponse(true, null);
 		} catch {

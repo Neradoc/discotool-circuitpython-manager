@@ -41,6 +41,7 @@ async function detect_usb() {
 	} else {
 		$(".usb_workflow").hide()
 	}
+	console.log("FIN USB")
 }
 
 async function detect_web() {
@@ -78,6 +79,7 @@ async function detect_web() {
 	} else {
 		$(".web_workflow").hide()
 	}
+	console.log("FIN WEB")
 }
 
 async function detect_ble() {
@@ -87,23 +89,24 @@ async function detect_ble() {
 	} else {
 		$(".ble_workflow").hide()
 	}
+	console.log("FIN BLE")
 }
 
 async function detect_boards() {
 	$(".workflow_list").addClass("loading")
 	$(".board_line").remove()
 	// async
-	await Promise.all([
+	var promises = Promise.all([
 		detect_usb(),
 		detect_web(),
 		detect_ble(),
 	])
-	console.log("FIN")
+	// no await ?
 }
 
 async function init_page() {
-	detect_boards()
 	$("#reload_boards").on("click", detect_boards)
+	await detect_boards()
 }
 
 init_page();

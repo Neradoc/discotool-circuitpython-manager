@@ -19,6 +19,8 @@ function semver_compare(a,b) {
 }
 
 class Circup {
+	static BAD_MPY = -1;
+
 	constructor(library_bundle, workflow) {
 		this.library_bundle = library_bundle
 		this.workflow = workflow
@@ -81,7 +83,7 @@ class Circup {
 				if(file_name.endsWith(".mpy")) {
 					// bad version of mpy files
 					if(file_data[0] != "C" || file_data[1] != "\x05") {
-						version = BAD_MPY;
+						version = this.BAD_MPY;
 						break;
 					}
 					// find version in mpy file
