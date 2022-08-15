@@ -39,8 +39,9 @@ async function refresh_list() {
 			current_path = "/";
 		}
 
+		var drive_name = common.board_control.drive_name || "CIRCUITPY"
 		var pwd = document.querySelector('#pwd');
-		var pwd_link = `<a class="files_list_dir dir" href="?path=/#files" data-path="/">CIRCUITPY</a>/`
+		var pwd_link = `<a class="files_list_dir dir" href="?path=/#files" data-path="/">${drive_name}</a>/`
 		var fullpath = "/";
 		for(var path of current_path.split("/")) {
 			if(path != "") {
@@ -161,8 +162,8 @@ async function refresh_list() {
 			}
 			td[3].innerHTML = (new Date(file_info.modified)).toLocaleString();
 			var delete_button = clone.querySelector(".delete");
-			delete_button.setAttribute("data-path", api_url);
-			delete_button.value = api_url;
+			delete_button.setAttribute("data-path", file_path);
+			delete_button.value = file_path;
 			delete_button.onclick = del;
 
 			var edit_button = clone.querySelector(".edit");
@@ -224,8 +225,7 @@ async function upload(e) {
 async function del(e) {
 	var path = $(e.target).data("path");
 	console.log("delete", path);
-	let fn = new URL(path);
-	var prompt = "Delete " + fn.pathname.substr(3);
+	var prompt = `Delete ${path}`;
 	if (path.endsWith("/")) {
 		prompt += " and all of its contents?";
 	} else {

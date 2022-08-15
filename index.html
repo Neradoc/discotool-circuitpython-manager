@@ -24,34 +24,36 @@ SPDX-License-Identifier: MIT
 	<div id="welcome_page" class="tab_page tab_page_welcome">
 		<h3 style="display:none"></h3>
 		<div>
-			Select a method to connect to a board.
+			Select a method to connect to a board. <button id="reload_boards">Refresh Board List</button>
 		</div>
 		<div id="usb_open_panel" class="usb_workflow">
 			Select a drive or a directory. Or drop it right here.
 		</div>
-		<div id="usb_workflow_list" class="usb_workflow loading">
+		<div id="usb_workflow_list" class="workflow_list usb_workflow loading">
 			<div class="boards_list_empty">No USB drive detected.</div>
 			<div id="template_board_usb" class="template_board">
-				<div class="board_name"><a class="board_link" href="BAD_URL">DRIVE NAME</a></div>
+				<div class="board_name"><a class="board_link" href="BAD_URL" target="_blank">DRIVE NAME</a></div>
 				<div class="board_info">Some identifying information from boot_out.txt ?</div>
 			</div>
+			<div class="some_load_image"><img src="assets/images/loading_black.gif" /></div>
 		</div>
 		<div id="web_open_panel" class="web_workflow">
 			Enter a URL or IP of an known device (from reading the REPL or screen).
 		</div>
-		<div id="web_workflow_list" class="web_workflow loading">
+		<div id="web_workflow_list" class="workflow_list web_workflow loading">
 			<div class="boards_list_empty">No Wifi board detected.</div>
 			<div id="template_board_web" class="template_board">
-				<div class="board_name"><a class="board_link" href="?dev=http://circuitpython.local">FunHouse something</a></div>
+				<div class="board_name"><a class="board_link" href="?dev=http://circuitpython.local" target="_blank">FunHouse something</a></div>
 				<div>Some identifying information <span class="serial_number">(serial number ?)</span></div>
 			</div>
 			<div class="some_load_image"><img src="assets/images/loading_black.gif" /></div>
 		</div>
 		<div class="ble_open_panel">Do the thing to enable BLE, select/connect to a board. List saved boards below or something ?</div>
 		<div id="ble_workflow_list" class="loading">
+			<div class="PH">(PH) The BLE workflow is not implemented.</div>
 			<div class="boards_list_empty">No BLE board detected.</div>
 			<div class="template_board" class="template_board">
-				<div class="board_name"><a class="board_link" href="?dev=ble://whatever_is_a_ble_id">Advertisement name ? </a></div>
+				<div class="board_name"><a class="board_link" href="?dev=ble://whatever_is_a_ble_id" target="_blank">Advertisement name ? </a></div>
 				<div>Some identifying information ? Memorized name ?</div>
 			</div>
 		</div>

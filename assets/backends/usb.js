@@ -14,6 +14,7 @@ class USBWorkflow extends Workflow {
 		this._device_info = null;
 		this._editable = false;
 		this.drive_info = null;
+		this.drive_name = null;
 	}
 	async start(drive="") {
 		if(drive) {
@@ -24,6 +25,7 @@ class USBWorkflow extends Workflow {
 		if(result) {
 			this.drive_info = result[0];
 			this.root = result[1];
+			this.drive_name = result[2]
 			this._editable = this.drive_info.isReadOnly;
 		}
 		const dev_info = await this.device_info()
@@ -133,6 +135,7 @@ class USBWorkflow extends Workflow {
 	async delete_file(file_path) {
 		var full_path = path.join(this.root, file_path);
 		try {
+			console.log("Delete", this.root, file_path, full_path)
 			await fsx.remove(full_path);
 			return new WorkflowResponse(true, null);
 		} catch {
@@ -184,10 +187,10 @@ class USBWorkflow extends Workflow {
 			if(!drive.isUSB) continue
 			for(var mount of drive.mountpoints) {
 				if(mount.path == needle) {
-					return [drive, needle];
+					return [drive, needle, mount.label];
 				}
 				if(mount.label == needle) {
-					return [drive, mount.path];
+					return [drive, mount.path, mount.label];
 				}
 			}
 		}

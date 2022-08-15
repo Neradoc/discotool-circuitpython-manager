@@ -26,6 +26,7 @@ class WebWorkflow extends Workflow {
 		super();
 		this.workflow_url_base = url_base;
 		this.version_info = null;
+		this.drive_name = null
 	}
 	async start(url_passed=null) {
 		// TODO: setup the actual URL for the workflow OUTSIDE
