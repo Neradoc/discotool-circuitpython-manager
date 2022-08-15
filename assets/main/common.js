@@ -25,8 +25,8 @@ export async function start() {
 	} else if (url_passed.startsWith("ble:")) {
 		console.log("BLE workflow not supported")
 	} else if (url_passed.startsWith("http://")) {
-		var target_url = url_passed.replace(/^http:\/\//, "")
-		board_control = new WebWorkflow(target_url);
+		// var target_url = url_passed.replace(/^http:\/\//, "")
+		board_control = new WebWorkflow(url_passed);
 	}
 
 }

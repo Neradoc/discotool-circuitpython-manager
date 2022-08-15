@@ -191,6 +191,9 @@ async function refresh_list() {
 		var tbody = document.querySelector("#file_list_body");
 		tbody.replaceChildren(...new_children);
 		$('#file_list_loading_image').hide();
+	} catch(e) {
+		console.log("Directory")
+		console.log(e)
 	} finally {
 		refreshing = false;
 		$('#file_list_loading_image').hide();

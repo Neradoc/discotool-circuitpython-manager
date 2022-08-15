@@ -6,8 +6,10 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 -->
 	<title></title>
-	<link rel="shortcut icon" type="image/jpg" href="assets/images/favicon.png"/>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Security-Policy"
+		  content="default-src 'self'; connect-src *">
+	<link rel="shortcut icon" type="image/jpg" href="assets/images/favicon.png"/>
 	<link rel="stylesheet" href="assets/main/workflow.css">
 	<link rel="stylesheet" href="assets/main/home.css">
 	<script src="assets/extlib/jquery.min.js"></script>
@@ -22,7 +24,7 @@ SPDX-License-Identifier: MIT
  -->
 	<content>
 	<div id="welcome_page" class="tab_page tab_page_welcome">
-		<h3 style="display:none"></h3>
+		<h3></h3>
 		<div>
 			Select a method to connect to a board. <button id="reload_boards">Refresh Board List</button>
 		</div>

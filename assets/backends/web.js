@@ -99,6 +99,7 @@ class WebWorkflow extends Workflow {
 		}
 		var heads = this.headers({"Accept": "application/json"});
 		var url = new URL("/fs"+dir_path, this.workflow_url_base);
+		console.log("URL", url)
 		var response = await fetch(
 			url,
 			{
@@ -108,7 +109,8 @@ class WebWorkflow extends Workflow {
 		);
 		try {
 			var data = await response.json();
-			return new WebResponse(response, WebWorkflowFile(data));
+			var file_list = data.map((d) => new WebWorkflowFile(d))
+			return new WebResponse(response, data);
 		} catch {
 			return new WebResponse(response, [], false);
 		}
@@ -167,7 +169,7 @@ class WebWorkflow extends Workflow {
 		return new URL("/edit/", this.workflow_url_base);
 	}
 	repl_url() {
-		new URL("/cp/serial/", this.workflow_url_base);
+		return new URL("/cp/serial/", this.workflow_url_base);
 	}
 
 	//##############################################################
