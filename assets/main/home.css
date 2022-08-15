@@ -1,0 +1,15 @@
+.template_board {
+	display: none;
+}
+div.some_load_image {
+	display: none;
+	width: 120px;
+	margin: auto;
+	text-align: center;
+}
+#web_workflow_list.loading {
+	opacity: 0.4;
+}
+#web_workflow_list.loading div.some_load_image {
+	display: block;
+}

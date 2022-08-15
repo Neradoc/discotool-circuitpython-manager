@@ -1,7 +1,5 @@
 import * as common from "./common.js";
 
-var backend = common.backend;
-
 const HIDDEN = [
 	".fseventsd",
 	".metadata_never_index",
@@ -84,7 +82,7 @@ async function refresh_list() {
 		}
 		const data = await response.json();
 		*/
-		var response = await backend.list_dir(current_path);
+		var response = await common.board_control.list_dir(current_path);
 		var data = response.content;
 		var new_children = [];
 		var template = document.querySelector('#row');
@@ -118,7 +116,7 @@ async function refresh_list() {
 			// -> make the backend cooperate with this to get the "direct reference"
 			// for web workflow it is currently the direct URL, though it should
 			// not remain so in the future.
-			let api_url = backend.api_url(file_path)
+			let api_url = common.board_control.api_url(file_path)
 			if (file_info.directory) {
 				file_path += "/";
 				api_url += "/";
@@ -173,7 +171,7 @@ async function refresh_list() {
 			} else {
 				// TODO: this is backend-specific
 				// we want an edit page that is backend agnostic.
-				var edit_url = backend.edit_url(file_path)
+				var edit_url = common.board_control.edit_url(file_path)
 				edit_url.hash = `#${file_path}`;
 				edit_button.href = edit_url;
 			}
@@ -201,7 +199,7 @@ async function refresh_list() {
 
 async function mkdir(e) {
 	var dir_path = current_path + new_directory_name.value + "/";
-	var response = await backend.create_dir(dir_path);
+	var response = await common.board_control.create_dir(dir_path);
 	if (response.ok) {
 		refresh_list();
 		new_directory_name.value = "";
@@ -213,7 +211,7 @@ async function upload(e) {
 	console.log("upload");
 	for (const file of files.files) {
 		console.log(file_path, file);
-		var response = await backend.upload_file(current_path + file.name, file);
+		var response = await common.board_control.upload_file(current_path + file.name, file);
 		if (response.ok) {
 			refresh_list();
 			console.log(files);
@@ -235,7 +233,7 @@ async function del(e) {
 	}
 	if (confirm(prompt)) {
 		console.log(path);
-		var response = await backend.delete_file(path);
+		var response = await common.board_control.delete_file(path);
 		if (response.ok) {
 			refresh_list();
 		} else {

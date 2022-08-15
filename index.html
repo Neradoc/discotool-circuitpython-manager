@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--
+SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
+SPDX-License-Identifier: MIT
+-->
+	<title></title>
+	<link rel="shortcut icon" type="image/jpg" href="assets/images/favicon.png"/>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<link rel="stylesheet" href="assets/main/workflow.css">
+	<link rel="stylesheet" href="assets/main/home.css">
+	<script src="assets/extlib/jquery.min.js"></script>
+	<script src="assets/extlib/jszip.min.js"></script>
+	<script src="assets/main/home.js" defer="true" type="module"></script>
+</head>
+<body>
+<!-- 
+	<header>
+	<h1 id="top_title">Welcome</h1>
+	</header>
+ -->
+	<content>
+	<div id="welcome_page" class="tab_page tab_page_welcome">
+		<h3 style="display:none"></h3>
+		<div>
+			Select a method to connect to a board.
+		</div>
+		<div id="usb_open_panel" class="usb_workflow">
+			Select a drive or a directory. Or drop it right here.
+		</div>
+		<div id="usb_workflow_list" class="usb_workflow loading">
+			<div class="boards_list_empty">No USB drive detected.</div>
+			<div id="template_board_usb" class="template_board">
+				<div class="board_name"><a class="board_link" href="BAD_URL">DRIVE NAME</a></div>
+				<div class="board_info">Some identifying information from boot_out.txt ?</div>
+			</div>
+		</div>
+		<div id="web_open_panel" class="web_workflow">
+			Enter a URL or IP of an known device (from reading the REPL or screen).
+		</div>
+		<div id="web_workflow_list" class="web_workflow loading">
+			<div class="boards_list_empty">No Wifi board detected.</div>
+			<div id="template_board_web" class="template_board">
+				<div class="board_name"><a class="board_link" href="?dev=http://circuitpython.local">FunHouse something</a></div>
+				<div>Some identifying information <span class="serial_number">(serial number ?)</span></div>
+			</div>
+			<div class="some_load_image"><img src="assets/images/loading_black.gif" /></div>
+		</div>
+		<div class="ble_open_panel">Do the thing to enable BLE, select/connect to a board. List saved boards below or something ?</div>
+		<div id="ble_workflow_list" class="loading">
+			<div class="boards_list_empty">No BLE board detected.</div>
+			<div class="template_board" class="template_board">
+				<div class="board_name"><a class="board_link" href="?dev=ble://whatever_is_a_ble_id">Advertisement name ? </a></div>
+				<div>Some identifying information ? Memorized name ?</div>
+			</div>
+		</div>
+	</div>
+	<div id="small_load_image"><img class="small_load_image" src="assets/images/loading_black_small.gif" /></div>
+	</content>
+</body>
+</html>

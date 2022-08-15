@@ -12,7 +12,7 @@ import * as bundler from "./workflow-bundler.js";
 
 // import { $ } from "../extlib/jquery.min.js";
 
-var board_control = common.backend;
+var board_control = null;
 var circup = null
 
 const DEBUG = common.DEBUG;
@@ -129,7 +129,7 @@ async function update_line(new_line, board_libs) {
 			await update_circup_table();
 		}
 		dont_need_update(module_name);
-	} else if(semver(module.version)[0] != semver(version)[0]) {
+	} else if(module.version[0] != version[0]) {
 		// this is a major update
 		new_line.addClass("major_update_module");
 		new_line.find(".status_icon").html("&#8252;&#65039;");
@@ -252,6 +252,7 @@ async function init_page() {
 		$(".tab_link_welcome").click();
 	}
 	await common.start();
+	board_control = common.board_control
 	await board_control.start();
 	var vinfo = await board_control.device_info();
 	// circup loading

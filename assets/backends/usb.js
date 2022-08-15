@@ -8,9 +8,9 @@ const fss = window.moduleFss;
 const DEFAULT_DRIVE = "CIRCUITPY";
 
 class USBWorkflow extends Workflow {
-	constructor() {
+	constructor(drive = DEFAULT_DRIVE) {
 		super();
-		this.drive = DEFAULT_DRIVE;
+		this.drive = drive;
 		this._device_info = null;
 		this._editable = false;
 		this.drive_info = null;
@@ -151,7 +151,7 @@ class USBWorkflow extends Workflow {
 	repl_url() {
 		return "";
 	}
-	async find_devices() {
+	static async find_devices() {
 		var drives = await drivelist.list();
 		var devices_list = [];
 		for(var drive of drives) {
@@ -161,7 +161,10 @@ class USBWorkflow extends Workflow {
 				var root = mount.path;
 				var boot_path = path.join(root, "boot_out.txt")
 				if(fss.existsSync(boot_path)) {
-					devices_list.push(root);
+					devices_list.push({
+						mount: root,
+						name: mount.label,
+					});
 				}
 			}
 		}
@@ -169,6 +172,9 @@ class USBWorkflow extends Workflow {
 			devices: devices_list,
 		};
 	}
+// 	async find_devices() {
+// 		return USBWorkflow.find_devices()
+// 	}
 
 	//##############################################################
 

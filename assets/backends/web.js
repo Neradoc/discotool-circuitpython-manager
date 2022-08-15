@@ -19,28 +19,37 @@ class WebWorkflowFile extends WorkflowFile {
 	}
 }
 
+const DEFAULT_URL_BASE = "http://circuitpython.local"
+
 class WebWorkflow extends Workflow {
-	constructor() {
+	constructor(url_base = DEFAULT_URL_BASE) {
 		super();
-		this.workflow_url_base = "http://circuitpython.local";
+		this.workflow_url_base = url_base;
 		this.version_info = null;
 	}
-	async start() {
-		// setup the actual URL for the workflow
-		var url = new URL(window.location);
-		var url_passed = url.searchParams.get("dev");
-		if(url_passed) {
-			console.log("Trying", url_passed);
-			var url_test = new URL("/", `http://${url_passed}`);
-			var response = await fetch(url_test);
-			this.workflow_url_base = response.url;
-		} else {
-			console.log("Trying", this.workflow_url_base);
-			var url_test = new URL("/", this.workflow_url_base);
-			var response = await fetch(url_test);
-			this.workflow_url_base = response.url;
+	async start(url_passed=null) {
+		// TODO: setup the actual URL for the workflow OUTSIDE
+		// var url = new URL(window.location);
+		// var url_passed = url.searchParams.get("dev");
+		try {
+			if(url_passed) {
+				console.log("Trying", url_passed);
+				var url_test = new URL("/", `http://${url_passed}`);
+				var response = await fetch(url_test);
+				this.workflow_url_base = response.url;
+			} else {
+				console.log("Trying", this.workflow_url_base);
+				var url_test = new URL("/", this.workflow_url_base);
+				var response = await fetch(url_test);
+				this.workflow_url_base = response.url;
+			}
+			console.log(`Board URL: ${this.workflow_url_base}`);
+			return true
+		} catch(e) {
+			console.log("No Web Workflow Found")
+			console.log(e)
 		}
-		console.log(`Board URL: ${this.workflow_url_base}`);
+		return false;
 	}
 	async device_info() {
 		if(this.version_info !== null) {
@@ -194,9 +203,22 @@ class WebWorkflow extends Workflow {
 		return head;
 	}
 
-	async find_devices() {
-		var response = await fetch(new URL("/cp/devices.json", this.workflow_url_base));
-		const data = await response.json();
+	static async find_devices() {
+		var webby = await new WebWorkflow()
+		await webby.start()
+		const response = await fetch(new URL("/cp/devices.json", webby.workflow_url_base));
+		var data = await response.json();
+		console.log("data", data)
+		// add myself
+		const web_info = await webby.device_info()
+		console.log(web_info)
+		data.devices.push({
+			hostname: web_info.hostname,
+			instance_name: web_info.board_name,
+			ip: web_info.ip,
+			port: web_info.port,
+		})
+		data.total += 1
 		return data;
 	}
 
