@@ -13,6 +13,7 @@ const board_page = "board_page.html"
 async function detect_usb() {
 	// USB workflow
 	if(window.modulePath != undefined) {
+		$(".usb_workflow").show()
 		const response = await USBWorkflow.find_devices()
 		const devices = response.devices
 		const template = $("#template_board_usb")
@@ -44,10 +45,24 @@ async function detect_usb() {
 	console.log("FIN USB")
 }
 
+async function giveup_web() {
+	console.log("ERROR: Detect Web")
+	console.log(e)
+	$(".web_workflow").show()
+	$("#web_workflow_list .boards_list_empty").show()
+	$("#web_workflow_list").removeClass("loading")
+}
+
 async function detect_web() {
 	// Web workflow
 	if(true) {
-		const response = await WebWorkflow.find_devices()
+		$(".web_workflow").show()
+		var response = null
+		try {
+			response = await WebWorkflow.find_devices()
+		} catch(e) {
+			return giveup_web(e)
+		}
 		const template = $("#template_board_web")
 		if(response && response.total > 0) {
 			$("#web_workflow_list .boards_list_empty").hide()
@@ -85,6 +100,7 @@ async function detect_web() {
 async function detect_ble() {
 	// BLE workflow
 	if(true) {
+		$(".ble_workflow").show()
 		$("#ble_workflow_list .boards_list_empty").hide()
 	} else {
 		$(".ble_workflow").hide()
