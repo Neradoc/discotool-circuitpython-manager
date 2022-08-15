@@ -5,7 +5,7 @@ const path = require('path')
 function createWindow () {
 	// Create the browser window.
 	const mainWindow = new BrowserWindow({
-		width: 1200,
+		width: 820,
 		height: 800,
 		webPreferences: {
 			preload: path.join(__dirname, 'preload.cjs'),
@@ -16,7 +16,8 @@ function createWindow () {
 	})
 
 	// and load the index.html of the app.
-	mainWindow.loadFile('circuitpython-web-packager/workflow.html')
+	mainWindow.loadFile('circuitpython-web-packager/index.html')
+	// mainWindow.loadFile('circuitpython-web-packager/workflow.html')
 
 	// Open the DevTools.
 	mainWindow.webContents.openDevTools()
