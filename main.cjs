@@ -3,8 +3,7 @@ const {app, BrowserWindow} = require('electron')
 const path = require('path')
 
 function createWindow () {
-	// Create the browser window.
-	const mainWindow = new BrowserWindow({
+	const browser_window_options = {
 		width: 820,
 		height: 800,
 		webPreferences: {
@@ -13,7 +12,10 @@ function createWindow () {
 			nodeIntegrationInWorker: true,
 			contextIsolation: false,
 		}
-	})
+	}
+
+	// Create the browser window.
+	const mainWindow = new BrowserWindow(browser_window_options)
 
 	// and load the index.html of the app.
 	mainWindow.loadFile('circuitpython-web-packager/index.html')
@@ -21,6 +23,14 @@ function createWindow () {
 
 	// Open the DevTools.
 	mainWindow.webContents.openDevTools()
+	
+	// Open all the windows with preload.cjs ?
+	mainWindow.webContents.setWindowOpenHandler((details) => {
+		return {
+			action: 'allow',
+			overrideBrowserWindowOptions: browser_window_options
+		}
+	})
 }
 
 // This method will be called when Electron has finished
