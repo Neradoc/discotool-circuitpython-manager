@@ -19,11 +19,7 @@ function createWindow () {
 
 	// and load the index.html of the app.
 	mainWindow.loadFile('circuitpython-web-packager/index.html')
-	// mainWindow.loadFile('circuitpython-web-packager/workflow.html')
 
-	// Open the DevTools.
-	mainWindow.webContents.openDevTools()
-	
 	// Open all the windows with preload.cjs ?
 	mainWindow.webContents.setWindowOpenHandler((details) => {
 		return {
