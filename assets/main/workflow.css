@@ -54,7 +54,10 @@ body {
 	margin: 0px;
 	height: 100%;
 }
-
+p {
+	margin: 0px;
+	padding: 2px 4px;
+}
 input
 {
 	font: inherit;
@@ -122,12 +125,9 @@ content {
 	color: var(--hover-color);
 }
 
-#file_list, #circup_page, #bundle_list {
-	display: none;
-	position: relative;
-}
-
+content > div.hide { display: none; }
 #welcome_page, #file_list, #circup_page, #bundle_list {
+	position: relative;
 	padding: 4px;
 }
 

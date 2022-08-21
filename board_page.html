@@ -17,37 +17,38 @@ SPDX-License-Identifier: MIT
 </head>
 <body>
 	<header>
-	<h1 id="top_title"><span class="board_name">Loading…</span></h1>
+	<h1 id="top_title"><span class="icon"></span> <span class="board_name">Loading…</span></h1>
 	<!--<p id="version_info_subtitle">
 		<span class="subtitle_text">With Circuipython <span class="circuitpy_version"></span>.</span>
 	</p>-->
 	</header>
 	<content>
 	<div id="tablist">
-		<button class="tab_link tab_link_welcome active"
+		<button class="tab_link tab_link_welcome"
 			value="welcome">Welcome</button>
-		<button class="tab_link tab_link_files"
+		<button class="tab_link tab_link_files active"
 			value="files">Files Browser</button>
 		<button class="tab_link tab_link_bundle"
 			value="bundle">Library Bundles</button>
 		<button class="tab_link tab_link_circup"
 			value="circup">Installer</button>
 	</div>
-	<div id="welcome_page" class="tab_page tab_page_welcome">
+	<div id="welcome_page" class="tab_page tab_page_welcome hide">
 		<h3>Welcome !</h3>
 		<div>
-			Connected to <a class="board_name" href="">(Loading…)</a>.<br>
-			With Circuitpython <span class="circuitpy_version">x.x.x</span>.
+			<p>Connected to <a class="board_name" href="">(Loading…)</a>.</p>
+			<p>With Circuitpython <span class="circuitpy_version">x.x.x</span>.</p>
+			<p>Serial number: <span class="serial_number">N/A</span>.</p>
 		</div>
 		<div class="boards_list">
 			<span class="boards_list_default">Other boards list (Loading…).</span>
 			<span class="boards_list_empty">No other board detected.</span>
 			<span class="boards_list_list">...</span>
 		</div>
-		<div>On-board web workflow: <a class="board_link" href="">(Loading…)</a></div>
-		<div>Connect to the Serial REPL: <a class="board_repl" href="">(Loading…)</a></div>
-		<div>IP address: <a class="board_ip" href="">??.??.??.??</a></div>
-		<div>
+		<div class="web_workflow">On-board web workflow: <a class="board_link" href="">(Loading…)</a></div>
+		<div class="web_workflow">Connect to the Serial REPL: <a class="board_repl" href="">(Loading…)</a></div>
+		<div class="web_workflow">IP address: <a class="board_ip" href="">??.??.??.??</a></div>
+		<div class="web_workflow">
 			API password (&#9888;&#65039; transmitted unencrypted).<br/>
 			<input name="password" id="password" type="password" placeholder="passw0rd"/>
 		</div>
@@ -103,7 +104,7 @@ SPDX-License-Identifier: MIT
 		</group>
 		</command>
 	</div>
-	<div id="bundle_list" class="tab_page tab_page_bundle">
+	<div id="bundle_list" class="tab_page tab_page_bundle hide">
 		<h3>Bundle Library Installer</h3>
 
 		<div id="bundle_filter">
@@ -120,7 +121,7 @@ SPDX-License-Identifier: MIT
 			<div id="bundle_dependencies" class="liste"></div>
 		</div>
 	</div>
-	<div id="circup_page" class="tab_page tab_page_circup">
+	<div id="circup_page" class="tab_page tab_page_circup hide">
 		<h3>Circup Library Manager</h3>
 		<p>
 			<commands>

@@ -199,7 +199,8 @@ class USBWorkflow extends Workflow {
 		}
 		return null;
 	}
-
+	icon = "💾"
+	type = "usb"
 }
 
 export { USBWorkflow };

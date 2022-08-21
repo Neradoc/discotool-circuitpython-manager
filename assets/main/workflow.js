@@ -187,7 +187,6 @@ async function run_update_process(imports) {
 	if (!DEBUG) {
 		$("#circup_page .loading").hide(1000);
 	}
-	$("#circup_page .title .circuitpy_version").html(await board_control.cp_version());
 	$("#circup_page .title").show();
 	$("#circup_page #button_install_all").attr("disabled", true);
 	$("#circup_page .buttons").show();
@@ -274,6 +273,11 @@ async function init_page() {
 	board_control = common.board_control
 	await board_control.start();
 	var vinfo = await board_control.device_info();
+	var workflow_type = board_control.type
+	// load some data into the page
+	$("#circup_page .title .circuitpy_version").html(await board_control.cp_version());
+	$("#circup_page .title .serial_number").html(await board_control.serial_num());
+	$("#welcome_page .serial_number").html(await board_control.serial_num());
 	// circup loading
 	var prom1 = (async () => {
 		await start_circup();
@@ -282,23 +286,28 @@ async function init_page() {
 	// board inits
 	var prom2 = (async () => {
 		// *** title
-		$(".board_name").html(vinfo.board_name);
-		$(".circuitpy_version").html(vinfo.version);
-		$("#version_info_subtitle .subtitle_text").show();
+		$("#top_title .icon").html(board_control.icon)
+		$(".board_name").html(vinfo.board_name)
+		$(".circuitpy_version").html(vinfo.version)
+		$("#version_info_subtitle .subtitle_text").show()
 		// *** file list
-		await setup_directory();
-		await refresh_list();
+		await setup_directory()
+		await refresh_list()
 		// *** welcome page information
 		$("a.board_name").attr("href", `https://circuitpython.org/board/${vinfo.board_id}/`);
-		$("a.board_link").attr("href", board_control.workflow_url_base);
-		$("a.board_link").html(board_control.workflow_url_base);
-		var repl_url = board_control.repl_url()
-		$("a.board_repl").attr("href", repl_url);
-		$("a.board_repl").html(repl_url.href);
-		$("a.board_ip").attr("href", `http://${vinfo.ip}`);
-		$("a.board_ip").html(vinfo.ip);
+		if(workflow_type == "web") {
+			$("a.board_link").attr("href", board_control.workflow_url_base);
+			$("a.board_link").html(board_control.workflow_url_base);
+			var repl_url = board_control.repl_url()
+			$("a.board_repl").attr("href", repl_url);
+			$("a.board_repl").html(repl_url.href);
+			$("a.board_ip").attr("href", `http://${vinfo.ip}`);
+			$("a.board_ip").html(vinfo.ip);
+		} else {
+			$("div.web_workflow").remove()
+		}
 		// other boards
-		$(".boards_list").hide()
+		$(".boards_list").remove()
 		// update_boards_list()
 	})();
 	//

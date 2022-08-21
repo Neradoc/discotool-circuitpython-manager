@@ -65,7 +65,7 @@ class WebWorkflow extends Workflow {
 		);
 		this.version_info = await response.json();
 		if( "UID" in this.version_info ) {
-			this.version_info["serial_num"] = this.version_info["UID"]
+			this.version_info.serial_num = this.version_info["UID"]
 		}
 		return this.version_info;
 	}
@@ -230,7 +230,8 @@ class WebWorkflow extends Workflow {
 		data.total += 1
 		return data;
 	}
-
+	icon = "🌐"
+	type = "web"
 }
 
 export { WebWorkflow };

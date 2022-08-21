@@ -79,6 +79,10 @@ class Workflow {
 		var version_data = await this.device_info();
 		return semver(version_data.version);
 	}
+	async serial_num() {
+		var version_data = await this.device_info();
+		return version_data.serial_num;
+	}
 	async get_lib_directory() {
 		var response = await this.list_dir("/lib/");
 		return response.content
@@ -93,6 +97,8 @@ class Workflow {
 			.map((item) => item.replace(/\.m?py$/,""));
 		return lib_list;
 	}
+	icon = "🐍"
+	type = "base"
 }
 
 export { Workflow, WorkflowResponse, WorkflowFile };
