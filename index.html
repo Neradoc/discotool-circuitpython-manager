@@ -23,42 +23,52 @@ SPDX-License-Identifier: MIT
 	</header>
  -->
 	<content>
-	<div id="welcome_page" class="tab_page tab_page_welcome">
+	<div id="home_page">
 		<h3></h3>
-		<div>
-			Select a method to connect to a board. <button id="reload_boards">Refresh Board List</button>
-		</div>
 		<div id="usb_open_panel" class="usb_workflow">
 			Select a drive or a directory. Or drop it right here.
-		</div>
-		<div id="usb_workflow_list" class="workflow_list usb_workflow loading">
-			<div class="boards_list_empty">No USB drive detected.</div>
-			<div id="template_board_usb" class="template_board">
-				<div class="board_name"><a class="board_link" href="BAD_URL" target="_blank">DRIVE NAME</a></div>
-				<div class="board_info">Some identifying information from boot_out.txt ?</div>
-			</div>
-			<div class="some_load_image"><img src="assets/images/loading_black.gif" /></div>
 		</div>
 		<div id="web_open_panel" class="web_workflow">
 			Enter a URL or IP of an known device (from reading the REPL or screen).
 		</div>
-		<div id="web_workflow_list" class="workflow_list web_workflow loading">
-			<div class="boards_list_empty">No Wifi board detected.</div>
-			<div id="template_board_web" class="template_board">
-				<div class="board_name"><a class="board_link" href="?dev=http://circuitpython.local" target="_blank">FunHouse something</a></div>
-				<div>Some identifying information <span class="serial_number">(serial number ?)</span></div>
-			</div>
-			<div class="some_load_image"><img src="assets/images/loading_black.gif" /></div>
+		<div id="ble_open_panel" class="PH">
+			(PH) Do the thing to enable BLE, select/connect to a board.
 		</div>
-		<div class="ble_open_panel">Do the thing to enable BLE, select/connect to a board. List saved boards below or something ?</div>
-		<div id="ble_workflow_list" class="loading">
-			<div class="PH">(PH) The BLE workflow is not implemented.</div>
-			<div class="boards_list_empty">No BLE board detected.</div>
-			<div class="template_board" class="template_board">
-				<div class="board_name"><a class="board_link" href="?dev=ble://whatever_is_a_ble_id" target="_blank">Advertisement name ? </a></div>
-				<div>Some identifying information ? Memorized name ?</div>
+		<div id="prompt_refresh">
+			Select a method to connect to a board.
+			<button id="reload_boards">Refresh Board List</button>
+			<span id="all_list_load">Loading <img class="small_load_image" src="assets/images/loading_black.gif" /></span>
+		</div>
+		<div id="all_boards_list">
+			<div id="template_board_all" class="template_board">
+				<div><span class="board_name">Board name</span> <img class="board_name_load small_load_image" src="assets/images/loading_black.gif" /></div>
+				<div class="link_usb link_line" display="none">
+					💾 <a class="board_link board_link_usb" href="BAD_URL" target="_blank">DRIVE NAME</a>
+				</div>
+				<div class="link_web link_line">
+					🌐 <a class="board_link board_link_web" href="?dev=http://circuitpython.local" target="_blank">LOADING OR NOT</a>
+				</div>
+				<div class="board_info">
+					Some identifying information from boot_out.txt or the web ? or Other ?
+				</div>
 			</div>
 		</div>
+		<div id="usb_boards_loading" class="workflow_loading">
+			<img class="small_load_image" src="assets/images/loading_black.gif" />
+			Loading USB drives.
+		</div>
+		<div id="web_boards_loading" class="workflow_loading">
+			<img class="small_load_image" src="assets/images/loading_black.gif" />
+			Loading Wifi boards.
+		</div>
+		<div id="ble_boards_loading" class="workflow_loading">
+			<img class="small_load_image" src="assets/images/loading_black.gif" />
+			Loading BLE boads.
+		</div>
+		<div id="usb_boards_list_empty" class="workflow_empy">No USB drive detected.</div>
+		<div id="web_boards_list_empty" class="workflow_empy">No Wifi board detected.</div>
+		<div id="ble_boards_list_empty" class="workflow_empy">No BLE board detected.</div>
+		<div class="PH">(PH) The BLE workflow is not implemented.</div>
 	</div>
 	<div id="small_load_image"><img class="small_load_image" src="assets/images/loading_black_small.gif" /></div>
 	</content>

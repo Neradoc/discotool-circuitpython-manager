@@ -40,6 +40,26 @@ async function start_circup() {
 	}
 }
 
+async function update_boards_list() {
+	// NOTE: web specific
+	var boards_list = await board_control.find_devices();
+	$(".boards_list .boards_list_default").hide();
+	var devices = boards_list.devices;
+	if(devices.length > 0) {
+		var liste = $("<ul></ul>");
+		for(var device of devices) {
+			var link = $(`<a href="">${device.hostname} / ${device.ip}</a>`);
+			link.attr("href", common.url_here({"dev": device.ip}).href);
+			var line = $(`<li>${device.instance_name} at </li>`);
+			line.append(link);
+			liste.append(line);
+		}
+		$(".boards_list .boards_list_list").empty().append("Other boards:").append(liste).show();
+	} else {
+		$(".boards_list .boards_list_empty").show();
+	}
+}
+
 async function install_all() {
 	$(".install_buttons").attr("disabled", true);
 	var modules = Array.from(modules_to_update);
@@ -278,22 +298,8 @@ async function init_page() {
 		$("a.board_ip").attr("href", `http://${vinfo.ip}`);
 		$("a.board_ip").html(vinfo.ip);
 		// other boards
-		var boards_list = await board_control.find_devices(); // NOTE: web specific
-		$(".boards_list .boards_list_default").hide();
-		var devices = boards_list.devices;
-		if(devices.length > 0) {
-			var liste = $("<ul></ul>");
-			for(var device of devices) {
-				var link = $(`<a href="">${device.hostname} / ${device.ip}</a>`);
-				link.attr("href", common.url_here({"dev": device.ip}).href);
-				var line = $(`<li>${device.instance_name} at </li>`);
-				line.append(link);
-				liste.append(line);
-			}
-			$(".boards_list .boards_list_list").empty().append("Other boards:").append(liste).show();
-		} else {
-			$(".boards_list .boards_list_empty").show();
-		}
+		$(".boards_list").hide()
+		// update_boards_list()
 	})();
 	//
 	await prom1;

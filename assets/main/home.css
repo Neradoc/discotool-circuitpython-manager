@@ -3,18 +3,55 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 h3 { display:none; }
+#home_page > div {
+	border-radius: 16px;
+	/* background: var(--input-background); */
+	border: 2px solid var(--input-background);
+	padding: 8px 22px;
+	margin: 4px;
+}
 .template_board {
 	display: none;
 }
-.workflow_list div.some_load_image {
+.link_line,
+.workflow_empty,
+.workflow_loading {
 	display: none;
-	width: 120px;
-	margin: auto;
-	text-align: center;
 }
-.workflow_list.loading {
-	opacity: 0.4;
+
+#prompt_refresh {
+	background: var(--input-background);
 }
-.workflow_list.loading div.some_load_image {
-	display: block;
+
+.board_line .board_info {
+	display: none;
+}
+
+.web_locked .board_link_web::after,
+.usb_locked .board_link_usb::after {
+	content: "  🔐";
+}
+.web_editable .board_link_web::after,
+.usb_editable .board_link_usb::after {
+	content: "  🔏";
+}
+
+.small_load_image {
+	height: 14px;
+}
+div#all_boards_list {
+	padding: 0px;
+	border: none;
+}
+#all_boards_list > div {
+	border-radius: 16px;
+	padding: 8px 22px;
+	margin: 4px 0px;
+	border: 2px solid var(--input-background);
+}
+#all_boards_list > div:nth-child(even) {
+	background: var(--color-pair0);
+}
+#all_boards_list > div:nth-child(odd) {
+	background: var(--color-pair1);
 }

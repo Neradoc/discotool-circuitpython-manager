@@ -30,7 +30,7 @@ class USBWorkflow extends Workflow {
 			this.drive_info = result[0];
 			this.root = result[1];
 			this.drive_name = result[2]
-			this._editable = this.drive_info.isReadOnly;
+			this._editable = ! this.drive_info.isReadOnly;
 		}
 		const dev_info = await this.device_info()
 	}
@@ -73,7 +73,7 @@ class USBWorkflow extends Workflow {
 		return this._device_info;
 	}
 	async is_editable() {
-		
+		// only valid after start()
 		return this._editable;
 	}
 	async get_file_content(file_path, range=null) {

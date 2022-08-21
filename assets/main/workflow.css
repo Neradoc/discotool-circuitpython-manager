@@ -300,11 +300,9 @@ group.install_buttons button {
 	/* background-color: #002244; */
 }
 
-
 .small_load_image {
 	height: 14px;
 }
-
 
 #bundle_list .lists {
 	display: grid;

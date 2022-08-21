@@ -38,17 +38,17 @@ class WebWorkflow extends Workflow {
 		// var url_passed = url.searchParams.get("dev");
 		try {
 			if(url_passed) {
-				console.log("Trying", url_passed);
+				// console.log("Trying", url_passed);
 				var url_test = new URL("/", `http://${url_passed}`);
 				var response = await fetch(url_test);
 				this.workflow_url_base = response.url;
 			} else {
-				console.log("Trying", this.workflow_url_base);
+				// console.log("Trying", this.workflow_url_base);
 				var url_test = new URL("/", this.workflow_url_base);
 				var response = await fetch(url_test);
 				this.workflow_url_base = response.url;
 			}
-			console.log(`Board URL: ${this.workflow_url_base}`);
+			// console.log(`Board URL: ${this.workflow_url_base}`);
 			return true
 		} catch(e) {
 			console.log("No Web Workflow Found")
@@ -64,6 +64,9 @@ class WebWorkflow extends Workflow {
 			new URL("/cp/version.json", this.workflow_url_base),
 		);
 		this.version_info = await response.json();
+		if( "UID" in this.version_info ) {
+			this.version_info["serial_num"] = this.version_info["UID"]
+		}
 		return this.version_info;
 	}
 	async is_editable() {
@@ -77,7 +80,6 @@ class WebWorkflow extends Workflow {
 			.get("Access-Control-Allow-Methods")
 			.toLowerCase()
 			.includes("delete");
-		console.log("IS EDITABLE", editable);
 		return editable;
 	}
 	async get_file_content(file_path, range=null) {
@@ -103,7 +105,7 @@ class WebWorkflow extends Workflow {
 		}
 		var heads = this.headers({"Accept": "application/json"});
 		var url = new URL("/fs"+dir_path, this.workflow_url_base);
-		console.log("URL", url)
+		// console.log("URL", url)
 		var response = await fetch(
 			url,
 			{
@@ -215,10 +217,10 @@ class WebWorkflow extends Workflow {
 		await webby.start()
 		const response = await fetch(new URL("/cp/devices.json", webby.workflow_url_base));
 		var data = await response.json();
-		console.log("data", data)
+		// console.log("data", data)
 		// add myself
 		const web_info = await webby.device_info()
-		console.log(web_info)
+		// console.log(web_info)
 		data.devices.push({
 			hostname: web_info.hostname,
 			instance_name: web_info.board_name,
