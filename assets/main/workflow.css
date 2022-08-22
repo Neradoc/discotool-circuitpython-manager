@@ -332,7 +332,9 @@ group.install_buttons button {
 
 #bundle_list .lists {
 	display: grid;
+	height: calc(100vh - 200px);
 	grid-template-columns: 1fr 1fr;
+	/* grid-template-rows: auto-fill; */
 }
 #bundle_list .title {
 	text-align: center;
@@ -344,7 +346,6 @@ group.install_buttons button {
 #bundle_list #bundle_modules,
 #bundle_list #bundle_dependencies
 {
-	height: 400px;
 	overflow: hidden auto;
 	padding: 0px 4px;
 	border: 2px solid #888;
