@@ -112,7 +112,6 @@ async function detect_usb() {
 		$(".usb_workflow").hide()
 		$("#usb_boards_loading").hide()
 	}
-	console.log("FIN USB")
 }
 
 async function giveup_web(e) {
@@ -198,7 +197,6 @@ async function detect_web() {
 		$(".web_workflow").hide()
 		$("#web_boards_loading").hide()
 	}
-	console.log("FIN WEB")
 }
 
 async function detect_ble() {
@@ -210,7 +208,6 @@ async function detect_ble() {
 		$(".ble_workflow").hide()
 	}
 	$("#ble_boards_loading").hide()
-	console.log("FIN BLE")
 }
 
 async function detect_boards() {
