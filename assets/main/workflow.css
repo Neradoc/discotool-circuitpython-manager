@@ -68,8 +68,24 @@ input
 }
 
 #top_title {
+	position: relative;
 	text-align: center;
 	margin: 0px;
+}
+#top_title .icon
+{
+	position: relative;
+	vertical-align: sub;
+}
+#top_title .icon img {
+	display: none;
+	height: 32px;
+}
+#top_title .icon .icon_locked {
+	position: absolute;
+	height: 18px;
+	top: 0px;
+	left: calc(50% - 24px);
 }
 h3 {
 	padding: 0px;
@@ -216,6 +232,11 @@ tr.odd { background: var(--color-pair1); }
 	margin: 0px;
 	text-align: center;
 }
+#file_list td.buttons a .view { display: none; }
+#file_list.locked td.buttons a .view { display: inline; }
+#file_list.locked td.buttons a .pencil { display: none; }
+#file_list.locked .icon_locked { display: inline; }
+#file_list.locked td .delete { display: none; }
 
 commands {
 	display: block;
@@ -264,6 +285,11 @@ group.install_buttons button {
 #pwd {
 	font-size: 120%;
 	padding: 8px;
+}
+#pwd .icon_locked {
+	height: 24px;
+	vertical-align: bottom;
+	display: none;
 }
 
 #dependencies table thead { display: none; }

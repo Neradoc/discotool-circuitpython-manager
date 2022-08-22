@@ -17,7 +17,14 @@ SPDX-License-Identifier: MIT
 </head>
 <body>
 	<header>
-	<h1 id="top_title"><span class="icon"></span> <span class="board_name">Loading…</span></h1>
+	<h1 id="top_title">
+		<span class="icon">
+			<img class="icon_usb" src="assets/images/icon-usb.png"/>
+			<img class="icon_web" src="assets/images/icon-web.png"/>
+			<img class="icon_locked" src="assets/images/icon-locked.png"/>
+		</span>
+		<span class="board_name">Loading…</span>
+	</h1>
 	<!--<p id="version_info_subtitle">
 		<span class="subtitle_text">With Circuipython <span class="circuitpy_version"></span>.</span>
 	</p>-->
@@ -57,8 +64,11 @@ SPDX-License-Identifier: MIT
 		<table id="file_list_list">
 			<thead>
 				<tr>
-					<th id="pwd" colspan="4"></th>
-					<th id="pwd" colspan="1"><button class="refresh_list">🔄</button></th>
+					<th id="pwd" colspan="4">
+						<img class="icon_locked" src="assets/images/icon-locked.png"/>
+						<span class="dir_path"></span>
+					</th>
+					<th colspan="1"><button class="refresh_list">🔄</button></th>
 				</tr>
 				<tr>
 					<th>Type</th>
@@ -81,7 +91,10 @@ SPDX-License-Identifier: MIT
 					<td class="modified"></td>
 					<td class="buttons">
 						<a class="delete">🗑️</a>
-						<a href="" target="_blank" class="edit">📝</a>
+						<a href="" target="_blank" class="edit">
+							<span class="pencil">📝</span>
+							<span class="view">📄<!-- 👁 --></span>
+						</a>
 						<a class="analyze">🔎</a>
 					</td>
 				</tr>

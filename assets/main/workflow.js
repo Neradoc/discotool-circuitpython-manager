@@ -286,7 +286,10 @@ async function init_page() {
 	// board inits
 	var prom2 = (async () => {
 		// *** title
-		$("#top_title .icon").html(board_control.icon)
+		$(`#top_title .icon_${workflow_type}`).show()
+		if(!await board_control.is_editable()) {
+			$("#top_title .icon_locked").show()
+		}
 		$(".board_name").html(vinfo.board_name)
 		$(".circuitpy_version").html(vinfo.version)
 		$("#version_info_subtitle .subtitle_text").show()

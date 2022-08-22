@@ -45,7 +45,7 @@ async function refresh_list() {
 		}
 
 		var drive_name = common.board_control.drive_name || "CIRCUITPY"
-		var pwd = document.querySelector('#pwd');
+		var pwd = $('#pwd .dir_path');
 		var pwd_link = `<a class="files_list_dir dir" href="?path=/#files" data-path="/">${drive_name}</a>/`
 		var fullpath = "/";
 		for(var path of current_path.split("/")) {
@@ -54,7 +54,11 @@ async function refresh_list() {
 				pwd_link += `<a href="?path=${fullpath}#files" data-path="${fullpath}" class="dir files_list_dir">${path}</a>/`;
 			}
 		}
-		pwd.innerHTML = pwd_link;
+		pwd.html(pwd_link);
+
+		if(!await common.board_control.is_editable()) {
+			$("#pwd .icon_locked").show()
+		}
 
 		/*
 		var heads = common.headers({"Accept": "application/json"});
@@ -96,7 +100,7 @@ async function refresh_list() {
 		if (current_path != "/") {
 			var clone = template.content.cloneNode(true);
 			var td = clone.querySelectorAll("td");
-			td[0].innerHTML = "&#128190;";
+			td[0].innerHTML = "⬆️";
 			var path_link = clone.querySelector("a");
 			let parent = new URL("..", "file://" + current_path);
 			var file_path = parent.pathname;
@@ -127,9 +131,16 @@ async function refresh_list() {
 				file_path += "/";
 				api_url += "/";
 			}
-			var icon = "&#10067;";
+			const ext_icons = [
+				[["txt", "py", "js", "json"], "📄"],
+				[["html", "html"], "🌐"],
+				[["mpy"], "🐍"],
+				[["jpg", "jpeg", "png", "bmp", "gif"], "🖼"],
+				[["wav", "mp3", "ogg"], "🎵"],
+			]
+			var icon = "❓";
 			if (current_path == "/" && SECRETS.includes(file_info.name)) {
-				icon = "🔐";
+				icon = "🔑"; // 🔐
 			} else if (current_path == "/" && HIDDEN.includes(file_info.name)) {
 				// hidden names in root
 				if(hide_level >= HIDE.DEFAULT_SYSTEM_FILES) continue
@@ -143,15 +154,14 @@ async function refresh_list() {
 				icon = "📚";
 			} else if (file_info.directory) {
 				icon = "📁";
-			} else if(file_info.name.endsWith(".txt") ||
-					  file_info.name.endsWith(".py") ||
-					  file_info.name.endsWith(".js") ||
-					  file_info.name.endsWith(".json")) {
-				icon = "📄";
-			} else if (file_info.name.endsWith(".html")) {
-				icon = "🌐";
-			} else if (file_info.name.endsWith(".mpy")) {
-				icon = "🐍"; // <img src='blinka.png'/>
+			} else {
+				for(const file_dat of ext_icons) {
+					const ext = file_info.name.split(".").pop()
+					if(file_dat[0].includes(ext)) {
+						icon = file_dat[1]
+						break
+					}
+				}
 			}
 			td[0].innerHTML = icon;
 			td[1].innerHTML = file_info.file_size;
@@ -203,6 +213,9 @@ async function refresh_list() {
 		refreshing = false;
 		$('#file_list_loading_image').hide();
 		$('#file_list_list').css("opacity", "1");
+		if(!await common.board_control.is_editable()) {
+			$("#file_list").addClass("locked");
+		}
 	}
 }
 
