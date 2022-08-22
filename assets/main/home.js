@@ -34,6 +34,21 @@ class Board {
 var boards = {};
 const template_all = $("#template_board_all")
 
+async function insert_line(all_dev_line, name) {
+	var added = false;
+	for(const line of $(".board_line")) {
+		const bname = $(line).find(".board_name").html()
+		if(bname.localeCompare(name) >= 0) {
+			$(line).before(all_dev_line)
+			added = true
+			break
+		}
+	}
+	if(!added) {
+		$("#all_boards_list").append(all_dev_line)
+	}
+}
+
 async function detect_usb() {
 	// USB workflow
 	if(window.modulePath != undefined) {
@@ -60,13 +75,12 @@ async function detect_usb() {
 				if(!(serial in boards)) {
 					board = new Board()
 					boards[serial] = board
-					console.log(serial)
 					board.serial = serial
 					board.name = name
 					var all_dev_line = template_all.clone()
 					all_dev_line.attr("id", line_id)
 					all_dev_line.addClass("board_line")
-					$("#all_boards_list").append(all_dev_line)
+					await insert_line(all_dev_line, name)
 				} else {
 					board = boards[serial]
 					while(!board.created) { sleep(100) }
@@ -78,7 +92,7 @@ async function detect_usb() {
 				name_field.html(name)
 				var link = all_dev_line.find(".board_link_usb")
 				link.attr("href", url_link);
-				link.html(`${drive_path}`)
+				link.find(".name").html(`${drive_name}`)
 				var board_info = all_dev_line.find(".board_info")
 				board_info.html(link.href)
 				all_dev_line.find(".link_usb").show()
@@ -139,20 +153,16 @@ async function detect_web() {
 				const serial = await info["serial_num"] || board_path
 				const name = await info["board_name"] || board_name
 				const line_id = `dev_line_${serial}`
-				console.log("WEB WORKFLOW - WEB WORKFLOW - WEB WORKFLOW")
-				console.log(info)
-				console.log(serial)
 				var board = null;
 				if(!(serial in boards)) {
 					board = new Board()
 					boards[serial] = board
-					console.log(serial)
 					board.serial = serial
 					board.name = name
 					var all_dev_line = template_all.clone()
 					all_dev_line.attr("id", line_id)
 					all_dev_line.addClass("board_line")
-					$("#all_boards_list").append(all_dev_line)
+					await insert_line(all_dev_line, name)
 				} else {
 					board = boards[serial]
 					while(!board.created) { sleep(100) }
@@ -164,8 +174,9 @@ async function detect_web() {
 				name_field.html(name)
 				var link = all_dev_line.find(".board_link_web")
 				link.attr("href", url_link);
-				var port = (device.port == 80) ? "" : device.port
-				link.html(`http://${board_path}.local${port}`)
+				// var port = (device.port == 80) ? "" : device.port
+				// var weblink = `http://${board_path}.local${port}`
+				link.find(".name").html(`${board_path}`)
 				var board_info = all_dev_line.find(".board_info")
 				board_info.html(link.href)
 				all_dev_line.find(".link_web").show()

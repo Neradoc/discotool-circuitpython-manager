@@ -2,6 +2,20 @@
 SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
+:root {
+	--background-usb: #301010;
+	--border-usb: #602010;
+	--background-web: #002010;
+	--border-web: #004020;
+	--background-ble: #101020;
+	--border-ble: #202040;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+	}
+}
+
 h3 { display:none; }
 #home_page > div {
 	border-radius: 16px;
@@ -23,17 +37,106 @@ h3 { display:none; }
 	background: var(--input-background);
 }
 
+#home_actions {
+	display: grid;
+	grid-template-columns: 33.33% 33.33% 33.33% ;
+	padding: 0px !important;
+	margin: 0px;
+	background: transparent;
+	border: none !important;
+}
+#home_actions > div {
+	margin: 2px;
+	padding: 4px 8px;
+}
+#file_select {
+	display: none;
+}
+#file_select_button {
+	font: inherit;
+}
+#web_open_panel input {
+	font: inherit;
+	width: calc(100% - 4em);
+	border-color: white;
+}
+#web_open_panel .web_go {
+	font: inherit;
+}
+
+.board_line .board_name_div {
+	padding-top: 8px;
+}
+
+.board_line {
+	display: grid;
+	grid-template-columns: 40% 20% 20% 20%;
+}
 .board_line .board_info {
 	display: none;
 }
-
-.web_locked .board_link_web::after,
-.usb_locked .board_link_usb::after {
-	content: "  🔐";
+.board_line .load_image {
+	display: none;
 }
-.web_editable .board_link_web::after,
-.usb_editable .board_link_usb::after {
-	content: "  🔏";
+.board_line.loading .load_image {
+	display: block;
+}
+.board_line .name {
+	display: block;
+}
+.board_line a {
+	text-decoration: none;
+	color: inherit;
+}
+.board_line > * {
+	min-height: 1em;
+}
+.board_line .board_link {
+	position: relative;
+	text-align: center;
+	margin-left: 4px;
+	padding: 4px;
+}
+.board_line .board_link img {
+	height:32px;
+	vertical-align: bottom;
+}
+.board_line .board_link img.locked {
+	position: absolute;
+	height: 18px;
+	top: 4px;
+	left: calc(50% - 24px);
+}
+.link_usb, #usb_open_panel
+{
+	border-radius: 8px;
+	background-color: var(--background-usb);
+	border: 2px solid var(--border-usb);
+}
+.link_web, #web_open_panel
+{
+	border-radius: 8px;
+	background-color: var(--background-web);
+	border: 2px solid var(--border-web);
+}
+.link_ble, #ble_open_panel
+{
+	border-radius: 8px;
+	background-color: var(--background-ble);
+	border: 2px solid var(--border-ble);
+}
+
+.board_link .locked,
+.board_link .editable {
+	display: none;
+}
+.web_locked .board_link_web .locked,
+.usb_locked .board_link_usb .locked {
+	display: inline;
+}
+.web_editable .board_link_web .editable,
+.usb_editable .board_link_usb .editable {
+	display: inline;
 }
 
 .small_load_image {
@@ -45,7 +148,7 @@ div#all_boards_list {
 }
 #all_boards_list > div {
 	border-radius: 16px;
-	padding: 8px 22px;
+	padding: 2px 22px;
 	margin: 4px 0px;
 	border: 2px solid var(--input-background);
 }

@@ -25,14 +25,19 @@ SPDX-License-Identifier: MIT
 	<content>
 	<div id="home_page">
 		<h3></h3>
-		<div id="usb_open_panel" class="usb_workflow">
-			Select a drive or a directory. Or drop it right here.
-		</div>
-		<div id="web_open_panel" class="web_workflow">
-			Enter a URL or IP of an known device (from reading the REPL or screen).
-		</div>
-		<div id="ble_open_panel" class="PH">
-			(PH) Do the thing to enable BLE, select/connect to a board.
+		<div id="home_actions">
+			<div id="usb_open_panel" class="usb_workflow">
+				<input id="file_select" type="file"/>
+				<button id="file_select_button">Select a drive</button><br/>
+				Or drop it here.
+			</div>
+			<div id="web_open_panel" class="web_workflow">
+				Device URL or IP:<br/>
+				<input type="text"/> <button id="web_go">GO</button>
+			</div>
+			<div id="ble_open_panel" class="PH">
+				(PH) Do the thing to enable BLE, select/connect to a board.
+			</div>
 		</div>
 		<div id="prompt_refresh">
 			Select a method to connect to a board.
@@ -41,13 +46,23 @@ SPDX-License-Identifier: MIT
 		</div>
 		<div id="all_boards_list">
 			<div id="template_board_all" class="template_board">
-				<div><span class="board_name">Board name</span> <img class="board_name_load small_load_image" src="assets/images/loading_black.gif" /></div>
-				<div class="link_usb link_line" display="none">
-					💾 <a class="board_link board_link_usb" href="BAD_URL" target="_blank">DRIVE NAME</a>
+				<div class="board_name_div">
+					<span class="board_name">Board name</span>
+					<img class="board_name_load small_load_image" src="assets/images/loading_black.gif" />
 				</div>
-				<div class="link_web link_line">
-					🌐 <a class="board_link board_link_web" href="?dev=http://circuitpython.local" target="_blank">LOADING OR NOT</a>
-				</div>
+				<a class="board_link board_link_usb link_usb link_line" display="none" href="BAD_URL" target="_blank">
+					<img src="assets/images/icon-usb.png"/>
+					<img class="locked" src="assets/images/icon-locked.png"/>
+					<!-- <img class="editable" src="assets/images/icon-editable.png"/> -->
+					<span class="name">DRIVE NAME</span>
+				</a>
+				<a class="board_link board_link_web link_web link_line" display="none" href="?dev=http://circuitpython.local" target="_blank">
+					<img src="assets/images/icon-web.png"/>
+					<img class="locked" src="assets/images/icon-locked.png"/>
+					<!-- <img class="editable" src="assets/images/icon-editable.png"/> -->
+					<span class="name">LOAD WEB</span>
+				</a>
+				<img class="load_image" src="assets/images/loading_black.gif" />
 				<div class="board_info">
 					Some identifying information from boot_out.txt or the web ? or Other ?
 				</div>
