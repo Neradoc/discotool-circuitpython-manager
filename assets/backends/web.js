@@ -38,19 +38,17 @@ class WebWorkflow extends Workflow {
 		// var url_passed = url.searchParams.get("dev");
 		try {
 			if(url_passed) {
-				// console.log("Trying", url_passed);
 				var url_test = new URL("/", `http://${url_passed}`);
-				var response = await fetch(url_test);
-				this.workflow_url_base = response.url;
 			} else {
-				// console.log("Trying", this.workflow_url_base);
 				var url_test = new URL("/", this.workflow_url_base);
-				var response = await fetch(url_test);
-				this.workflow_url_base = response.url;
 			}
+			var response = await fetch(url_test)
+			console.log(response)
+			this.workflow_url_base = response.url
 			// console.log(`Board URL: ${this.workflow_url_base}`);
 			return true
 		} catch(e) {
+			console.log("While trying", url_test)
 			console.log("No Web Workflow Found")
 			console.log(e)
 		}
