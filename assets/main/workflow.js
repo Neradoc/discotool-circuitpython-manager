@@ -87,23 +87,32 @@ function dont_need_update(module_name) {
 }
 
 async function update_circup_table() {
-	$('#circup_page .line').removeClass("odd even");
 	if (show_up_to_date) {
-		if ($('#circup_page .line').length > 0) {
-			await $("#dependencies table thead").show(LINE_HIDE_DELAY).promise();
-		} else {
-			await $("#dependencies table thead").hide(LINE_HIDE_DELAY).promise();
-		}
-		$('#circup_page .line:odd').addClass("odd");
-		$('#circup_page .line:even').addClass("even");
+		$("#show_updates").hide();
+		$("#hide_updates").show();
+		$('#circup_page .module_exists').show(LINE_HIDE_DELAY);
 	} else {
-		if($('#circup_page .line').not(".module_exists").length > 0) {
+		$("#show_updates").show();
+		$("#hide_updates").hide();
+		$('#circup_page .module_exists').hide(LINE_HIDE_DELAY);
+	}
+	$('#circup_row_list .line').removeClass("odd even");
+	if (show_up_to_date) {
+		if ($('#circup_row_list .line').length > 0) {
 			await $("#dependencies table thead").show(LINE_HIDE_DELAY).promise();
 		} else {
 			await $("#dependencies table thead").hide(LINE_HIDE_DELAY).promise();
 		}
-		$('#circup_page .line').not(".module_exists").odd().addClass("odd");
-		$('#circup_page .line').not(".module_exists").even().addClass("even");
+		$('#circup_row_list .line:odd').addClass("odd");
+		$('#circup_row_list .line:even').addClass("even");
+	} else {
+		if($('#circup_row_list .line').not(".module_exists").length > 0) {
+			await $("#dependencies table thead").show(LINE_HIDE_DELAY).promise();
+		} else {
+			await $("#dependencies table thead").hide(LINE_HIDE_DELAY).promise();
+		}
+		$('#circup_row_list .line').not(".module_exists").odd().addClass("odd");
+		$('#circup_row_list .line').not(".module_exists").even().addClass("even");
 	}
 }
 
@@ -226,13 +235,11 @@ async function auto_install(file_name) {
 	// TODO: wait until the bundle and board are inited
 	await pre_update_process();
 	$("#circup_page .loading").append(`<br/>Loading <b>${file_name}</b>...`);
-	$("#circup_page .title .filename").html(`/${file_name}`);
+	$("#circup_page .title .filename").html(`${file_name}`);
 	// get the file
 	var code_response = await board_control.get_file_content("/" + file_name);
 	if(!code_response.ok) {
-		console.log(`Error: ${file_name} not found.`);
-		// TODO: make sure to exit gracefully
-		$("#circup_page .loading").html(`No such file: <b>/${file_name}</b>`)
+		$("#circup_page .loading").html(`No such file: <b>${file_name}</b>`)
 		return false;
 	}
 	// get the list
@@ -241,7 +248,9 @@ async function auto_install(file_name) {
 	const imports = library_bundle.get_imports_from_python(code_content);
 	console.log("imports", imports);
 	// do the thing
-	await run_update_process(imports);
+	if(imports) {
+		await run_update_process(imports);
+	}
 	return true;
 }
 
@@ -287,6 +296,7 @@ async function init_page() {
 	var prom1 = (async () => {
 		await start_circup();
 		await bundler.start(library_bundle);
+		await update_circup_table();
 	})();
 	// board inits
 	var prom2 = (async () => {
@@ -365,13 +375,17 @@ $("#button_install_all").on("click", (e) => {
 });
 $("#toggle_updates").on("click", async (e) => {
 	show_up_to_date = !show_up_to_date;
-	if (show_up_to_date) {
-		await $('#circup_page .module_exists').show(LINE_HIDE_DELAY).promise();
-	} else {
-		await $('#circup_page .module_exists').hide(LINE_HIDE_DELAY).promise();
-	}
 	await update_circup_table();
 });
+$("#show_updates").on("click", async (e) => {
+	show_up_to_date = true;
+	await update_circup_table();
+});
+$("#hide_updates").on("click", async (e) => {
+	show_up_to_date = false;
+	await update_circup_table();
+});
+
 
 $(".tab_link").on("click", (e) => {
 	var target = e.target.value;
