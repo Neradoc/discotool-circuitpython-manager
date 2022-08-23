@@ -18,7 +18,7 @@ class WebWorkflowFile extends WorkflowFile {
 			result.name,
 			result.directory,
 			result.file_size,
-			result.modified_ns * 1000000,
+			result.modified_ns / 1000000,
 		);
 	}
 }
@@ -116,7 +116,7 @@ class WebWorkflow extends Workflow {
 		try {
 			var data = await response.json();
 			var file_list = data.map((d) => new WebWorkflowFile(d))
-			return new WebResponse(response, data);
+			return new WebResponse(response, file_list);
 		} catch {
 			return new WebResponse(response, [], false);
 		}
