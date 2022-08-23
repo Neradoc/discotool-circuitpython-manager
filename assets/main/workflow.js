@@ -11,6 +11,7 @@ import { Circup } from "../lib/circup.js";
 import * as bundler from "./workflow-bundler.js";
 
 // import { $ } from "../extlib/jquery.min.js";
+const CODE_FILES = ["code.txt", "code.py", "main.py", "main.txt"]
 
 var board_control = null;
 var circup = null
@@ -24,6 +25,7 @@ var cpver = null;
 var library_bundle = null;
 var install_running = false;
 var show_up_to_date = false;
+var is_editable = false;
 
 async function start_circup() {
 	if (circup == null) {
@@ -70,7 +72,7 @@ async function install_all() {
 			await upload_button_call({ "target":button });
 		}
 	}
-	$(".install_buttons").attr("disabled", false);
+	$(".install_buttons").attr("disabled", !is_editable);
 }
 
 function dont_need_update(module_name) {
@@ -159,14 +161,14 @@ async function update_line(new_line, board_libs) {
 		new_line.find(".status_icon").html("&#10071;&#65039;");
 		new_line.find(".status").html("Update Available");
 	}
-	new_line.find(".upload button").attr("disabled", false);
+	new_line.find(".upload button").attr("disabled", !is_editable);
 }
 
 async function upload_button_call(e) {
 	var button = $(e.target);
 	var target_module = button.val();
 	var line = button.parents("tr.line");
-	button.attr("disabled", true);
+	button.attr("disabled", !is_editable);
 	line.find(".status_icon").html(LOADING_IMAGE);
 	await circup.install_modules([target_module])
 	await refresh_list()
@@ -216,20 +218,22 @@ async function run_update_process(imports) {
 	for(var new_line of new_lines) {
 		await update_line(new_line, board_libs);
 	}
-	$("#circup_page #button_install_all").attr("disabled", false);
+	$("#circup_page #button_install_all").attr("disabled", !is_editable);
+	$("#circup_page #circup_row_list .install").attr("disabled", !is_editable);
 }
 
 async function auto_install(file_name) {
 	// TODO: wait until the bundle and board are inited
 	await pre_update_process();
 	$("#circup_page .loading").append(`<br/>Loading <b>${file_name}</b>...`);
-	$("#circup_page .title .filename").html(file_name);
+	$("#circup_page .title .filename").html(`/${file_name}`);
 	// get the file
 	var code_response = await board_control.get_file_content("/" + file_name);
 	if(!code_response.ok) {
 		console.log(`Error: ${file_name} not found.`);
 		// TODO: make sure to exit gracefully
-		return;
+		$("#circup_page .loading").html(`No such file: <b>/${file_name}</b>`)
+		return false;
 	}
 	// get the list
 	const code_content = code_response.content;
@@ -238,6 +242,7 @@ async function auto_install(file_name) {
 	console.log("imports", imports);
 	// do the thing
 	await run_update_process(imports);
+	return true;
 }
 
 async function update_all() {
@@ -270,9 +275,10 @@ async function init_page() {
 	}
 	await common.start();
 	board_control = common.board_control
-	await board_control.start();
-	var vinfo = await board_control.device_info();
+	await board_control.start()
+	var vinfo = await board_control.device_info()
 	var workflow_type = board_control.type
+	is_editable = await board_control.is_editable()
 	// load some data into the page
 	$("#circup_page .title .circuitpy_version").html(await board_control.cp_version());
 	$("#circup_page .title .serial_number").html(await board_control.serial_num());
@@ -286,7 +292,7 @@ async function init_page() {
 	var prom2 = (async () => {
 		// *** title
 		$(`#top_title .icon_${workflow_type}`).show()
-		if(!await board_control.is_editable()) {
+		if(!is_editable) {
 			$("#top_title .icon_locked").show()
 		}
 		$(".board_name").html(vinfo.board_name)
@@ -328,9 +334,16 @@ async function run_exclusively(command) {
 	}
 }
 
-$(".auto_install").on("click", (e) => {
+$(".auto_install").on("click", async (e) => {
 	$(".tab_link_circup").click();
-	run_exclusively(() => auto_install("code.py"));
+	await run_exclusively(async () => {
+		for(const code of CODE_FILES) {
+			if(await auto_install(code)) {
+				return
+			}
+		}
+	}
+	);
 });
 $(".update_all").on("click", (e) => {
 	$(".tab_link_circup").click();
