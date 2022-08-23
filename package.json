@@ -15,7 +15,8 @@
   "license": "MIT",
   "devDependencies": {
     "electron": "^19.0.10",
-    "electron-packager": "^15.5.1"
+    "electron-packager": "^15.5.1",
+    "electron-rebuild": "^3.2.9"
   },
   "type": "module",
   "dependencies": {
@@ -23,6 +24,7 @@
     "electron-log": "^4.4.8",
     "fs": "^0.0.1-security",
     "fs-extra": "^10.1.0",
+    "mdns": "^2.7.2",
     "path": "^0.12.7"
   }
 }
