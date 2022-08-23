@@ -93,15 +93,15 @@ async function refresh_list() {
 		const data = await response.json();
 		*/
 		var response = await common.board_control.list_dir(current_path);
-		var data = response.content;
+		var dir_files_list = response.content;
 		var new_children = [];
-		var template = document.querySelector('#row');
+		var template = $('#file_list_template');
 
 		if (current_path != "/") {
-			var clone = template.content.cloneNode(true);
-			var td = clone.querySelectorAll("td");
+			var clone = template.clone();
+			var td = clone.find("td");
 			td[0].innerHTML = "⬆️";
-			var path_link = clone.querySelector("a");
+			var path_link = clone.find("a")[0];
 			let parent = new URL("..", "file://" + current_path);
 			var file_path = parent.pathname;
 			path_link.href = common.url_here({"path": parent.pathname});
@@ -113,14 +113,14 @@ async function refresh_list() {
 			new_children.push(clone);
 		}
 
-		data.sort((a,b) => {
+		dir_files_list.sort((a,b) => {
 			return a.name.localeCompare(b.name);
 		})
 
-		for (const file_info of data) {
+		for (const file_info of dir_files_list) {
 			// Clone the new row and insert it into the table
-			var clone = template.content.cloneNode(true);
-			var td = clone.querySelectorAll("td");
+			var clone = template.clone();
+			var td = clone.find("td");
 			var file_path = current_path + file_info.name;
 			// TODO: this is backend-specific
 			// -> make the backend cooperate with this to get the "direct reference"
@@ -166,22 +166,22 @@ async function refresh_list() {
 			td[0].innerHTML = icon;
 			td[1].innerHTML = file_info.file_size;
 
-			var path = clone.querySelector("a.path");
-			path.innerHTML = file_info.name;
+			var path = clone.find("a.path");
+			path.html(file_info.name);
 			if(file_info.directory) {
-				path.href = common.url_here({"path": `${file_path}`});
-				path.classList.add("files_list_dir");
-				path.setAttribute("data-path", file_path);
+				path.attr("href", common.url_here({"path": `${file_path}`}));
+				path.addClass("files_list_dir");
+				path.data("path", file_path);
 			} else {
-				path.href = api_url;
+				path.attr("href", api_url);
 			}
 			td[3].innerHTML = (new Date(file_info.modified)).toLocaleString();
-			var delete_button = clone.querySelector(".delete");
-			delete_button.setAttribute("data-path", file_path);
-			delete_button.value = file_path;
-			delete_button.onclick = del;
+			var delete_button = clone.find(".delete");
+			delete_button.data("path", file_path);
+			delete_button.val(file_path);
+			delete_button.on("click", del);
 
-			var edit_button = clone.querySelector(".edit");
+			var edit_button = clone.find(".edit");
 			if(file_info.directory) {
 				edit_button.remove()
 			} else {
@@ -189,13 +189,13 @@ async function refresh_list() {
 				// we want an edit page that is backend agnostic.
 				var edit_url = common.board_control.edit_url(file_path)
 				edit_url.hash = `#${file_path}`;
-				edit_button.href = edit_url;
+				edit_button.attr("href", edit_url);
 			}
 
-			var analyze_button = clone.querySelector(".analyze");
+			var analyze_button = clone.find(".analyze");
 			if(file_info.name.endsWith(".py")) {  // || search("requirement") >= 0 ?
-				analyze_button.setAttribute("data-path", file_path);
-				analyze_button.value = api_url;
+				analyze_button.data("path", file_path);
+				analyze_button.val(api_url);
 			} else {
 				analyze_button.remove()
 			}
@@ -203,8 +203,8 @@ async function refresh_list() {
 			new_children.push(clone);
 		}
 		$('#file_list_loading_image').hide();
-		var tbody = document.querySelector("#file_list_body");
-		tbody.replaceChildren(...new_children);
+		$("#file_list_body tr").remove();
+		$("#file_list_body").append(new_children);
 		$('#file_list_loading_image').hide();
 	} catch(e) {
 		console.log("Directory")

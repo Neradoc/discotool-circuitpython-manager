@@ -78,13 +78,9 @@ SPDX-License-Identifier: MIT
 					<th></th>
 				</tr>
 			</thead>
-			<tbody>
-				<tr>
-				</tr>
-			</tbody>
 			<tbody id="file_list_body"></tbody>
-			<template id="row">
-				<tr>
+			<tbody class="template">
+				<tr id="file_list_template">
 					<td class="type"></td>
 					<td class="size"></td>
 					<td class="path"><a class="path"></a></td>
@@ -98,7 +94,7 @@ SPDX-License-Identifier: MIT
 						<a class="analyze">🔎</a>
 					</td>
 				</tr>
-			</template>
+			</tbody>
 		</table>
 		<div id="file_list_loading_image"><img src="assets/images/loading_black.gif" /></div>
 		<div id="file_list_error_image">&#9888;&#65039;</div>
@@ -161,9 +157,8 @@ SPDX-License-Identifier: MIT
 					<th class="status" colspan="2">Status</th>
 				</tr>
 			</thead>
-			<tbody>
-			<template id="circup_row">
-				<tr class="line">
+			<tbody class="template">
+				<tr id="circup_row_template" class="line">
 					<td class="upload"><button name="install" value="">Install</button></td>
 					<!-- <td class="icon"></td> -->
 					<td class="name"></td>
@@ -172,7 +167,8 @@ SPDX-License-Identifier: MIT
 					<td class="status_icon"></td>
 					<td class="status"></td>
 				</tr>
-			</template>
+			</tbody>
+			<tbody id="circup_row_list">
 			</tbody>
 			</table>
 		</div>

@@ -399,5 +399,6 @@ group.install_buttons button {
 #bundle_install {
 	margin-left: 16px;
 }
-
 #small_load_image { display: none; }
+
+.template { display: none; }

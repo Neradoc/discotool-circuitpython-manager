@@ -107,7 +107,7 @@ async function update_circup_table() {
 
 async function pre_update_process() {
 	$("#circup_page .hide").hide();
-	$("#dependencies table tbody tr").remove();
+	$("#dependencies table #circup_row_list tr").remove();
 	// setup circup
 	$("#circup_page .loading").html(`Loading library bundles...`).show();
 }
@@ -200,8 +200,7 @@ async function run_update_process(imports) {
 		var module = library_bundle.get_module(dependency);
 		var file_name = module.name + (module.package ? "" : ".mpy");
 		var icon = module.package ? "&#128193;" : "&#128196;";
-		var template = $("#circup_row").html();
-		var new_line = $(template);
+		var new_line = $("#circup_row_template").clone(); // clone the template
 		new_line.find(".upload button").on("click", upload_button_call);
 		new_line.find(".upload button").val(dependency);
 		new_line.find(".icon").html(icon);
@@ -211,7 +210,7 @@ async function run_update_process(imports) {
 		if (imports.includes(dependency)) {
 			new_line.addClass("imported");
 		}
-		$("#dependencies table tbody").append(new_line);
+		$("#dependencies #circup_row_list").append(new_line);
 		new_lines.push(new_line);
 	}
 	for(var new_line of new_lines) {
