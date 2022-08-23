@@ -114,13 +114,13 @@ SPDX-License-Identifier: MIT
 		</command>
 	</div>
 	<div id="bundle_list" class="tab_page tab_page_bundle hide">
-		<h3>Bundle Library Installer</h3>
-
+		<!-- <h3>Bundle Library Installer</h3> -->
+		<p>Install libraries from the bundles. Select the modules you want in the list, and click on the Install button to send the list of all the dependencies to the installer.</p>
 		<div id="bundle_filter">
 			<input name="bundle_filter" value="" placeholder="Enter library name to filter"/>
 			<button id="bundle_clear_search">Clear</button>
 			<button id="bundle_deselect_all">Deselect All</button>
-			<button id="bundle_install">Install The Dependencies</button>
+			<button id="bundle_install">Install These Dependencies...</button>
 		</div>
 
 		<div class="lists">
@@ -138,19 +138,23 @@ SPDX-License-Identifier: MIT
 				<button type="submit" class="auto_install">Auto Install...</button>
 				<button type="submit" class="update_all">Update All...</button>
 			</group>
+			<group class="buttons hide">
+				<!-- <button id="toggle_updates">Show/Hide Up-to-date</button> -->
+				<button id="show_updates">Show Up-to-date</button>
+				<button id="hide_updates">Hide Up-to-date</button>
+			</group>
 			</command>
 		</p>
 		<p class="loading hide">Loading libraries...</p>
 		<p class="title hide">
 			Dependencies and updates for <b class="filename">???</b>
 		</p>
-		<p class="buttons hide"><button id="button_install_all" name="install_all" value="">Upload All</button> <button id="toggle_updates">Show/Hide Up-to-date</button></p>
 		<p class="all_up_to_date hide">All libraries are up to date.</p>
 		<div id="dependencies">
 			<table>
 			<thead class="hide">
 				<tr>
-					<th class="upload"></th>
+					<th class="upload"><button id="button_install_all" name="install_all" value="">Upload All</button></th>
 					<th class="name">Module</th>
 					<th class="board_version">Board</th>
 					<th class="bundle_version">Bundle</th>
