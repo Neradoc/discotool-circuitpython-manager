@@ -9,6 +9,8 @@ import { WebWorkflow } from "../backends/web.js";
 import { USBWorkflow } from "../backends/usb.js";
 
 const board_page = "board_page.html"
+var update_timer = null
+var update_timer_running = false
 
 class Board {
 	constructor() {
@@ -202,6 +204,9 @@ async function detect_ble() {
 }
 
 async function detect_boards() {
+	if(update_timer != null) {
+		clearInterval(update_timer)
+	}
 	$("#all_list_load").show()
 	$(".workflow_empy").hide()
 	$(".workflow_loading").show()
@@ -225,13 +230,20 @@ async function detect_boards() {
 	$("#all_list_load").hide()
 	$(".board_name_load").hide()
 	// no await ?
-	var timer = setInterval(async () => {
-		$("#all_list_load").show()
-		await detect_usb()
-		await detect_web()
-		await detect_ble()
+	update_timer_running = true
+	update_timer = setInterval(async () => {
+		try {
+			if(update_timer_running) return false
+			$("#all_list_load").show()
+			await detect_usb()
+			await detect_web()
+			await detect_ble()
+		} catch(e) {
+			console.log(e)
+		}
 		$("#all_list_load").hide()
-	}, 5000)
+		update_timer_running = false
+	}, 10000)
 }
 
 async function init_page() {
