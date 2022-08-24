@@ -87,12 +87,12 @@ async function detect_usb() {
 				board.usb_path = drive_path
 				var name_field = all_dev_line.find(".board_name")
 				name_field.html(name)
-				var link = all_dev_line.find(".board_link_usb")
+				var link = all_dev_line.find(".link_usb")
 				link.attr("href", url_link);
 				link.find(".name").html(`${drive_name}`)
 				var board_info = all_dev_line.find(".board_info")
 				board_info.html(link.href)
-				all_dev_line.find(".link_usb").show()
+				link.show()
 				if(await wf.is_editable()) {
 					all_dev_line.addClass("usb_editable")
 					all_dev_line.removeClass("usb_locked")
@@ -162,14 +162,14 @@ async function detect_web() {
 			board.web_url = board_path
 			var name_field = all_dev_line.find(".board_name")
 			name_field.html(name)
-			var link = all_dev_line.find(".board_link_web")
+			var link = all_dev_line.find(".link_web")
 			link.attr("href", url_link);
 			// var port = (device.port == 80) ? "" : device.port
 			// var weblink = `http://${board_path}.local${port}`
 			link.find(".name").html(`${board_path}`)
 			var board_info = all_dev_line.find(".board_info")
 			board_info.html(link.href)
-			all_dev_line.find(".link_web").show()
+			link.show()
 			if(await wf.is_editable()) {
 				all_dev_line.addClass("web_editable")
 				all_dev_line.removeClass("web_locked")
@@ -234,14 +234,14 @@ async function detect_boards() {
 	update_timer = setInterval(async () => {
 		try {
 			if(update_timer_running) return false
-			$("#all_list_load").show()
+			$("#all_list_refresh").show()
 			await detect_usb()
 			await detect_web()
 			await detect_ble()
 		} catch(e) {
 			console.log(e)
 		}
-		$("#all_list_load").hide()
+		$("#all_list_refresh").hide()
 		update_timer_running = false
 	}, 10000)
 }

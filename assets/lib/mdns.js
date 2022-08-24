@@ -2,20 +2,24 @@
 SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
-import { DEBUG } from "../lib/tools.js"
+import { DEBUG, sleep } from "../lib/tools.js"
 const CP_LOCAL_DOMAIN = "circuitpython.local"
 
-var mdns = window.moduleMdns
+const module_mdns = window.moduleMdns
 var candidates = {}
 var everything_else = {}
+var mdns = null
 
 function available() {
-	return mdns != undefined
+	return module_mdns != undefined
 }
 
-async function start_scan() {
+function query() {
 	if(!available()) return
+	mdns.query({ questions:[{ name: CP_LOCAL_DOMAIN, type: 'A' }]})
+}
 
+function set_responder() {
 	mdns.on('response', function(response) {
 		if(response.type == "response") {
 			var candidate = {
@@ -84,18 +88,34 @@ async function start_scan() {
 			}
 		}
 	})
-	mdns.query({ questions:[{ name: CP_LOCAL_DOMAIN, type: 'A' }]})
 }
 
-function query() {
+async function start_scan() {
 	if(!available()) return
-	mdns.query({ questions:[{ name: CP_LOCAL_DOMAIN, type: 'A' }]})
+	if(mdns == null) {
+		mdns = module_mdns()
+		set_responder()
+	}
+	query()
+}
+
+async function close() {
+	mdns.destroy()
+	mdns = null
 }
 
 function get_candidates() {
 	return structuredClone(candidates)
 }
 
+async function scan_for_candidates() {
+	await start_scan()
+	await sleep(1.5)
+	const candidates = await get_candidates()
+	await close()
+	return candidates
+}
+
 start_scan()
 
-export { start_scan, query, get_candidates, available }
+export { start_scan, query, get_candidates, available, close, scan_for_candidates }

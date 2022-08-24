@@ -213,12 +213,10 @@ class WebWorkflow extends Workflow {
 
 	static async find_devices() {
 		if(mdns.available()) {
-			await mdns.query()
-			await tools.sleep(1.5)
-			const candidates = await mdns.get_candidates()
+			const candidates = await mdns.scan_for_candidates()
 			return Object.values(candidates)
 		}
-		// 
+		//
 		try {
 			var webby = await new WebWorkflow()
 			await webby.start()
