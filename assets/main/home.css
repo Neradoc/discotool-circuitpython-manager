@@ -31,7 +31,7 @@ button, input {
 .template_board {
 	display: none;
 }
-.link_line,
+.board_link,
 .workflow_empty,
 .workflow_loading {
 	display: none;
@@ -108,21 +108,21 @@ button, input {
 	top: 4px;
 	left: calc(50% - 24px);
 }
+.board_link, #home_actions > div {
+	border-radius: 16px;
+}
 .link_usb, #usb_open_panel
 {
-	border-radius: 8px;
 	background-color: var(--background-usb);
 	border: 2px solid var(--border-usb);
 }
 .link_web, #web_open_panel
 {
-	border-radius: 8px;
 	background-color: var(--background-web);
 	border: 2px solid var(--border-web);
 }
 .link_ble, #ble_open_panel
 {
-	border-radius: 8px;
 	background-color: var(--background-ble);
 	border: 2px solid var(--border-ble);
 }
@@ -131,12 +131,12 @@ button, input {
 .board_link .editable {
 	display: none;
 }
-.web_locked .board_link_web .locked,
-.usb_locked .board_link_usb .locked {
+.web_locked .link_web .locked,
+.usb_locked .link_usb .locked {
 	display: inline;
 }
-.web_editable .board_link_web .editable,
-.usb_editable .board_link_usb .editable {
+.web_editable .link_web .editable,
+.usb_editable .link_usb .editable {
 	display: inline;
 }
 
@@ -149,7 +149,7 @@ div#all_boards_list {
 }
 #all_boards_list > div {
 	border-radius: 16px;
-	padding: 2px 22px;
+	padding: 2px 4px 2px 22px;
 	margin: 4px 0px;
 	border: 2px solid var(--input-background);
 }
@@ -159,3 +159,4 @@ div#all_boards_list {
 #all_boards_list > div:nth-child(odd) {
 	background: var(--color-pair1);
 }
+#all_list_refresh { display: none; }

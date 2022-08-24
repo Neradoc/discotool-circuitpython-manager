@@ -43,6 +43,7 @@ SPDX-License-Identifier: MIT
 			Select a method to connect to a board.
 			<button id="reload_boards">Refresh Board List</button>
 			<span id="all_list_load">Loading <img class="small_load_image" src="assets/images/loading_black.gif" /></span>
+			<span id="all_list_refresh">Updating <img class="small_load_image" src="assets/images/loading_black.gif" /></span>
 		</div>
 		<div id="all_boards_list">
 			<div id="template_board_all" class="template_board">
@@ -50,13 +51,13 @@ SPDX-License-Identifier: MIT
 					<span class="board_name">Board name</span>
 					<!-- <img class="board_name_load small_load_image" src="assets/images/loading_black.gif" /> -->
 				</div>
-				<a class="board_link board_link_usb link_usb link_line" display="none" href="BAD_URL" target="_blank">
+				<a class="board_link link_usb" display="none" href="BAD_URL" target="_blank">
 					<img src="assets/images/icon-usb.png"/>
 					<img class="locked" src="assets/images/icon-locked.png"/>
 					<!-- <img class="editable" src="assets/images/icon-editable.png"/> -->
 					<span class="name">DRIVE NAME</span>
 				</a>
-				<a class="board_link board_link_web link_web link_line" display="none" href="?dev=http://circuitpython.local" target="_blank">
+				<a class="board_link link_web" display="none" href="?dev=http://circuitpython.local" target="_blank">
 					<img src="assets/images/icon-web.png"/>
 					<img class="locked" src="assets/images/icon-locked.png"/>
 					<!-- <img class="editable" src="assets/images/icon-editable.png"/> -->
