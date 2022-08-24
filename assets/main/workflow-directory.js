@@ -29,6 +29,32 @@ const HIDE = {
 
 var hide_level = HIDE.DEFAULT_SYSTEM_FILES;
 
+async function open_outside(link) {
+	// showItemInFolder
+	console.log("link", link)
+	if(window.shell) {
+		console.log(link.href)
+		await shell.openExternal(link.href)
+		return false
+	} else {
+		return true
+	}
+}
+function open_outside_a(e) {
+	const target = e.target
+	var path = $(target).data("path")
+	if(path) {
+		var full_path = common.board_control.edit_url(path)
+		console.log("-".repeat(70))
+		console.log(path)
+		console.log(full_path)
+		open_outside(full_path).after(() => {
+			
+		})
+	}
+	return false
+}
+
 async function refresh_list() {
 	if (refreshing) {
 		return;
@@ -167,12 +193,13 @@ async function refresh_list() {
 			td[0].innerHTML = icon;
 			td[1].innerHTML = file_info.file_size;
 
-			var path = clone.find("a.path");
-			path.html(file_info.name);
+			var path = clone.find("a.path")
+			path.html(file_info.name)
+			path.on("click", open_outside_a)
+			path.data("path", file_path)
 			if(file_info.directory) {
 				path.attr("href", tools.url_here({"path": `${file_path}`}));
 				path.addClass("files_list_dir");
-				path.data("path", file_path);
 			} else {
 				path.attr("href", api_url);
 			}
@@ -183,6 +210,7 @@ async function refresh_list() {
 			delete_button.on("click", del);
 
 			var edit_button = clone.find(".edit");
+			edit_button.on("click", open_outside_a)
 			if(file_info.directory) {
 				edit_button.remove()
 			} else {
