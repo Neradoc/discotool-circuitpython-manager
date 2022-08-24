@@ -149,10 +149,12 @@ class USBWorkflow extends Workflow {
 	//##############################################################
 
 	api_url(file_path) {
-		return new URL(`file://${file_path}`);
+		var full_path = path.join(this.root, file_path);
+		return new URL(`file://${full_path}`);
 	}
 	edit_url(file_path) {
-		return new URL(`file://${file_path}`);
+		var full_path = path.join(this.root, file_path);
+		return new URL(`file://${full_path}`);
 	}
 	repl_url() {
 		return "";
