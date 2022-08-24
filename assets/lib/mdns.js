@@ -2,6 +2,7 @@
 SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
+import { DEBUG } from "../lib/tools.js"
 const CP_LOCAL_DOMAIN = "circuitpython.local"
 
 var mdns = window.moduleMdns
@@ -58,27 +59,27 @@ async function start_scan() {
 			if(ref == "_circuitpython" || start_with_cpy || is_cp_local) {
 				if(candidates[candidate.ip] == undefined) {
 					candidates[candidate.ip] = candidate
-					console.log("New board", candidate)
+					if(DEBUG) {
+						console.log("New board", candidate)
+					}
 				} else {
 					if(candidates[candidate.ip].hostname == CP_LOCAL_DOMAIN) {
 						candidates[candidate.ip].hostname = candidate.hostname
 					}
 					if(candidates[candidate.ip].instance_name == "") {
 						candidates[candidate.ip].instance_name = candidate.instance_name
-						console.log("v".repeat(70))
-						console.log(candidates[candidate.ip])
-						console.log("^".repeat(70))
 					}
 				}
 			} else {
-				
 				if(candidate.ip) {
 					everything_else[candidate.ip] = candidate
 				}
 				if(candidate.hostname && candidate.hostname.includes("cpy-")) {
-					console.log("*".repeat(70))
-					console.log('candidate:', candidate)
-					console.log('got a response packet:', response)
+					if(DEBUG) {
+						console.log("*".repeat(70))
+						console.log('candidate:', candidate)
+						console.log('got a response packet:', response)
+					}
 				}
 			}
 		}
