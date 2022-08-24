@@ -3,11 +3,15 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
-import {WORKFLOW_USERNAME, WORKFLOW_PASSWORD} from "../../config.js";
+import {WORKFLOW_USERNAME, WORKFLOW_PASSWORD, DEBUG_DEFAULT} from "../../config.js";
 
-export var hash = window.location.hash.substr(1);
+export var hash = window.location.hash.substr(1)
 export var url_params = new URLSearchParams(document.location.search)
-export const DEBUG = url_params.get("debug") ? true : false;
+export const DEBUG = (
+	DEBUG_DEFAULT !== null ? DEBUG_DEFAULT : (
+		url_params.get("debug") ? true : false
+	)
+)
 export const current_path = url_params.get("path") || "/";
 
 export function url_here(parameters = {}, hash = null) {

@@ -206,6 +206,7 @@ async function detect_ble() {
 async function detect_boards() {
 	if(update_timer != null) {
 		clearInterval(update_timer)
+		update_timer_running = false
 	}
 	$("#all_list_load").show()
 	$(".workflow_empy").hide()
@@ -214,7 +215,7 @@ async function detect_boards() {
 	boards = {}
 	// async
 	// do USB first, as it is fast
-	// TODO: have some lock mechanism:
+	// TODO: have better lock mechanisms ?
 	//       to avoid race conditions so that when a device is already found
 	//       with another workflow, we await until that other workflow has
 	//       finished with this device.
@@ -230,7 +231,6 @@ async function detect_boards() {
 	$("#all_list_load").hide()
 	$(".board_name_load").hide()
 	// no await ?
-	update_timer_running = true
 	update_timer = setInterval(async () => {
 		try {
 			if(update_timer_running) return false

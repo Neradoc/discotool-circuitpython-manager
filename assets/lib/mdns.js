@@ -22,6 +22,7 @@ function query() {
 function set_responder() {
 	mdns.on('response', function(response) {
 		if(response.type == "response") {
+			if(DEBUG) console.log("MDNS:", response)
 			var candidate = {
 				port: 80,
 				hostname: "",
