@@ -174,9 +174,7 @@ class USBWorkflow extends Workflow {
 				}
 			}
 		}
-		return {
-			devices: devices_list,
-		};
+		return devices_list;
 	}
 // 	async find_devices() {
 // 		return USBWorkflow.find_devices()

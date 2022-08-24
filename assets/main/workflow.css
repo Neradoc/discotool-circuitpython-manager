@@ -160,9 +160,6 @@ content > div.hide { display: none; }
 	background: var(--color-pair1);
 }
 
-.boards_list .boards_list_empty { display: none; }
-.boards_list .boards_list_list { display: none; }
-
 #password {
 	font-size: inherit;
 	width: 240px;

@@ -2,13 +2,15 @@
 SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
-import { Workflow, WorkflowResponse, WorkflowFile } from "./workflow_base.js";
-import { WORKFLOW_USERNAME, WORKFLOW_PASSWORD } from "../../config.js";
+import { Workflow, WorkflowResponse, WorkflowFile } from "./workflow_base.js"
+import { WORKFLOW_USERNAME, WORKFLOW_PASSWORD } from "../../config.js"
+import * as tools from "../lib/tools.js"
+import * as mdns from "../lib/mdns.js"
 
 class WebResponse extends WorkflowResponse {
 	constructor(response, content, ok=null) {
-		if(ok===null) ok = response.ok;
-		super(ok, content, response.status, response.statusText);
+		if(ok===null) ok = response.ok
+		super(ok, content, response.status, response.statusText)
 	}
 }
 
@@ -43,7 +45,6 @@ class WebWorkflow extends Workflow {
 				var url_test = new URL("/", this.workflow_url_base);
 			}
 			var response = await fetch(url_test)
-			console.log(response)
 			this.workflow_url_base = response.url
 			// console.log(`Board URL: ${this.workflow_url_base}`);
 			return true
@@ -211,22 +212,34 @@ class WebWorkflow extends Workflow {
 	}
 
 	static async find_devices() {
-		var webby = await new WebWorkflow()
-		await webby.start()
-		const response = await fetch(new URL("/cp/devices.json", webby.workflow_url_base));
-		var data = await response.json();
-		// console.log("data", data)
-		// add myself
-		const web_info = await webby.device_info()
-		// console.log(web_info)
-		data.devices.push({
-			hostname: web_info.hostname,
-			instance_name: web_info.board_name,
-			ip: web_info.ip,
-			port: web_info.port,
-		})
-		data.total += 1
-		return data;
+		if(mdns.available()) {
+			await mdns.query()
+			await tools.sleep(1.5)
+			const candidates = await mdns.get_candidates()
+			return Object.values(candidates)
+		}
+		// 
+		try {
+			var webby = await new WebWorkflow()
+			await webby.start()
+			const response = await fetch(
+				new URL("/cp/devices.json", webby.workflow_url_base)
+			);
+			var data = await response.json();
+			var devices = data.devices
+			// add myself
+			const web_info = await webby.device_info()
+			devices.push({
+				hostname: web_info.hostname,
+				instance_name: web_info.board_name,
+				ip: web_info.ip,
+				port: web_info.port,
+			})
+			return devices
+		} catch(e) {
+			console.log(e)
+			return []
+		}
 	}
 	icon = "🌐"
 	type = "web"

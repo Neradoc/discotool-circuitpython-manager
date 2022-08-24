@@ -4,6 +4,7 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 import * as common from "./common.js";
+import * as tools from "./tools.js";
 
 const HIDDEN = [
 	".fseventsd",
@@ -16,7 +17,7 @@ const SECRETS = [".env", "secrets.py"];
 
 let new_directory_name = document.getElementById("name");
 let files = document.getElementById("files_upload");
-var current_path = common.current_path;
+var current_path = tools.current_path;
 var refreshing = false;
 
 const HIDE = {
@@ -104,7 +105,7 @@ async function refresh_list() {
 			var path_link = clone.find("a")[0];
 			let parent = new URL("..", "file://" + current_path);
 			var file_path = parent.pathname;
-			path_link.href = common.url_here({"path": parent.pathname});
+			path_link.href = tools.url_here({"path": parent.pathname});
 			path_link.classList.add("files_list_dir");
 			path_link.setAttribute("data-path", file_path);
 			path_link.innerHTML = "..";
@@ -169,7 +170,7 @@ async function refresh_list() {
 			var path = clone.find("a.path");
 			path.html(file_info.name);
 			if(file_info.directory) {
-				path.attr("href", common.url_here({"path": `${file_path}`}));
+				path.attr("href", tools.url_here({"path": `${file_path}`}));
 				path.addClass("files_list_dir");
 				path.data("path", file_path);
 			} else {
@@ -281,7 +282,7 @@ async function del(e) {
 
 async function load_directory(path) {
 	current_path = path;
-	window.history.pushState({}, '', common.url_here({'path': path}));
+	window.history.pushState({}, '', tools.url_here({'path': path}));
 	refresh_list();
 }
 

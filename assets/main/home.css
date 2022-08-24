@@ -17,6 +17,10 @@ SPDX-License-Identifier: MIT
 }
 
 h3 { display:none; }
+button, input {
+	font: inherit;
+}
+
 #home_page > div {
 	border-radius: 16px;
 	/* background: var(--input-background); */
@@ -52,9 +56,6 @@ h3 { display:none; }
 #file_select {
 	display: none;
 }
-#file_select_button {
-	font: inherit;
-}
 #web_open_panel input {
 	font: inherit;
 	width: calc(100% - 4em);
@@ -70,7 +71,7 @@ h3 { display:none; }
 
 .board_line {
 	display: grid;
-	grid-template-columns: 40% 20% 20% 20%;
+	grid-template-columns: 40% 30% 30%;
 }
 .board_line .board_info {
 	display: none;

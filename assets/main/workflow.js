@@ -5,6 +5,7 @@ SPDX-License-Identifier: MIT
 
 import { BUNDLE_ACCESS } from "../../config.js";
 import * as common from "./common.js";
+import * as tools from "./tools.js";
 import { setup_directory, refresh_list } from "./workflow-directory.js";
 import { LibraryBundle } from "../lib/bundle.js";
 import { Circup } from "../lib/circup.js";
@@ -16,7 +17,7 @@ const CODE_FILES = ["code.txt", "code.py", "main.py", "main.txt"]
 var board_control = null;
 var circup = null
 
-const DEBUG = common.DEBUG;
+const DEBUG = tools.DEBUG;
 const LINE_HIDE_DELAY = 800;
 const LOADING_IMAGE = $("#small_load_image").html();
 
@@ -39,26 +40,6 @@ async function start_circup() {
 		// 3 - setup the circup updates manager for the actions
 		circup = new Circup(library_bundle, board_control)
 		await circup.start()
-	}
-}
-
-async function update_boards_list() {
-	// NOTE: web specific
-	var boards_list = await board_control.find_devices();
-	$(".boards_list .boards_list_default").hide();
-	var devices = boards_list.devices;
-	if(devices.length > 0) {
-		var liste = $("<ul></ul>");
-		for(var device of devices) {
-			var link = $(`<a href="">${device.hostname} / ${device.ip}</a>`);
-			link.attr("href", common.url_here({"dev": device.ip}).href);
-			var line = $(`<li>${device.instance_name} at </li>`);
-			line.append(link);
-			liste.append(line);
-		}
-		$(".boards_list .boards_list_list").empty().append("Other boards:").append(liste).show();
-	} else {
-		$(".boards_list .boards_list_empty").show();
 	}
 }
 
@@ -324,9 +305,6 @@ async function init_page() {
 		} else {
 			$("div.web_workflow").remove()
 		}
-		// other boards
-		$(".boards_list").remove()
-		// update_boards_list()
 	})();
 	//
 	await prom1;

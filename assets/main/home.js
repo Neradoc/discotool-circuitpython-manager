@@ -3,16 +3,12 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
-import * as common from "../main/common.js";
 import * as jq from "../extlib/jquery.min.js";
+import { sleep, url_to } from "../lib/tools.js"
 import { WebWorkflow } from "../backends/web.js";
 import { USBWorkflow } from "../backends/usb.js";
 
 const board_page = "board_page.html"
-
-async function sleep(duration) {
-	await new Promise(resolve => setTimeout(resolve, duration))
-}
 
 class Board {
 	constructor() {
@@ -53,8 +49,7 @@ async function detect_usb() {
 	// USB workflow
 	if(window.modulePath != undefined) {
 		$(".usb_workflow").show()
-		const response = await USBWorkflow.find_devices()
-		const devices = response.devices
+		const devices = await USBWorkflow.find_devices()
 		if(devices.length == 0) {
 			$("#usb_boards_list_empty").show()
 		} else {
@@ -62,7 +57,7 @@ async function detect_usb() {
 			for(const device of devices) {
 				var drive_path = device.mount
 				var drive_name = device.name
-				var url = common.url_to(board_page, {"dev": `file://${drive_path}`})
+				var url = url_to(board_page, {"dev": `file://${drive_path}`})
 				var url_link = `${board_page}${url.search}`;
 
 				var wf = new USBWorkflow(drive_path)
@@ -83,7 +78,7 @@ async function detect_usb() {
 					await insert_line(all_dev_line, name)
 				} else {
 					board = boards[serial]
-					while(!board.created) { sleep(100) }
+					while(!board.created) { sleep(0.1) }
 					all_dev_line = $(`#${line_id}`)
 				}
 				board.usb_name = drive_name
@@ -126,70 +121,66 @@ async function detect_web() {
 	// Web workflow
 	if(true) {
 		// $(".web_workflow").show()
-		var response = null
-		try {
-			response = await WebWorkflow.find_devices()
-		} catch(e) {
-			return giveup_web(e)
-		}
-		if(response && response.total > 0) {
-			$("#web_boards_list_empty").hide()
-			const devices = response.devices
-			for(const device of devices) {
-				// hostname: "cpy-9673a4"
-				// instance_name: "Adafruit Feather ESP32-S2 TFT"
-				// ip: "192.168.1.28"
-				// port: 80
-				var board_path = device.hostname
-				var board_name = device.instance_name
-				var board_link = `http://${device.ip}:${device.port}`;
-				var url = common.url_to(board_page, {"dev": board_link})
-				var url_link = `${board_page}${url.search}`;
+		const devices = await WebWorkflow.find_devices()
+		// candidates
+		var noboard = true
+		for(const device of devices) {
+			// hostname: "cpy-9673a4"
+			// instance_name: "Adafruit Feather ESP32-S2 TFT"
+			// ip: "192.168.1.28"
+			// port: 80
+			var board_path = device.hostname.replace(/\.local$/, "")
+			var board_name = device.instance_name
+			var board_link = `http://${device.ip}:${device.port}`;
+			var url = url_to(board_page, {"dev": board_link})
+			var url_link = `${board_page}${url.search}`;
 
-				var wf = new WebWorkflow(board_link)
-				await wf.start()
-				const info = await wf.device_info()
-				const serial = await info["serial_num"] || board_path
-				const name = await info["board_name"] || board_name
-				const line_id = `dev_line_${serial}`
-				var board = null;
-				if(!(serial in boards)) {
-					board = new Board()
-					boards[serial] = board
-					board.serial = serial
-					board.name = name
-					var all_dev_line = template_all.clone()
-					all_dev_line.attr("id", line_id)
-					all_dev_line.addClass("board_line")
-					await insert_line(all_dev_line, name)
-				} else {
-					board = boards[serial]
-					while(!board.created) { sleep(100) }
-					all_dev_line = $(`#${line_id}`)
-				}
-				board.web_name = board_name
-				board.web_url = board_path
-				var name_field = all_dev_line.find(".board_name")
-				name_field.html(name)
-				var link = all_dev_line.find(".board_link_web")
-				link.attr("href", url_link);
-				// var port = (device.port == 80) ? "" : device.port
-				// var weblink = `http://${board_path}.local${port}`
-				link.find(".name").html(`${board_path}`)
-				var board_info = all_dev_line.find(".board_info")
-				board_info.html(link.href)
-				all_dev_line.find(".link_web").show()
-				if(await wf.is_editable()) {
-					all_dev_line.addClass("web_editable")
-					all_dev_line.removeClass("web_locked")
-				} else {
-					all_dev_line.removeClass("web_editable")
-					all_dev_line.addClass("web_locked")
-				}
-				board.created = true
-				all_dev_line.show()
+			var wf = new WebWorkflow(board_link)
+			await wf.start()
+			const info = await wf.device_info()
+			const serial = await info["serial_num"] || board_path
+			const name = await info["board_name"] || board_name
+			const line_id = `dev_line_${serial}`
+			var board = null;
+			if(!(serial in boards)) {
+				board = new Board()
+				boards[serial] = board
+				board.serial = serial
+				board.name = name
+				var all_dev_line = template_all.clone()
+				all_dev_line.attr("id", line_id)
+				all_dev_line.addClass("board_line")
+				await insert_line(all_dev_line, name)
+			} else {
+				board = boards[serial]
+				while(!board.created) { sleep(0.1) }
+				all_dev_line = $(`#${line_id}`)
 			}
-		} else {
+			board.web_name = board_name
+			board.web_url = board_path
+			var name_field = all_dev_line.find(".board_name")
+			name_field.html(name)
+			var link = all_dev_line.find(".board_link_web")
+			link.attr("href", url_link);
+			// var port = (device.port == 80) ? "" : device.port
+			// var weblink = `http://${board_path}.local${port}`
+			link.find(".name").html(`${board_path}`)
+			var board_info = all_dev_line.find(".board_info")
+			board_info.html(link.href)
+			all_dev_line.find(".link_web").show()
+			if(await wf.is_editable()) {
+				all_dev_line.addClass("web_editable")
+				all_dev_line.removeClass("web_locked")
+			} else {
+				all_dev_line.removeClass("web_editable")
+				all_dev_line.addClass("web_locked")
+			}
+			board.created = true
+			all_dev_line.show()
+			$("#web_boards_list_empty").hide()
+			noboard = false
+		}
+		if(noboard) {
 			$("#web_boards_list_empty").show()
 		}
 		$("#web_boards_loading").hide()
@@ -225,14 +216,22 @@ async function detect_boards() {
 	//       The section where the serial number is compared and the Board
 	//       instance created should be a critical section.
 	await detect_usb()
-	var promises = Promise.all([
-		detect_web(),
+	await Promise.all([
 		detect_ble(),
-	]).then(() => {
-		$("#all_list_load").hide()
-		$(".board_name_load").hide()
-	})
+		detect_web(),
+	])
+	await sleep(2)
+	await detect_web()
+	$("#all_list_load").hide()
+	$(".board_name_load").hide()
 	// no await ?
+	var timer = setInterval(async () => {
+		$("#all_list_load").show()
+		await detect_usb()
+		await detect_web()
+		await detect_ble()
+		$("#all_list_load").hide()
+	}, 5000)
 }
 
 async function init_page() {
@@ -240,4 +239,4 @@ async function init_page() {
 	await detect_boards()
 }
 
-init_page();
+init_page()
