@@ -3,8 +3,7 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
-import { DEBUG } from "./common.js";
-import * as tools from "./tools.js";
+import { DEBUG } from "../lib/tools.js";
 import * as jq from "../extlib/jquery.min.js";
 
 export var modules_list = [];

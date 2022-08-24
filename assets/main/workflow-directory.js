@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 import * as common from "./common.js";
-import * as tools from "./tools.js";
+import * as tools from "../lib/tools.js";
 
 const HIDDEN = [
 	".fseventsd",
