@@ -27,7 +27,7 @@ class Circup {
 	}
 
 	async start() {
-		console.log(this.library_bundle)
+		//  console.log(this.library_bundle)
 	}
 
 	async install_modules(dependencies) {

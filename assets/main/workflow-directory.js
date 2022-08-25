@@ -52,6 +52,39 @@ function open_outside_a(e) {
 	return false
 }
 
+async function password_dialog(open=true) {
+	if(open) {
+		$("#password_dialog").addClass("popup_dialog")
+		$("body").addClass("popup_dialog")
+		$("#password").data("backup", $("#password").val())
+	} else {
+		await refresh_list()
+		$("#password_dialog").removeClass("popup_dialog")
+		$("body").removeClass("popup_dialog")
+		$("#password").data("backup", "")
+	}
+}
+
+async function get_error_message(response, message) {
+	const status = await response.status;
+	const error = await response.statusText;
+	var error_message = "";
+	switch(status) {
+	case 401:
+		error_message = `${message}: Bad password !`
+		break;
+	case 403:
+		error_message = `${message}: Not authorized !`
+		break;
+	case 409:
+		error_message = `${message}: Drive read-only !`
+		break;
+	default:
+		error_message = `${message}: ${error} !`
+	}
+	return error_message
+}
+
 async function refresh_list() {
 	if (refreshing) {
 		return;
@@ -61,7 +94,7 @@ async function refresh_list() {
 		var top = Math.floor($('#file_list_list').height() / 2 - $('#file_list_loading_image').height() / 2);
 		$('#file_list_loading_image').css("top", `${top}px`);
 		$('#file_list_loading_image').show();
-		$('#file_list_error_image').hide();
+		$('#file_list_error').hide();
 		$('#file_list_list').css("opacity", "0.30");
 
 		if (current_path == "") {
@@ -79,44 +112,26 @@ async function refresh_list() {
 			}
 		}
 		pwd.html(pwd_link);
-
 		if(!await common.board_control.is_editable()) {
 			$("#pwd .icon_locked").show()
 		}
 
-		/*
-		var heads = common.headers({"Accept": "application/json"});
-		const response = await fetch(new URL("/fs" + current_path, common.workflow_url_base),
-			{
-				headers: heads,
-				credentials: "include"
-			}
-		);
+		var response = await common.board_control.list_dir(current_path);
+
 		if (! response.ok) {
-			$('#file_list_error_image').show();
+			$('#file_list_error').show();
 			$('#file_list_body tr').remove();
-		
-			const message = `Dir list failed`;
-			const status = await response.status;
-			const error = await response.statusText;
-			switch(status) {
-			case 401:
-				console.log(`${message}: Bad password !`);
-				break;
-			case 403:
-				console.log(`${message}: Not authorized !`);
-				break;
-			case 409:
-				console.log(`${message}: Drive read-only !`);
-				break;
-			default:
-				console.log(`${message}: ${error} !`);
+			const message = `Directory listing failed`;
+			var error_message = await get_error_message(response, message);
+			console.log(error_message);
+			$("#file_list_error_label").html(error_message);
+			//
+			if(response.status == 401) {
+				await password_dialog()
 			}
 			return;
 		}
-		const data = await response.json();
-		*/
-		var response = await common.board_control.list_dir(current_path);
+
 		var dir_files_list = response.content;
 		var new_children = [];
 		var template = $('#file_list_template');
@@ -338,9 +353,54 @@ async function setup_directory() {
 	$(document).on("click", ".refresh_list", (e) => {
 		refresh_list();
 	});
-	$(document).on("change", "#password", (e) => {
-		refresh_list();
-	});
+
+	/******************************************************************/
+
+	if(common.board_control.supports_credentials) {
+		var info = await common.board_control.device_info()
+		const serial_num = info["serial_num"]
+		const password_key = `insecure_password_${serial_num}`
+		$("#password_dialog .ok_button").on("click", () => {
+			var password = $("#password").val()
+			common.board_control.set_credentials(undefined, password)
+			if($("#password_dialog #remember_password").is(":checked")) {
+				if(serial_num) localStorage[password_key] = password
+			} else {
+				if(serial_num) delete localStorage[password_key]
+			}
+			password_dialog(false)
+		})
+		$("#password_dialog .cancel_button").on("click", () => {
+			$("#password").val($("#password").data("backup"))
+			if(password_key in localStorage) {
+				$("#password_dialog #remember_password").prop("checked", true)
+			} else {
+				$("#password_dialog #remember_password").prop("checked", false)
+			}
+			password_dialog(false)
+		})
+		$("#password_dialog #password").on("keypress", (e) => {
+			if(e.which == 13) {
+				$("#password_dialog .ok_button").click()
+				return false
+			}
+			return true
+		})
+		$("#password_dialog #remember_password").on("click", (e) => {
+			const that = $(e.target)
+		})
+		$(".show_password_dialog").on(
+			"click", (e) => { password_dialog() }
+		)
+		if(serial_num) {
+			if(password_key in localStorage) {
+				const pass_mem = localStorage[password_key]
+				common.board_control.set_credentials(undefined, pass_mem)
+				$("#password").val(common.board_control.get_password())
+				$("#password_dialog #remember_password").prop("checked", true)
+			}
+		}
+	}
 }
 
 export { setup_directory, refresh_list };

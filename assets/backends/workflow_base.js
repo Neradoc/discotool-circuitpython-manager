@@ -99,6 +99,7 @@ class Workflow {
 	}
 	icon = "🐍"
 	type = "base"
+	supports_credentials = false
 }
 
 export { Workflow, WorkflowResponse, WorkflowFile };

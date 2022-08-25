@@ -29,10 +29,12 @@ const DEFAULT_URL_BASE = "http://circuitpython.local"
 
 class WebWorkflow extends Workflow {
 	constructor(url_base = DEFAULT_URL_BASE) {
-		super();
-		this.workflow_url_base = url_base;
-		this.version_info = null;
+		super()
+		this.workflow_url_base = url_base
+		this.version_info = null
 		this.drive_name = null
+		this.username = WORKFLOW_USERNAME
+		this.password = WORKFLOW_PASSWORD
 	}
 	async start(url_passed=null) {
 		// TODO: setup the actual URL for the workflow OUTSIDE
@@ -181,27 +183,20 @@ class WebWorkflow extends Workflow {
 
 	//##############################################################
 
-	set_credentials(user, password) {
-		this.user = user;
-		this.password = password;
+	set_credentials(user=null, password=null) {
+		if(user != null) {
+			this.user = user;
+		}
+		if(password != null) {
+			this.password = password
+		}
 	}
-
 	get_password() {
-		return $("#password").val();
+		return this.password;
 	}
 	
 	headers(others=null) {
-		var username = WORKFLOW_USERNAME;
-		var password = WORKFLOW_PASSWORD;
-		var password_field = this.get_password();
-		if (password_field) {
-			password = password_field;
-		} else if (WORKFLOW_PASSWORD == null) {
-			alert("The workflow password must be set.");
-			// $(".tab_link_home").click();
-		}
-		// throw 'This is not used anymore !';
-		var encoded = btoa(username + ":" + password);
+		var encoded = btoa(this.username + ":" + this.password)
 		var head = new Headers({
 			"Authorization": 'Basic ' + encoded,
 		});
@@ -243,6 +238,7 @@ class WebWorkflow extends Workflow {
 	}
 	icon = "🌐"
 	type = "web"
+	supports_credentials = true
 }
 
 export { WebWorkflow };

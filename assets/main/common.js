@@ -8,7 +8,6 @@ import { WebWorkflow } from "../backends/web.js";
 import { USBWorkflow } from "../backends/usb.js";
 
 export var board_control = null
-
 export async function start() {
 	var url = new URL(window.location);
 	var url_passed = url.searchParams.get("dev");

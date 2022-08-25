@@ -50,10 +50,7 @@ SPDX-License-Identifier: MIT
 		<div class="web_workflow">On-board web workflow: <a class="board_link" href="">(Loading…)</a></div>
 		<div class="web_workflow">Connect to the Serial REPL: <a class="board_repl" href="">(Loading…)</a></div>
 		<div class="web_workflow">IP address: <a class="board_ip" href="">??.??.??.??</a></div>
-		<div class="web_workflow">
-			API password (&#9888;&#65039; transmitted unencrypted).<br/>
-			<input name="password" id="password" type="password" placeholder="passw0rd"/>
-		</div>
+		<div class="web_workflow"><button class="show_password_dialog">Set password for this board.</button></div>
 	</div>
 	<div id="file_list" class="tab_page tab_page_files">
 		<table id="file_list_list">
@@ -73,6 +70,12 @@ SPDX-License-Identifier: MIT
 					<th></th>
 				</tr>
 			</thead>
+			<tbody id="file_list_error">
+				<tr><td colspan="99">
+					<div id="file_list_error_image">&#9888;&#65039;</div>
+					<div id="file_list_error_label"></div>
+				</td></tr>
+			</tbody>
 			<tbody id="file_list_body"></tbody>
 			<tbody class="template">
 				<tr id="file_list_template">
@@ -92,7 +95,6 @@ SPDX-License-Identifier: MIT
 			</tbody>
 		</table>
 		<div id="file_list_loading_image"><img src="assets/images/loading_black.gif" /></div>
-		<div id="file_list_error_image">&#9888;&#65039;</div>
 		<commands>
 		<group>
 			<input type="file" id="files_upload" name="files" multiple />
@@ -174,5 +176,17 @@ SPDX-License-Identifier: MIT
 	</div>
 	<div id="small_load_image"><img class="small_load_image" src="assets/images/loading_black_small.gif" /></div>
 	</content>
+	<div id="blanket"></div>
+	<div class="web_workflow" id="password_dialog">
+		Set the API password.<br/>
+		&#9888;&#65039; transmitted unencrypted !<br/>
+		<input name="password" id="password" type="password" placeholder="passw0rd"/><br/>
+		<label for="remember_password">
+			<input name="remember_password" type="checkbox" id="remember_password"/>
+			Remember (&#9888;&#65039; not secure).
+		</label><br/>
+		<button class="cancel_button">Cancel</button>
+		<button class="ok_button">OK</button>
+	</div>
 </body>
 </html>
