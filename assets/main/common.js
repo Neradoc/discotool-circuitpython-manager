@@ -7,6 +7,7 @@ import {WORKFLOW_USERNAME, WORKFLOW_PASSWORD} from "../../config.js";
 import { WebWorkflow } from "../backends/web.js";
 import { USBWorkflow } from "../backends/usb.js";
 
+export var library_bundle = null;
 export var board_control = null
 export async function start() {
 	var url = new URL(window.location);
@@ -21,5 +22,7 @@ export async function start() {
 		// var target_url = url_passed.replace(/^http:\/\//, "")
 		board_control = new WebWorkflow(url_passed);
 	}
-
+}
+export function set_library_bundle(bundle) {
+	library_bundle = bundle
 }

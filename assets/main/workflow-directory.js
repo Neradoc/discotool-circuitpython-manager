@@ -14,6 +14,7 @@ const HIDDEN = [
 	"System Volume Information",
 ];
 const SECRETS = [".env", "secrets.py"];
+const ADAFRUIT_ICON = '<img src="assets/images/icon-adafruit.png" class="adafruit_logo"/>'
 
 let new_directory_name = document.getElementById("name");
 let files = document.getElementById("files_upload");
@@ -31,9 +32,7 @@ var hide_level = HIDE.DEFAULT_SYSTEM_FILES;
 
 async function open_outside(link) {
 	// showItemInFolder
-	console.log("link", link)
 	if(window.shell) {
-		console.log(link.href)
 		await shell.openExternal(link.href)
 		return false
 	} else {
@@ -140,15 +139,17 @@ async function refresh_list() {
 			var clone = template.clone();
 			var td = clone.find("td");
 			td[0].innerHTML = "⬆️";
-			var path_link = clone.find("a")[0];
+			var path_link = clone.find("a.path");
 			let parent = new URL("..", "file://" + current_path);
 			var file_path = parent.pathname;
-			path_link.href = tools.url_here({"path": parent.pathname});
-			path_link.classList.add("files_list_dir");
-			path_link.setAttribute("data-path", file_path);
-			path_link.innerHTML = "..";
+			path_link.prop("href", tools.url_here({"path": parent.pathname}));
+			path_link.addClass("files_list_dir");
+			path_link.data("path", file_path);
+			path_link.html("..");
+			path_link.prop("target", "")
+			path_link.on("click", load_directory)
 			// Remove the delete button
-			td[4].replaceChildren();
+			clone.find(".buttons").html("");
 			new_children.push(clone);
 		}
 
@@ -191,6 +192,15 @@ async function refresh_list() {
 				if(hide_level >= HIDE.ALL_DOTTED_FILES) continue
 			} else if (current_path == "/" && file_info.name == "lib") {
 				icon = "📚";
+// 			} else if (common.library_bundle &&
+// 				(file_info.name.replace(/\.m?py$/, "")
+// 				in common.library_bundle.all_the_modules)
+// 			) {
+// 				if(file_info.name.startsWith("adafruit_")) {
+// 					icon = ADAFRUIT_ICON
+// 				} else {
+// 					icon = "🐍"
+// 				}
 			} else if (file_info.directory) {
 				icon = "📁";
 			} else {
@@ -207,13 +217,13 @@ async function refresh_list() {
 
 			var path = clone.find("a.path")
 			path.html(file_info.name)
-			path.on("click", open_outside_a)
 			path.data("path", file_path)
 			if(file_info.directory) {
 				path.attr("href", tools.url_here({"path": `${file_path}`}));
 				path.addClass("files_list_dir");
 			} else {
 				path.attr("href", api_url);
+				path.on("click", open_outside_a)
 			}
 			td[3].innerHTML = (new Date(file_info.modified)).toLocaleString();
 			var delete_button = clone.find(".delete");
@@ -320,10 +330,12 @@ async function del(e) {
 	return false;
 }
 
-async function load_directory(path) {
-	current_path = path;
-	window.history.pushState({}, '', tools.url_here({'path': path}));
-	refresh_list();
+function load_directory(e) {
+	var self = $(e.target)
+	current_path = self.data("path")
+	window.history.pushState({}, '', tools.url_here({'path': current_path}))
+	refresh_list()
+	return false
 }
 
 async function setup_directory() {
@@ -345,14 +357,10 @@ async function setup_directory() {
 		mkdir_button.disabled = new_directory_name.value.length == 0;
 	}
 
-	$(document).on("click", "a.files_list_dir", (e) => {
-		var self = $(e.target);
-		load_directory(self.data("path"));
-		return false;
-	});
 	$(document).on("click", ".refresh_list", (e) => {
 		refresh_list();
 	});
+	$(document).on("click", "#file_list .files_list_dir", load_directory);
 
 	/******************************************************************/
 

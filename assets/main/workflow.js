@@ -23,7 +23,6 @@ const LOADING_IMAGE = $("#small_load_image").html();
 
 var modules_to_update = [];
 var cpver = null;
-var library_bundle = null;
 var install_running = false;
 var show_up_to_date = false;
 var is_editable = false;
@@ -35,10 +34,10 @@ async function start_circup() {
 		cpver = await board_control.cp_version()
 		// 2 - setup the library bundle with the version from the board
 		// init circup with the CP version
-		library_bundle = new LibraryBundle(BUNDLE_ACCESS, cpver);
-		await library_bundle.setup_the_modules_list();
+		common.set_library_bundle(new LibraryBundle(BUNDLE_ACCESS, cpver));
+		await common.library_bundle.setup_the_modules_list();
 		// 3 - setup the circup updates manager for the actions
-		circup = new Circup(library_bundle, board_control)
+		circup = new Circup(common.library_bundle, board_control)
 		await circup.start()
 	}
 }
@@ -106,7 +105,7 @@ async function pre_update_process() {
 
 async function update_line(new_line, board_libs) {
 	var module_name = new_line.find(".upload button").val();
-	var module = library_bundle.get_module(module_name);
+	var module = common.library_bundle.get_module(module_name);
 	new_line.find(".status_icon").html(LOADING_IMAGE);
 	new_line.removeClass("bad_mpy_module new_module invalid_module module_exists major_update_module update_module");
 	// module versions from the board
@@ -172,7 +171,7 @@ async function run_update_process(imports) {
 	var board_libs = await board_control.get_lib_directory();
 	// get the dependencies
 	var dependencies = []
-	library_bundle.get_dependencies(imports, dependencies);
+	common.library_bundle.get_dependencies(imports, dependencies);
 	// list them
 	dependencies.sort();
 
@@ -189,7 +188,7 @@ async function run_update_process(imports) {
 
 	var new_lines = [];
 	for(var dependency of dependencies) {
-		var module = library_bundle.get_module(dependency);
+		var module = common.library_bundle.get_module(dependency);
 		var file_name = module.name + (module.package ? "" : ".mpy");
 		var icon = module.package ? "&#128193;" : "&#128196;";
 		var new_line = $("#circup_row_template").clone(); // clone the template
@@ -226,7 +225,7 @@ async function auto_install(file_name) {
 	// get the list
 	const code_content = code_response.content;
 	$("#circup_page .loading").append(`<br/>Loading modules from <b>${file_name}</b>...`);
-	const imports = library_bundle.get_imports_from_python(code_content);
+	const imports = common.library_bundle.get_imports_from_python(code_content);
 	console.log("imports", imports);
 	// do the thing
 	if(imports) {
@@ -276,7 +275,7 @@ async function init_page() {
 	// circup loading
 	var prom1 = (async () => {
 		await start_circup();
-		await bundler.start(library_bundle);
+		await bundler.start(common.library_bundle);
 		await update_circup_table();
 	})();
 	// board inits
