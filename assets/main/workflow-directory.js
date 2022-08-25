@@ -94,7 +94,7 @@ async function refresh_list() {
 		$('#file_list_loading_image').css("top", `${top}px`);
 		$('#file_list_loading_image').show();
 		$('#file_list_error').hide();
-		$('#file_list_list').css("opacity", "0.30");
+		$('#file_list_list').addClass("loading");
 
 		if (current_path == "") {
 			current_path = "/";
@@ -265,7 +265,7 @@ async function refresh_list() {
 	} finally {
 		refreshing = false;
 		$('#file_list_loading_image').hide();
-		$('#file_list_list').css("opacity", "1");
+		$('#file_list_list').removeClass("loading");
 		if(!await common.board_control.is_editable()) {
 			$("#file_list").addClass("locked");
 		}

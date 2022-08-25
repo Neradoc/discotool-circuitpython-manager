@@ -68,6 +68,7 @@ input
 button, input {
 	font: inherit;
 	border-radius: 4px;
+	padding: 2px 4px;
 }
 
 #top_title {
@@ -258,7 +259,9 @@ commands group {
 	border-radius: 8px;
 	background: var(--color-pair1);
 }
-
+#file_list_list.loading {
+	opacity: 0.30;
+}
 #file_list_loading_image {
 	position: absolute;
 	top: 4px;
