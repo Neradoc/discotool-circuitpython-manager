@@ -330,10 +330,11 @@ group.install_buttons button {
 }
 
 #bundle_list .lists {
+	--height: calc(100vh - 200px);
 	display: grid;
-	height: calc(100vh - 200px);
+	height: var(--height);
 	grid-template-columns: 1fr 1fr;
-	/* grid-template-rows: auto-fill; */
+	grid-template-rows: 2em calc(var(--height) - 2em);
 }
 #bundle_list .title {
 	text-align: center;
@@ -378,14 +379,14 @@ group.install_buttons button {
 	position: relative;
 	padding: 2px 4px;
 	display: grid;
-	grid-template-columns: auto 90px 50%;
+	grid-template-columns: auto 120px 50%;
 }
 #bundle_clear_search {
 	display:none;
 	position: absolute;
 	color: var(--disabled-text);
 	border-color: var(--disabled-border);
-	right: calc(50% + 90px + 4px + 2px);
+	right: calc(50% + 120px + 4px + 2px);
 	bottom: calc(2px + 2px);
 	font-size: 80%
 }
@@ -439,4 +440,8 @@ group.install_buttons button {
 #password_dialog.popup_dialog .ok_button {
 	display: block;
 	float: right;
+}
+
+.adafruit_logo {
+	height: 1em;
 }
