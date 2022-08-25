@@ -137,6 +137,7 @@ async function refresh_list() {
 
 		if (current_path != "/") {
 			var clone = template.clone();
+			clone.prop("id", "")
 			var td = clone.find("td");
 			td[0].innerHTML = "⬆️";
 			var path_link = clone.find("a.path");
@@ -160,6 +161,7 @@ async function refresh_list() {
 		for (const file_info of dir_files_list) {
 			// Clone the new row and insert it into the table
 			var clone = template.clone();
+			clone.prop("id", "")
 			var td = clone.find("td");
 			var file_path = current_path + file_info.name;
 			// TODO: this is backend-specific
@@ -248,7 +250,7 @@ async function refresh_list() {
 				analyze_button.data("path", file_path);
 				analyze_button.val(api_url);
 			} else {
-				analyze_button.remove()
+				analyze_button.hide()
 			}
 
 			new_children.push(clone);
