@@ -299,7 +299,11 @@ group.install_buttons button {
 #circup_page table td { padding: 4px; }
 #circup_page table th { padding: 8px; }
 
-#circup_page table .upload { width: 50px; }
+#circup_page table .upload {
+	width: 50px;
+	text-align: center;
+	font-weight: normal;
+}
 #circup_page table .name { width: 100%; }
 #circup_page table .board_version { white-space: nowrap; }
 #circup_page table .bundle_version { white-space: nowrap; }
