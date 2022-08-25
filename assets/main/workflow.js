@@ -176,7 +176,7 @@ async function run_update_process(imports) {
 	dependencies.sort();
 
 	if (!DEBUG) {
-		$("#circup_page .loading").hide(1000);
+		$("#circup_page .loading").hide();
 	}
 	$("#circup_page .title").show();
 	$("#circup_page #button_install_all").attr("disabled", true);
