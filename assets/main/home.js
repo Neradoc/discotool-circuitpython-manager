@@ -5,6 +5,7 @@ SPDX-License-Identifier: MIT
 
 import * as jq from "../extlib/jquery.min.js";
 import { sleep, url_to } from "../lib/tools.js"
+import * as top from "./home-top.js";
 import { WebWorkflow } from "../backends/web.js";
 import { USBWorkflow } from "../backends/usb.js";
 
@@ -49,7 +50,7 @@ async function insert_line(all_dev_line, name) {
 
 async function detect_usb() {
 	// USB workflow
-	if(window.modulePath != undefined) {
+	if(USBWorkflow.available) {
 		$(".usb_workflow").show()
 		const devices = await USBWorkflow.find_devices()
 		if(devices.length == 0) {

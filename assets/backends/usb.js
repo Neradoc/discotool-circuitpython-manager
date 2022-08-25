@@ -201,6 +201,7 @@ class USBWorkflow extends Workflow {
 	}
 	icon = "💾"
 	type = "usb"
+	static available = (path !== undefined)
 }
 
 export { USBWorkflow };

@@ -184,7 +184,6 @@ async function run_update_process(imports) {
 	$("#dependencies table thead").show();
 
 	modules_to_update = Array.from(dependencies);
-	console.log(modules_to_update)
 
 	var new_lines = [];
 	for(var dependency of dependencies) {
@@ -226,7 +225,6 @@ async function auto_install(file_name) {
 	const code_content = code_response.content;
 	$("#circup_page .loading").append(`<br/>Loading modules from <b>${file_name}</b>...`);
 	const imports = common.library_bundle.get_imports_from_python(code_content);
-	console.log("imports", imports);
 	// do the thing
 	if(imports) {
 		await run_update_process(imports);

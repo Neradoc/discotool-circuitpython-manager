@@ -27,13 +27,14 @@ SPDX-License-Identifier: MIT
 		<h3></h3>
 		<div id="home_actions">
 			<div id="usb_open_panel" class="usb_workflow">
-				<input id="file_select" type="file"/>
+				<input id="select_files_input" type="file" webkitdirectory directory/>
 				<button id="file_select_button">Select a drive</button><br/>
 				Or drop it here.
 			</div>
 			<div id="web_open_panel" class="web_workflow">
 				Device URL or IP:<br/>
-				<input type="text"/> <button id="web_go">GO</button>
+				<input class="web_input" type="text"/>
+				<button class="web_go">GO</button>
 			</div>
 			<div id="ble_open_panel" class="PH">
 				NOT IMPLEMENTED. Enable BLE, select/connect to a board.

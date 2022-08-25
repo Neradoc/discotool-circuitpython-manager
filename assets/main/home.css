@@ -63,7 +63,7 @@ button, input {
 	margin: 2px;
 	padding: 4px 8px;
 }
-#file_select {
+#select_files_input {
 	display: none;
 }
 #web_open_panel input {
