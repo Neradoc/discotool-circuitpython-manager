@@ -25,7 +25,7 @@ button, input {
 	border-radius: 16px;
 	/* background: var(--input-background); */
 	border: 2px solid var(--input-background);
-	padding: 8px 22px;
+	padding: 8px 12px;
 	margin: 4px;
 }
 .template_board {
@@ -38,7 +38,17 @@ button, input {
 }
 
 #prompt_refresh {
+	position: relative;
 	background: var(--input-background);
+}
+#all_list_refresh { display: none; }
+#all_list_load, #all_list_refresh, #reload_boards {
+	margin: 0px 4px;
+}
+#reload_boards {
+	position: absolute;
+	right: 8px;
+	top: 4px;
 }
 
 #home_actions {
@@ -149,7 +159,7 @@ div#all_boards_list {
 }
 #all_boards_list > div {
 	border-radius: 16px;
-	padding: 2px 4px 2px 22px;
+	padding: 2px 4px 2px 12px;
 	margin: 4px 0px;
 	border: 2px solid var(--input-background);
 }
@@ -159,4 +169,3 @@ div#all_boards_list {
 #all_boards_list > div:nth-child(odd) {
 	background: var(--color-pair1);
 }
-#all_list_refresh { display: none; }
