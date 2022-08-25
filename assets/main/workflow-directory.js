@@ -45,11 +45,8 @@ function open_outside_a(e) {
 	var path = $(target).data("path")
 	if(path) {
 		var full_path = common.board_control.edit_url(path)
-		console.log("-".repeat(70))
-		console.log(path)
-		console.log(full_path)
-		open_outside(full_path).after(() => {
-			
+		open_outside(full_path).then(() => {
+			console.log("GO", full_path)
 		})
 	}
 	return false

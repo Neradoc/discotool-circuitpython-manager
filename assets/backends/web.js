@@ -171,7 +171,9 @@ class WebWorkflow extends Workflow {
 		return new URL("/fs" + file_path, this.workflow_url_base);
 	}
 	edit_url(file_path) {
-		return new URL("/edit/", this.workflow_url_base);
+		var url = new URL("/edit/", this.workflow_url_base);
+		url.hash = `#${file_path}`
+		return url
 	}
 	repl_url() {
 		return new URL("/cp/serial/", this.workflow_url_base);
