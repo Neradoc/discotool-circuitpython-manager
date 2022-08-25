@@ -11,10 +11,10 @@ async function look_at_files(files_dropped) {
 		if(fss.existsSync(file.path)) {
 			var file_stats = await fs.stat(file.path)
 			if(file_stats.isDirectory()) {
-				var tlink = `file://${file.path}`
+				var link = `file://${file.path}`
 				window.postMessage({
 					type: 'open-board',
-					url: tlink,
+					url: link,
 				})
 			}
 		}
@@ -82,5 +82,9 @@ $(window).on("dragover", (event) => {
 
 $("#web_open_panel .web_go").on("click", (e) => {
 	const target = $("#web_open_panel .web_input").val()
-	var link = `./board_page.html?dev=http://${target}`
+	var link = `http://${target}`
+	window.postMessage({
+		type: 'open-board',
+		url: link,
+	})
 });
