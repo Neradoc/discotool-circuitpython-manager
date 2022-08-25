@@ -1,21 +1,21 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron')
+const { app, BrowserWindow, dialog, ipcMain } = require('electron')
 const path = require('path')
 
-function createWindow () {
-	const browser_window_options = {
-		width: 820,
-		height: 800,
-		minWidth: 600,
-		minHeight: 600,
-		webPreferences: {
-			preload: path.join(__dirname, 'preload.cjs'),
-			nodeIntegration: true,
-			nodeIntegrationInWorker: true,
-			contextIsolation: false,
-		}
+const browser_window_options = {
+	width: 820,
+	height: 800,
+	minWidth: 600,
+	minHeight: 600,
+	webPreferences: {
+		preload: path.join(__dirname, 'preload.cjs'),
+		nodeIntegration: true,
+		nodeIntegrationInWorker: true,
+		contextIsolation: false,
 	}
+}
 
+function createWindow () {
 	// Create the browser window.
 	const mainWindow = new BrowserWindow(browser_window_options)
 
@@ -24,6 +24,35 @@ function createWindow () {
 
 	// Open all the windows with preload.cjs ?
 	mainWindow.webContents.setWindowOpenHandler((details) => {
+		return {
+			action: 'allow',
+			overrideBrowserWindowOptions: browser_window_options
+		}
+	})
+
+	// liste for the "open directory" dialog and do something with it
+	ipcMain.on('select-dirs', async (event, arg) => {
+		const result = await dialog.showOpenDialog(mainWindow, {
+			properties: ['openDirectory']
+		})
+		if(result.filePaths) {
+			const dir_path = result.filePaths[0]
+			const dir_url = `file://${dir_path}`
+			openBoard(dir_url)
+		}
+	})
+}
+
+const board_page = "circuitpython-web-packager/board_page.html"
+
+function openBoard (url) {
+	const new_window = new BrowserWindow(browser_window_options)
+	new_window.loadFile(board_page, {
+		query: { "dev": url }
+	})
+
+	// Open all the windows with preload.cjs ?
+	new_window.webContents.setWindowOpenHandler((details) => {
 		return {
 			action: 'allow',
 			overrideBrowserWindowOptions: browser_window_options
@@ -54,3 +83,7 @@ app.on('window-all-closed', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+ipcMain.on('open-board', async (event, arg) => {
+	openBoard(arg.url)
+})
