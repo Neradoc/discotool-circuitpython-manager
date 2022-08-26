@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 /* Variables and dark mode */
 :root {
 	--color-pair0: #EEF;
-	--color-pair1: #EFE;
+	--color-pair1: #EEE;
 	--text-color: black;
 	--disabled-color: #888;
 	--hover-background: #48B;

@@ -3,16 +3,22 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 :root {
-	--background-usb: #301010;
+	--background-usb: #FCC;
 	--border-usb: #602010;
-	--background-web: #002010;
+	--background-web: #CFC;
 	--border-web: #004020;
-	--background-ble: #101020;
+	--background-ble: #CCF;
 	--border-ble: #202040;
 }
 
 @media (prefers-color-scheme: dark) {
 	:root {
+		--background-usb: #301010;
+		--border-usb: #602010;
+		--background-web: #002010;
+		--border-web: #004020;
+		--background-ble: #101020;
+		--border-ble: #202040;
 	}
 }
 
@@ -62,6 +68,11 @@ button, input {
 #home_actions > div {
 	margin: 2px;
 	padding: 4px 8px;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
 }
 #select_files_input {
 	display: none;
