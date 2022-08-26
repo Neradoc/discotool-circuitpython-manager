@@ -291,6 +291,12 @@ async function init_page() {
 		await refresh_list()
 		// *** welcome page information
 		$("a.board_name").attr("href", `https://circuitpython.org/board/${vinfo.board_id}/`);
+		if(workflow_type == "usb") {
+			$("a.board_drive").attr("href", board_control.root);
+			$("a.board_drive").html(board_control.root);
+		} else {
+			$("div.usb_workflow").remove()
+		}
 		if(workflow_type == "web") {
 			$("a.board_link").attr("href", board_control.workflow_url_base);
 			$("a.board_link").html(board_control.workflow_url_base);
@@ -318,6 +324,17 @@ async function run_exclusively(command) {
 		$(running_buttons).attr("disabled", false);
 	}
 }
+
+$("#welcome_page .board_drive").on("click", (e) => {
+	const link = $("#welcome_page .board_drive")
+	const url = link.prop("href")
+	if(window.shell) {
+		shell.openExternal(url)
+		return false
+	} else {
+		return true
+	}
+})
 
 $(".auto_install").on("click", async (e) => {
 	$(".tab_link_circup").click();

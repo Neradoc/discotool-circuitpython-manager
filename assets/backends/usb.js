@@ -24,8 +24,7 @@ class USBWorkflow extends Workflow {
 		if(drive) {
 			this.drive = drive
 		}
-		var drives = await drivelist.list()
-		var result = await this.find_drive(this.drive, drives);
+		var result = await this.find_drive(this.drive);
 		if(result) {
 			this.drive_info = result[0];
 			this.root = result[1];
@@ -184,7 +183,9 @@ class USBWorkflow extends Workflow {
 
 	//##############################################################
 
-	async find_drive(needle, drives) {
+	async find_drive(needle) {
+		// find in actual drives
+		const drives = await drivelist.list()
 		for(var drive of drives) {
 			if(!drive.isRemovable) continue
 			if(!drive.isUSB) continue
@@ -196,6 +197,13 @@ class USBWorkflow extends Workflow {
 					return [drive, mount.path, mount.label];
 				}
 			}
+		}
+		// if this is an existing directory with boot_out.txt
+		var boot_path = path.join(needle, "boot_out.txt")
+		if(fss.existsSync(boot_path)) {
+			const label = path.basename(needle)
+			const drive = window.moduleFss.statSync(needle)
+			return [drive, needle, label]
 		}
 		return null;
 	}
