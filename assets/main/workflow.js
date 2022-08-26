@@ -43,7 +43,7 @@ async function start_circup() {
 }
 
 async function install_all() {
-	$(".install_buttons").attr("disabled", true);
+	$(".install_buttons").prop("disabled", true);
 	var modules = Array.from(modules_to_update);
 	for (var line of $("#circup_page tr.line")) {
 		var button = $(line).find(".upload button");
@@ -52,7 +52,8 @@ async function install_all() {
 			await upload_button_call({ "target":button });
 		}
 	}
-	$(".install_buttons").attr("disabled", !is_editable);
+	$(".install_buttons").prop("disabled", !is_editable);
+	await update_circup_table();
 }
 
 function dont_need_update(module_name) {
@@ -60,39 +61,53 @@ function dont_need_update(module_name) {
 	if (index > -1) {
 		modules_to_update.splice(index, 1);
 	}
-	if(modules_to_update.length == 0) {
-		$("#circup_page .all_up_to_date").show()
-		$("#circup_page .loading").hide();
-	}
+}
+
+function make_odd_even(lines) {
+	lines.odd().addClass("odd").removeClass("even");
+	lines.even().addClass("even").removeClass("odd");
 }
 
 async function update_circup_table() {
+	var head_time = LINE_HIDE_DELAY
+	const mod_lines = $('#circup_row_list .line')
+	const theads = $("#dependencies table thead")
+	const n_modules = mod_lines.length
+	if (n_modules == 0) {
+		head_time = 0
+	}
 	if (show_up_to_date) {
 		$("#show_updates").hide();
 		$("#hide_updates").show();
-		$('#circup_page .module_exists').show(LINE_HIDE_DELAY);
+		$('#circup_row_list .module_exists').show(LINE_HIDE_DELAY);
 	} else {
 		$("#show_updates").show();
 		$("#hide_updates").hide();
-		$('#circup_page .module_exists').hide(LINE_HIDE_DELAY);
+		$('#circup_row_list .module_exists').hide(LINE_HIDE_DELAY);
 	}
-	$('#circup_row_list .line').removeClass("odd even");
 	if (show_up_to_date) {
-		if ($('#circup_row_list .line').length > 0) {
-			await $("#dependencies table thead").show(LINE_HIDE_DELAY).promise();
+		if (n_modules > 0) {
+			await theads.show(head_time).promise();
 		} else {
-			await $("#dependencies table thead").hide(LINE_HIDE_DELAY).promise();
+			await theads.hide(head_time).promise();
 		}
-		$('#circup_row_list .line:odd').addClass("odd");
-		$('#circup_row_list .line:even').addClass("even");
+		make_odd_even(mod_lines);
 	} else {
-		if($('#circup_row_list .line').not(".module_exists").length > 0) {
-			await $("#dependencies table thead").show(LINE_HIDE_DELAY).promise();
+		if(modules_to_update.length > 0) {
+			await theads.show(head_time).promise();
 		} else {
-			await $("#dependencies table thead").hide(LINE_HIDE_DELAY).promise();
+			await theads.hide(head_time).promise();
 		}
-		$('#circup_row_list .line').not(".module_exists").odd().addClass("odd");
-		$('#circup_row_list .line').not(".module_exists").even().addClass("even");
+		make_odd_even(mod_lines.not(".module_exists"));
+	}
+	if(modules_to_update.length == 0) {
+		$("#circup_page thead").addClass("module_exists")
+	} else {
+		$("#circup_page thead").removeClass("module_exists")
+	}
+	if(modules_to_update.length == 0 && n_modules > 0) {
+		$("#circup_page .all_up_to_date").show()
+		$("#circup_page .loading").hide();
 	}
 }
 
@@ -133,11 +148,6 @@ async function update_line(new_line, board_libs) {
 		new_line.addClass("module_exists");
 		new_line.find(".status_icon").html("&#10004;&#65038;");
 		new_line.find(".status").html("Up To Date");
-		if (!show_up_to_date) {
-			// await new_line.hide(LINE_HIDE_DELAY).promise();
-			new_line.hide(LINE_HIDE_DELAY)
-			await update_circup_table();
-		}
 		dont_need_update(module_name);
 	} else if(module.version[0] != version[0]) {
 		// this is a major update
@@ -150,19 +160,21 @@ async function update_line(new_line, board_libs) {
 		new_line.find(".status_icon").html("&#10071;&#65039;");
 		new_line.find(".status").html("Update Available");
 	}
-	new_line.find(".upload button").attr("disabled", !is_editable);
+	new_line.find(".upload button").prop("disabled", !is_editable);
 }
 
 async function upload_button_call(e) {
 	var button = $(e.target);
 	var target_module = button.val();
 	var line = button.parents("tr.line");
-	button.attr("disabled", !is_editable);
+	button.prop("disabled", true);
 	line.find(".status_icon").html(LOADING_IMAGE);
 	await circup.install_modules([target_module])
 	await refresh_list()
 	var board_libs = await board_control.get_lib_directory();
 	await update_line(line, board_libs);
+	await update_circup_table();
+	button.prop("disabled", !is_editable);
 }
 
 async function run_update_process(imports) {
@@ -179,7 +191,7 @@ async function run_update_process(imports) {
 		$("#circup_page .loading").hide();
 	}
 	$("#circup_page .title").show();
-	$("#circup_page #button_install_all").attr("disabled", true);
+	$("#circup_page #button_install_all").prop("disabled", true);
 	$("#circup_page .buttons").show();
 	$("#dependencies table thead").show();
 
@@ -191,6 +203,7 @@ async function run_update_process(imports) {
 		var file_name = module.name + (module.package ? "" : ".mpy");
 		var icon = module.package ? "&#128193;" : "&#128196;";
 		var new_line = $("#circup_row_template").clone(); // clone the template
+		new_line.prop("id", "");
 		new_line.find(".upload button").on("click", upload_button_call);
 		new_line.find(".upload button").val(dependency);
 		new_line.find(".icon").html(icon);
@@ -206,8 +219,9 @@ async function run_update_process(imports) {
 	for(var new_line of new_lines) {
 		await update_line(new_line, board_libs);
 	}
-	$("#circup_page #button_install_all").attr("disabled", !is_editable);
-	$("#circup_page #circup_row_list .install").attr("disabled", !is_editable);
+	await update_circup_table()
+	$("#circup_page #button_install_all").prop("disabled", !is_editable);
+	$("#circup_page #circup_row_list .install").prop("disabled", !is_editable);
 }
 
 async function auto_install(file_name) {
@@ -226,9 +240,7 @@ async function auto_install(file_name) {
 	$("#circup_page .loading").append(`<br/>Loading modules from <b>${file_name}</b>...`);
 	const imports = common.library_bundle.get_imports_from_python(code_content);
 	// do the thing
-	if(imports) {
-		await run_update_process(imports);
-	}
+	await run_update_process(imports);
 	return true;
 }
 
@@ -241,6 +253,7 @@ async function update_all() {
 	var libs_list = await board_control.get_lib_modules();
 	// do the thing
 	await run_update_process(libs_list);
+	// TODO: update circup table ?
 }
 
 async function bundle_install() {
@@ -276,10 +289,15 @@ async function init_page() {
 	$("#circup_page .title .serial_number").html(await board_control.serial_num());
 	$("#welcome_page .serial_number").html(await board_control.serial_num());
 	// circup loading
+	$(".update_all, .auto_install").prop("disabled", true)
+	$("#circup_page .loading").show()
+	$("#circup_page .loading").html(`Loading library bundles...`)
 	var prom1 = (async () => {
 		await start_circup();
 		await bundler.start(common.library_bundle);
 		await update_circup_table();
+		$(".update_all, .auto_install").prop("disabled", false)
+		$("#circup_page .loading").hide()
 	})();
 	// board inits
 	var prom2 = (async () => {
@@ -295,20 +313,20 @@ async function init_page() {
 		await setup_directory()
 		await refresh_list()
 		// *** welcome page information
-		$("a.board_name").attr("href", `https://circuitpython.org/board/${vinfo.board_id}/`);
+		$("a.board_name").prop("href", `https://circuitpython.org/board/${vinfo.board_id}/`);
 		if(workflow_type == "usb") {
-			$("a.board_drive").attr("href", board_control.root);
+			$("a.board_drive").prop("href", board_control.root);
 			$("a.board_drive").html(board_control.root);
 		} else {
 			$("div.usb_workflow").remove()
 		}
 		if(workflow_type == "web") {
-			$("a.board_link").attr("href", board_control.workflow_url_base);
+			$("a.board_link").prop("href", board_control.workflow_url_base);
 			$("a.board_link").html(board_control.workflow_url_base);
 			var repl_url = board_control.repl_url()
-			$("a.board_repl").attr("href", repl_url);
+			$("a.board_repl").prop("href", repl_url);
 			$("a.board_repl").html(repl_url.href);
-			$("a.board_ip").attr("href", `http://${vinfo.ip}`);
+			$("a.board_ip").prop("href", `http://${vinfo.ip}`);
 			$("a.board_ip").html(vinfo.ip);
 		} else {
 			$("div.web_workflow").remove()
@@ -322,11 +340,11 @@ async function init_page() {
 const running_buttons = ".auto_install, .update_all";
 async function run_exclusively(command) {
 	if(!install_running) {
-		$(running_buttons).attr("disabled", true);
+		$(running_buttons).prop("disabled", true);
 		install_running = true;
 		await command();
 		install_running = false;
-		$(running_buttons).attr("disabled", false);
+		$(running_buttons).prop("disabled", false);
 	}
 }
 

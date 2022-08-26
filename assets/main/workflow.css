@@ -320,7 +320,7 @@ commands group {
 #circup_page .line.module_exists {
 	color: var(--disabled-color);
 }
-#circup_page .line.module_exists button {
+#circup_page .module_exists .upload button {
 	opacity: 0.5;
 }
 #circup_page .line.update_module { }
