@@ -59,6 +59,8 @@ function update_dependencies_list() {
 	$(".num_deps").html(pair);
 	$("#zip_link").hide();
 	$("#zip_in_progress").hide();
+	const num_deps = $("#bundle_dependencies p").length;
+	$("#bundle_install").prop("disabled", num_deps == 0);
 }
 
 /***************************************************************

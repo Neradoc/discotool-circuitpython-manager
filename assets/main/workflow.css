@@ -337,8 +337,12 @@ commands group {
 	height: 14px;
 }
 
+#bundle_list > p {
+	padding: 4px 8px;
+	line-height: 150%;
+}
 #bundle_list .lists {
-	--height: calc(100vh - 200px);
+	--height: calc(100vh - 210px);
 	display: grid;
 	height: var(--height);
 	grid-template-columns: 1fr 1fr;

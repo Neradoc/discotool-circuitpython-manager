@@ -244,13 +244,18 @@ async function update_all() {
 }
 
 async function bundle_install() {
-	await pre_update_process();
-	$("#circup_page .loading").append(`<br/>Loading libraries selected from the bundles...`);
-	$("#circup_page .title .filename").html("selected bundle modules");
 	// get the list of libraries to install
 	var libs_list = bundler.modules_list;
-	// do the thing
-	await run_update_process(libs_list);
+	// should we do the thing ?
+	if(libs_list.length > 0) {
+		$(".tab_link_circup").click();
+		// start
+		await pre_update_process();
+		$("#circup_page .loading").append(`<br/>Loading libraries selected from the bundles...`);
+		$("#circup_page .title .filename").html("selected bundle modules");
+		// do the thing
+		await run_update_process(libs_list);
+	}
 }
 
 async function init_page() {
@@ -352,7 +357,6 @@ $(".update_all").on("click", (e) => {
 	run_exclusively(() => update_all());
 });
 $("#bundle_list #bundle_install").on("click", (e) => {
-	$(".tab_link_circup").click();
 	run_exclusively(() => bundle_install());
 });
 $(document).on("click", "#file_list_list .analyze", (e) => {
