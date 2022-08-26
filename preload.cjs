@@ -30,17 +30,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
 process.once('loaded', () => {
 	window.addEventListener('message', evt => {
-		console.log("message")
-		console.log(evt)
-		console.log(evt.data)
-
-		if (evt.data.type === 'select-dirs') {
-			console.log("select-dirs", evt.data)
-			ipcRenderer.send('select-dirs', evt.data)
-		}
-		if (evt.data.type === 'open-board') {
-			console.log("open-board", evt.data)
-			ipcRenderer.send('open-board', evt.data)
+		const data = evt.data
+		try {
+			const type = data.type
+			ipcRenderer.send(type, evt.data)
+		} catch(e) {
+			console.log("IPC Error:", e)
+			console.log("Event:", evt)
 		}
 	})
 })

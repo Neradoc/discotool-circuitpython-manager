@@ -1,6 +1,9 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, dialog, ipcMain } = require('electron')
+const { app, BrowserWindow, dialog, ipcMain, nativeTheme } = require('electron')
 const path = require('path')
+
+// change the theme manually ?
+// nativeTheme.themeSource = "light"
 
 const browser_window_options = {
 	width: 820,
@@ -30,7 +33,7 @@ function createWindow () {
 		}
 	})
 
-	// liste for the "open directory" dialog and do something with it
+	// listen for the "open directory" dialog and do something with it
 	ipcMain.on('select-dirs', async (event, arg) => {
 		const result = await dialog.showOpenDialog(mainWindow, {
 			properties: ['openDirectory']
