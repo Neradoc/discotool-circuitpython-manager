@@ -66,8 +66,9 @@ async function detect_usb() {
 				var wf = new USBWorkflow(drive_path)
 				await wf.start()
 				const info = await wf.device_info()
-				const serial = await info["serial_num"] || drive_path
-				const name = await info["board_name"] || drive_name
+				var serial = info["serial_num"] || drive_path
+				const name = info["board_name"] || drive_name
+				serial = serial.replaceAll(/[^a-z0-9_]+/ig, "_W")
 				const line_id = `dev_line_${serial}`
 				var board = null;
 				if(!(serial in boards)) {
