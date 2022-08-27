@@ -14,8 +14,11 @@ window.moduleFsx = require("fs-extra")
 window.moduleMdns = require('multicast-dns')
 window.shell = shell
 
-// window.BrowserWindow = BrowserWindow
-// window.dialog = dialog
+var win = window.clientInformation.platform == "Win32"
+if(win) {
+	const { PowerShell } = require('node-powershell')
+	window.PowerShell = PowerShell
+}
 
 window.addEventListener('DOMContentLoaded', () => {
 	const replaceText = (selector, text) => {
