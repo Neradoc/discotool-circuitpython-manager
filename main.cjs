@@ -38,7 +38,7 @@ function createWindow () {
 		const result = await dialog.showOpenDialog(mainWindow, {
 			properties: ['openDirectory']
 		})
-		if(result.filePaths) {
+		if(!result.canceled && result.filePaths.length > 0) {
 			const dir_path = result.filePaths[0]
 			const dir_url = `file://${dir_path}`
 			openBoard(dir_url)
