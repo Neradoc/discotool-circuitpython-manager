@@ -9,6 +9,11 @@ const drivelist = window.moduleDrivelist;
 const fs = window.moduleFs;
 const fss = window.moduleFss;
 
+var win = null
+if(window.clientInformation.platform == "Win32") {
+	win = await import("./usb-win32.js")
+}
+
 const DEFAULT_DRIVE = "CIRCUITPY";
 
 class USBWorkflow extends Workflow {
@@ -168,18 +173,19 @@ class USBWorkflow extends Workflow {
 				var root = mount.path;
 				var boot_path = path.join(root, "boot_out.txt")
 				if(fss.existsSync(boot_path)) {
+					var label = mount.label
+					if(win) {
+						label = await win.drive_label_by_letter(root)
+					}
 					devices_list.push({
 						mount: root,
-						name: mount.label,
+						name: label,
 					});
 				}
 			}
 		}
 		return devices_list;
 	}
-// 	async find_devices() {
-// 		return USBWorkflow.find_devices()
-// 	}
 
 	//##############################################################
 
