@@ -42,3 +42,25 @@ export async function sleep_ms(duration) {
 export async function sleep(duration) {
 	await new Promise(resolve => setTimeout(resolve, 1000 * duration))
 }
+
+export async function open_outside(link) {
+	// showItemInFolder
+	if(window.shell) {
+		if(typeof(link) == "string") { // direct url string
+			await shell.openExternal(link)
+		} else if(typeof(link.href) == "string") { // URL instance most likely
+			await shell.openExternal(link.href)
+		} else if(link.prop !== undefined) { // jQuery object, expecting a link
+			await shell.openExternal(link.prop("href"))
+		} else if(link.target !== undefined) { // onClick event with a target
+			await shell.openExternal(link.target.href)
+		}
+		return false
+	} else {
+		return true
+	}
+}
+export function open_outside_sync(link) {
+	open_outside(link)
+	return false
+}

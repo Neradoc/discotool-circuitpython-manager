@@ -348,16 +348,8 @@ async function run_exclusively(command) {
 	}
 }
 
-$("#welcome_page .board_drive").on("click", (e) => {
-	const link = $("#welcome_page .board_drive")
-	const url = link.prop("href")
-	if(window.shell) {
-		shell.openExternal(url)
-		return false
-	} else {
-		return true
-	}
-})
+$("#welcome_page .board_drive").on("click", tools.open_outside_sync)
+$("a.board_name").on("click", tools.open_outside_sync)
 
 $(".auto_install").on("click", async (e) => {
 	$(".tab_link_circup").click();
@@ -399,7 +391,6 @@ $("#hide_updates").on("click", async (e) => {
 	show_up_to_date = false;
 	await update_circup_table();
 });
-
 
 $(".tab_link").on("click", (e) => {
 	var target = e.target.value;

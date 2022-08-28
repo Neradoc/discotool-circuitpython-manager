@@ -30,21 +30,12 @@ const HIDE = {
 
 var hide_level = HIDE.DEFAULT_SYSTEM_FILES;
 
-async function open_outside(link) {
-	// showItemInFolder
-	if(window.shell) {
-		await shell.openExternal(link.href)
-		return false
-	} else {
-		return true
-	}
-}
 function open_outside_a(e) {
 	const target = e.target
 	var path = $(target).data("path")
 	if(path) {
 		var full_path = common.board_control.edit_url(path)
-		open_outside(full_path).then(() => {
+		tools.open_outside(full_path).then(() => {
 			console.log("GO", full_path)
 		})
 	}
