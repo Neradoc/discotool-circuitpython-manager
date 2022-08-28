@@ -1,3 +1,0 @@
-[submodule "circuitpython-web-packager"]
-	path = circuitpython-web-packager
-	url = https://github.com/Neradoc/circuitpython-web-packager
