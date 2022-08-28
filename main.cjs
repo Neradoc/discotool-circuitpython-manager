@@ -23,7 +23,7 @@ function createWindow () {
 	const mainWindow = new BrowserWindow(browser_window_options)
 
 	// and load the index.html of the app.
-	mainWindow.loadFile('circuitpython-web-packager/index.html')
+	mainWindow.loadFile('index.html')
 
 	// Open all the windows with preload.cjs ?
 	mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -46,7 +46,7 @@ function createWindow () {
 	})
 }
 
-const board_page = "circuitpython-web-packager/board_page.html"
+const board_page = "board_page.html"
 
 function openBoard (url) {
 	const new_window = new BrowserWindow(browser_window_options)
