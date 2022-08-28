@@ -9,7 +9,7 @@ import * as top from "./home-top.js";
 import { WebWorkflow } from "../backends/web.js";
 import { USBWorkflow } from "../backends/usb.js";
 
-const board_page = "board_page.html"
+const BOARD_PAGE = "board_page.html"
 var update_timer = null
 var update_timer_running = false
 
@@ -60,8 +60,8 @@ async function detect_usb() {
 			for(const device of devices) {
 				var drive_path = device.mount
 				var drive_name = device.name
-				var url = url_to(board_page, {"dev": `file://${drive_path}`})
-				var url_link = `${board_page}${url.search}`;
+				var url = url_to(BOARD_PAGE, {"dev": `file://${drive_path}`})
+				var url_link = `${BOARD_PAGE}${url.search}`;
 
 				var wf = new USBWorkflow(drive_path)
 				await wf.start()
@@ -77,7 +77,7 @@ async function detect_usb() {
 					board.serial = serial
 					board.name = name
 					var all_dev_line = template_all.clone()
-					all_dev_line.attr("id", line_id)
+					all_dev_line.prop("id", line_id)
 					all_dev_line.addClass("board_line")
 					await insert_line(all_dev_line, name)
 				} else {
@@ -90,8 +90,9 @@ async function detect_usb() {
 				var name_field = all_dev_line.find(".board_name")
 				name_field.html(name)
 				var link = all_dev_line.find(".link_usb")
-				link.attr("href", url_link);
+				link.prop("href", url_link);
 				link.find(".name").html(`${drive_name}`)
+				link.prop("title", drive_path)
 				var board_info = all_dev_line.find(".board_info")
 				board_info.html(link.href)
 				link.show()
@@ -136,8 +137,8 @@ async function detect_web() {
 			var board_path = device.hostname.replace(/\.local$/, "")
 			var board_name = device.instance_name
 			var board_link = `http://${device.ip}:${device.port}`;
-			var url = url_to(board_page, {"dev": board_link})
-			var url_link = `${board_page}${url.search}`;
+			var url = url_to(BOARD_PAGE, {"dev": board_link})
+			var url_link = `${BOARD_PAGE}${url.search}`;
 
 			var wf = new WebWorkflow(board_link)
 			await wf.start()
@@ -152,7 +153,7 @@ async function detect_web() {
 				board.serial = serial
 				board.name = name
 				var all_dev_line = template_all.clone()
-				all_dev_line.attr("id", line_id)
+				all_dev_line.prop("id", line_id)
 				all_dev_line.addClass("board_line")
 				await insert_line(all_dev_line, name)
 			} else {
@@ -165,10 +166,9 @@ async function detect_web() {
 			var name_field = all_dev_line.find(".board_name")
 			name_field.html(name)
 			var link = all_dev_line.find(".link_web")
-			link.attr("href", url_link);
-			// var port = (device.port == 80) ? "" : device.port
-			// var weblink = `http://${board_path}.local${port}`
+			link.prop("href", url_link);
 			link.find(".name").html(`${board_path}`)
+			link.prop("title", device.ip)
 			var board_info = all_dev_line.find(".board_info")
 			board_info.html(link.href)
 			link.show()
