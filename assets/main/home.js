@@ -8,6 +8,7 @@ import { sleep, url_to } from "../lib/tools.js"
 import * as top from "./home_top.js";
 import { WebWorkflow } from "../backends/web.js";
 import { USBWorkflow } from "../backends/usb.js";
+import { BLEWorkflow } from "../backends/ble.js";
 
 const BOARD_PAGE = "board_page.html"
 var update_timer = null
@@ -196,7 +197,7 @@ async function detect_web() {
 
 async function detect_ble() {
 	// BLE workflow
-	if(true) {
+	if(BLEWorkflow.available) {
 		$(".ble_workflow").show()
 		$("#ble_boards_list_empty").hide()
 	} else {

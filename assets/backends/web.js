@@ -238,7 +238,8 @@ class WebWorkflow extends Workflow {
 	}
 	icon = "🌐"
 	type = "web"
-	supports_credentials = true
+	static available = true
+	static supports_credentials = true
 }
 
 export { WebWorkflow };
