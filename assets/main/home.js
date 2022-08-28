@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 import * as jq from "../extlib/jquery.min.js";
 import { sleep, url_to } from "../lib/tools.js"
-import * as top from "./home-top.js";
+import * as top from "./home_top.js";
 import { WebWorkflow } from "../backends/web.js";
 import { USBWorkflow } from "../backends/usb.js";
 
