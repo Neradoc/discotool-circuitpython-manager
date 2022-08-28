@@ -101,8 +101,10 @@ async function start_scan() {
 }
 
 async function close() {
-	mdns.destroy()
-	mdns = null
+	if(mdns != null) {
+		await mdns.destroy()
+		mdns = null
+	}
 }
 
 function get_candidates() {
