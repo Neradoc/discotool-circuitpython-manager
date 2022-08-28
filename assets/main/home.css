@@ -58,8 +58,7 @@ button, input {
 }
 
 #home_actions {
-	display: grid;
-	grid-template-columns: 33.33% 33.33% 33.33% ;
+	display: flex;
 	padding: 0px !important;
 	margin: 0px;
 	background: transparent;
@@ -70,6 +69,7 @@ button, input {
 	padding: 4px 8px;
 
 	display: flex;
+	flex: 1 1 0px;
 	justify-content: center;
 	align-items: center;
 	text-align: center;

@@ -102,9 +102,6 @@ async function refresh_list() {
 			}
 		}
 		pwd.html(pwd_link);
-		if(!await common.board_control.is_editable()) {
-			$("#pwd .icon_locked").show()
-		}
 
 		var response = await common.board_control.list_dir(current_path);
 
@@ -257,9 +254,6 @@ async function refresh_list() {
 		refreshing = false;
 		$('#file_list_loading_image').hide();
 		$('#file_list_list').removeClass("loading");
-		if(!await common.board_control.is_editable()) {
-			$("#file_list").addClass("locked");
-		}
 	}
 }
 

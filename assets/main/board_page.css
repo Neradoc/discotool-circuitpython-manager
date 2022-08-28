@@ -97,6 +97,9 @@ body.workflow_type_web div.web_workflow { display: block; }
 	top: 0px;
 	left: calc(50% - 24px);
 }
+.board_locked .icon_locked {
+	display: auto;
+}
 h3 {
 	padding: 0px;
 	margin: 8px 16px;
@@ -246,10 +249,10 @@ tr.odd { background: var(--color-pair1); }
 	text-align: center;
 }
 #file_list td.buttons a .view { display: none; }
-#file_list.locked td.buttons a .view { display: inline; }
-#file_list.locked td.buttons a .pencil { display: none; }
-#file_list.locked .icon_locked { display: inline; }
-#file_list.locked td .delete { display: none; }
+.board_locked #file_list td.buttons a .view { display: inline; }
+.board_locked #file_list td.buttons a .pencil { display: none; }
+.board_locked #file_list .icon_locked { display: inline; }
+.board_locked #file_list td .delete { display: none; }
 
 commands {
 	display: block;
@@ -343,6 +346,10 @@ commands group {
 
 #circup_page .imported .status_icon {
 	/* background-color: #002244; */
+}
+.board_locked #circup_page .drive_is_locked {
+	display: block;
+	color: red;
 }
 
 .small_load_image {

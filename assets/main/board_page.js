@@ -286,6 +286,11 @@ async function init_page() {
 	is_editable = await board_control.is_editable()
 	// configure the page from the workflow
 	$("body").addClass(`workflow_type_${workflow_type} loaded`)
+	if(is_editable) {
+		$("body").addClass("board_editable")
+	} else {
+		$("body").addClass("board_locked")
+	}
 	// load some data into the page
 	$("#circup_page .title .circuitpy_version").html(await board_control.cp_version());
 	$("#circup_page .title .serial_number").html(await board_control.serial_num());
@@ -305,9 +310,6 @@ async function init_page() {
 	var prom2 = (async () => {
 		// *** title
 		$(`#top_title .icon_${workflow_type}`).show()
-		if(!is_editable) {
-			$("#top_title .icon_locked").show()
-		}
 		$(".board_name").html(vinfo.board_name)
 		$(".circuitpy_version").html(vinfo.version)
 		$("#version_info_subtitle .subtitle_text").show()
