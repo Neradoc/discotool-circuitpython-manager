@@ -71,6 +71,12 @@ button, input {
 	padding: 2px 4px;
 }
 
+div.usb_workflow { display: none; }
+body.workflow_type_usb div.usb_workflow { display: block; }
+
+div.web_workflow { display: none; }
+body.workflow_type_web div.web_workflow { display: block; }
+
 #top_title {
 	position: relative;
 	text-align: center;
@@ -162,6 +168,12 @@ content > div.hide { display: none; }
 }
 #welcome_page > div:nth-child(odd) {
 	background: var(--color-pair1);
+}
+#welcome_page .loading_image {
+	text-align: center;
+}
+body.loaded #welcome_page .loading_image {
+	display: none;
 }
 
 #password {

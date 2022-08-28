@@ -284,6 +284,8 @@ async function init_page() {
 	var vinfo = await board_control.device_info()
 	var workflow_type = board_control.type
 	is_editable = await board_control.is_editable()
+	// configure the page from the workflow
+	$("body").addClass(`workflow_type_${workflow_type} loaded`)
 	// load some data into the page
 	$("#circup_page .title .circuitpy_version").html(await board_control.cp_version());
 	$("#circup_page .title .serial_number").html(await board_control.serial_num());
@@ -317,8 +319,6 @@ async function init_page() {
 		if(workflow_type == "usb") {
 			$("a.board_drive").prop("href", board_control.root);
 			$("a.board_drive").html(board_control.root);
-		} else {
-			$("div.usb_workflow").remove()
 		}
 		if(workflow_type == "web") {
 			$("a.board_link").prop("href", board_control.workflow_url_base);
@@ -328,8 +328,6 @@ async function init_page() {
 			$("a.board_repl").html(repl_url.href);
 			$("a.board_ip").prop("href", `http://${vinfo.ip}`);
 			$("a.board_ip").html(vinfo.ip);
-		} else {
-			$("div.web_workflow").remove()
 		}
 	})();
 	//
@@ -348,8 +346,7 @@ async function run_exclusively(command) {
 	}
 }
 
-$("#welcome_page .board_drive").on("click", tools.open_outside_sync)
-$("a.board_name").on("click", tools.open_outside_sync)
+$("#welcome_page a").on("click", tools.open_outside_sync)
 
 $(".auto_install").on("click", async (e) => {
 	$(".tab_link_circup").click();
