@@ -6,10 +6,10 @@ SPDX-License-Identifier: MIT
 import { BUNDLE_ACCESS } from "../../config.js";
 import * as common from "./common.js";
 import * as tools from "../lib/tools.js";
-import { setup_directory, refresh_list } from "./workflow-directory.js";
+import { setup_directory, refresh_list } from "./list_directory.js";
 import { LibraryBundle } from "../lib/bundle.js";
 import { Circup } from "../lib/circup.js";
-import * as bundler from "./workflow-bundler.js";
+import * as bundler from "./bundler_select.js";
 
 // import { $ } from "../extlib/jquery.min.js";
 const CODE_FILES = ["code.txt", "code.py", "main.py", "main.txt"]
