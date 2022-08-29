@@ -1,6 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit" width="44" height="44" viewBox="2 2 20 20" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
   <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <rect x="5" y="8" width="11" height="11" rx="0" fill="#fff" stroke="#fff"/>
   <path d="M9 7h-3a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-3" />
-  <path d="M9 15h3l8.5 -8.5a1.5 1.5 0 0 0 -3 -3l-8.5 8.5v3" />
-  <line x1="16" y1="5" x2="19" y2="8" />
+  <path d="M19.5 7.5 l1 -1 a1.5 1.5 0 0 0 -3 -3 l-1 1" fill="#F00" /> -->
+  <path d="M9 15 h3 l7.5 -7.5 l -3 -3 l-7.5 7.5 v3" fill="#FF8" />
 </svg>

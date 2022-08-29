@@ -1,9 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-code" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-code" width="44" height="44" viewBox="2 2 20 20" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
   <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
   <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" fill="#fff"/>
   <path d="M14 3v4a1 1 0 0 0 1 1h4" />
 
-<g transform="scale(0.5,0.5) translate(12,17)" stroke-width="2.5">
+<g transform="scale(0.5,0.5) translate(12,17)" stroke-width="2.2">
+  <path d="M 4,9 h4.5 v-5.5 h7 v13 h-11.5 z" fill="lightblue" stroke-width="0"/>
+  <path d="M 9,12 h7.5 v-5 h4 v8 h-5 v6 h-6.5 z" fill="yellow" stroke-width="0"/>
   <path d="M12 9h-7a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h3" />
   <path d="M12 15h7a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-3" />
   <path d="M8 9v-4a2 2 0 0 1 2 -2h4a2 2 0 0 1 2 2v5a2 2 0 0 1 -2 2h-4a2 2 0 0 0 -2 2v5a2 2 0 0 0 2 2h4a2 2 0 0 0 2 -2v-4" />

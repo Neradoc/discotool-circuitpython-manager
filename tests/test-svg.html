@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8" />
+	<title>Test SVG</title>
+	<style type="text/css" title="text/css">
+		/* vos styles ici */
+		body {
+			background: #A88;
+		}
+		content {
+			display: block;
+		}
+		img {
+			border: 2px solid white;
+			height: 200px;
+			float:left;
+		}
+	</style>
+	<!-- <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script> -->
+	<script type="text/javascript" src="https://ri1.fr/jq/v2.js"></script>
+	<script type="text/javascript" language="javascript" charset="utf-8">
+		/* votre code ici */
+		const path_dir = "../assets/images/svg/"
+
+		$(window).on("dragenter", (event) => {
+			event.stopPropagation();
+			event.preventDefault();
+		});
+		$(window).on("dragexit", (event) => {
+			event.stopPropagation();
+			event.preventDefault();
+		});
+		$(window).on("dragover", (event) => {
+			event.stopPropagation();
+			event.preventDefault();
+		});
+
+		$(window).on("drop", (event) => {
+			try {
+				var dropped_files_list = [];
+				var data_transfer = event.originalEvent.dataTransfer;
+				if (data_transfer.items) {
+					// Use DataTransferItemList interface to access the file(s)
+					for (var i = 0; i < data_transfer.items.length; i++) {
+						// If dropped items aren't files, reject them
+						if (data_transfer.items[i].kind === 'file') {
+							var file = data_transfer.items[i].getAsFile();
+							dropped_files_list.push(file)
+						}
+					}
+				} else {
+					// Use DataTransfer interface to access the file(s)
+					for (var i = 0; i < data_transfer.files.length; i++) {
+						var file = data_transfer.files[i]
+						dropped_files_list.push(file)
+					}
+				}
+				for(dropped_file of dropped_files_list) {
+					var full_path = path_dir + dropped_file.name
+					$("content").append(`<img src="${full_path}"/>`)
+				}
+			} catch(e) {
+				console.log(e)
+			} finally {
+				event.stopPropagation();
+				event.preventDefault();
+				return false;
+			}
+		});
+		function reload() {
+			const randy = Math.floor(10000000 * Math.random())
+			const blurp = `#${randy}`
+			$("content img").each((index, img) => {
+				const src = $(img).prop("src")
+				const newlink = src.replace(/#.*/, "") + blurp
+				$(img).prop("src", newlink)
+			})
+		}
+		setInterval(reload, 2000)
+	</script>
+</head>
+<body>
+<content></content>
+</body>
+</html>
