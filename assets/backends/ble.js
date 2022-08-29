@@ -11,8 +11,8 @@ class BLEWorkflow extends Workflow {
 	}
 	icon = "📱"
 	type = "ble"
+	supports_credentials = false
 	static available = false
-	static supports_credentials = false
 }
 
 export { BLEWorkflow };

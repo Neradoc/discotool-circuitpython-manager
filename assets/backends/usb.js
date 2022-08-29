@@ -215,6 +215,7 @@ class USBWorkflow extends Workflow {
 	}
 	icon = "💾"
 	type = "usb"
+	supports_credentials = false
 	static available = (path !== undefined)
 }
 

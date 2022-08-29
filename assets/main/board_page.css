@@ -231,6 +231,7 @@ tr.odd { background: var(--color-pair1); }
 	background: var(--hover-background);
 	color: var(--hover-color);
 }
+#file_list .refresh_list,
 #file_list td.buttons a,
 #file_list td.buttons button
 {
@@ -238,8 +239,8 @@ tr.odd { background: var(--color-pair1); }
 	font: inherit;
 	line-height: inherit;
 	display: inline-block;
-	height: 24px;
-	width: 24px;
+	height: 26px;
+	width: 26px;
 	vertical-align: middle;
 	background: var(--contrast-clear);
 	border: 1px solid black;
@@ -248,11 +249,17 @@ tr.odd { background: var(--color-pair1); }
 	margin: 0px;
 	text-align: center;
 }
+#file_list button img,
+#file_list a img {
+	max-height: 24px;
+}
+
 #file_list td.buttons a .view { display: none; }
 .board_locked #file_list td.buttons a .view { display: inline; }
 .board_locked #file_list td.buttons a .pencil { display: none; }
 .board_locked #file_list .icon_locked { display: inline; }
 .board_locked #file_list td .delete { display: none; }
+.board_locked #file_list td .rename { display: none; }
 
 commands {
 	display: block;
@@ -435,7 +442,7 @@ commands group {
 .template { display: none; }
 
 /*********************************************************************
-* Popup password dialog thing
+* Popup password dialog
 */
 .popup_dialog #blanket {
 	z-index: 90;
@@ -456,7 +463,7 @@ commands group {
 	width: 300px;
 	left: calc(50% - 160px);
 	border: 4px solid var(--contrast-color);
-	background: var(--input-background);
+	background: var(--body-background);
 	border-radius: 8px;
 	padding: 8px 16px;
 }
@@ -472,7 +479,27 @@ commands group {
 	display: block;
 	float: right;
 }
-
-.adafruit_logo {
-	height: 1em;
+/*********************************************************************
+* Popup file rename dialog
+*/
+#rename_dialog { display: none; }
+#rename_dialog.popup_dialog {
+	display: block;
+	z-index: 100;
+	position: fixed;
+	top: 200px;
+	width: 300px;
+	left: calc(50% - 160px);
+	border: 4px solid var(--contrast-color);
+	background: var(--body-background);
+	border-radius: 8px;
+	padding: 8px 16px;
+}
+#rename_dialog .cancel_button {
+	display: block;
+	float: left;
+}
+#rename_dialog .ok_button {
+	display: block;
+	float: right;
 }

@@ -62,7 +62,7 @@ SPDX-License-Identifier: MIT
 						<img class="icon_locked" src="assets/images/icon-locked.png"/>
 						<span class="dir_path"></span>
 					</th>
-					<th colspan="1"><button class="refresh_list">🔄</button></th>
+					<th colspan="1"><button class="refresh_list" title="reload"><img src="assets/images/svg/reload.svg" /></button></th>
 				</tr>
 				<tr>
 					<th>Type</th>
@@ -86,12 +86,13 @@ SPDX-License-Identifier: MIT
 					<td class="path"><a class="path" target="_blank"></a></td>
 					<td class="modified"></td>
 					<td class="buttons">
-						<a class="delete">🗑️</a>
-						<a href="" target="_blank" class="edit">
-							<span class="pencil">📝</span>
-							<span class="view">📄<!-- 👁 --></span>
+						<a class="rename" title="Rename"><img src="assets/images/svg/edit-line.svg" /></a>
+						<a class="delete" title="Delete"><img src="assets/images/svg/delete.svg" /></a>
+						<a href="" target="_blank" class="edit" title="Edit/View">
+							<span class="pencil"><img src="assets/images/svg/edit-file.svg" /></span>
+							<span class="view"><img src="assets/images/svg/file-text.svg" /></span>
 						</a>
-						<a class="analyze">🔎</a>
+						<a class="analyze" title="Auto Install Dependencies"><img src="assets/images/svg/magnifying-glass.svg" /></a>
 					</td>
 				</tr>
 			</tbody>
@@ -179,7 +180,7 @@ SPDX-License-Identifier: MIT
 	<div id="small_load_image"><img class="small_load_image" src="assets/images/loading_black_small.gif" /></div>
 	</content>
 	<div id="blanket"></div>
-	<div class="web_workflow" id="password_dialog">
+	<div id="password_dialog">
 		Set the API password.<br/>
 		&#9888;&#65039; transmitted unencrypted !<br/>
 		<input name="password" id="password" type="password" placeholder="passw0rd"/><br/>
@@ -187,6 +188,13 @@ SPDX-License-Identifier: MIT
 			<input name="remember_password" type="checkbox" id="remember_password"/>
 			Remember (&#9888;&#65039; not secure).
 		</label><br/>
+		<button class="cancel_button">Cancel</button>
+		<button class="ok_button">OK</button>
+	</div>
+	<div id="rename_dialog">
+		Renaming a file/directory.<br/>
+		<pre>From: </pre><input name="original_name" class="original_name" type="text" disabled/><br/>
+		<pre>  To: </pre><input name="new_name" class="new_name" type="text" placeholder=""/><br/>
 		<button class="cancel_button">Cancel</button>
 		<button class="ok_button">OK</button>
 	</div>

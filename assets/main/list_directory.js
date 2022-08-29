@@ -3,8 +3,8 @@ SPDX-FileCopyrightText: Copyright (c) Scott Shawcroft for Adafruit
 SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
-import * as common from "./common.js";
-import * as tools from "../lib/tools.js";
+import * as common from "./common.js"
+import * as tools from "../lib/tools.js"
 
 const HIDDEN = [
 	".fseventsd",
@@ -12,26 +12,34 @@ const HIDDEN = [
 	".Trashes",
 	".TemporaryItems",
 	"System Volume Information",
-];
-const SECRETS = [".env", "secrets.py"];
+]
+const SECRETS = [".env", "secrets.py"]
 const ADAFRUIT_ICON = '<img src="assets/images/icon-adafruit.png" class="adafruit_logo"/>'
 
-let new_directory_name = document.getElementById("name");
-let files = document.getElementById("files_upload");
-var current_path = tools.current_path;
-var refreshing = false;
+let new_directory_name = document.getElementById("name")
+let files = document.getElementById("files_upload")
+var current_path = tools.current_path
+var refreshing = false
 
 const HIDE = {
 	NOTHING: 0,
 	DEFAULT_SYSTEM_FILES: 1,
 	ALL_SYSTEM_FILES: 2,
 	ALL_DOTTED_FILES: 3,
-};
+}
 
-var hide_level = HIDE.DEFAULT_SYSTEM_FILES;
+var hide_level = HIDE.DEFAULT_SYSTEM_FILES
+
+function icon(name) {
+	return `<img src="assets/images/svg/${name}.svg" />`
+}
+
+/*****************************************************************
+* Open link in the browser or other
+*/
 
 function open_outside_a(e) {
-	const target = e.target
+	const target = e.currentTarget
 	var path = $(target).data("path")
 	if(path) {
 		var full_path = common.board_control.edit_url(path)
@@ -41,6 +49,85 @@ function open_outside_a(e) {
 	}
 	return false
 }
+
+/*****************************************************************
+* File rename dialog
+*/
+
+function rename_dialog_close() {
+	refresh_list()
+	$("#rename_dialog").data("path", "")
+	$("#rename_dialog").removeClass("popup_dialog")
+	$("body").removeClass("popup_dialog")
+}
+function rename_dialog_open(e) {
+	const target = e.currentTarget
+	var path = $(target).data("path")
+	console.log("rename", path)
+	$("#rename_dialog").data("path", path)
+	// TODO: filter path for html ?
+	$("#rename_dialog .ok_button").prop("disabled", false)
+	$("#rename_dialog .cancel_button").prop("disabled", false)
+	$("#rename_dialog .original_name").val(path)
+	$("#rename_dialog .new_name").val(path)
+	$("#rename_dialog").addClass("popup_dialog")
+	$("body").addClass("popup_dialog")
+	return false
+}
+async function setup_rename_dialog() {
+	$("#rename_dialog .ok_button").on("click", () => {
+		$("#rename_dialog .ok_button").prop("disabled", true)
+		$("#rename_dialog .cancel_button").prop("disabled", true)
+		var from_path = $("#rename_dialog").data("path")
+		var new_path = $("#rename_dialog .new_name").val()
+		// sanitize the new path
+		// try doing the rename command
+		common.board_control.rename(from_path, to_path).after((res) => {
+			if(res.ok) {
+				$("#rename_dialog .ok_button").prop("disabled", false)
+				$("#rename_dialog .cancel_button").prop("disabled", false)
+				rename_dialog_close()
+			} else {
+				// TODO: there was an error doing the thing
+			}
+		});
+	})
+	$("#rename_dialog .cancel_button").on("click", () => {
+		rename_dialog_close()
+	})
+	$("#rename_dialog #new_name").on("keypress", (e) => {
+		if(e.which == 13) {
+			$("#password_dialog .ok_button").click()
+			return false
+		}
+		return true
+	})
+}
+
+async function rename(e) {
+    let fn = new URL(e.target.value);
+    var new_fn = prompt("Rename to ", fn.pathname.substr(3));
+    if (new_fn === null) {
+        return;
+    }
+    let new_uri = new URL("/fs" + new_fn, fn);
+    const response = await fetch(e.target.value,
+        {
+            method: "MOVE",
+            headers: {
+                'X-Destination': new_uri.pathname,
+            },
+        }
+    )
+    if (response.ok) {
+        refresh_list();
+    }
+}
+
+
+/*****************************************************************
+* Password dialog
+*/
 
 async function password_dialog(open=true) {
 	if(open) {
@@ -54,112 +141,162 @@ async function password_dialog(open=true) {
 		$("#password").data("backup", "")
 	}
 }
+async function setup_password_dialog() {
+	var info = await common.board_control.device_info()
+	const serial_num = info["serial_num"]
+	const password_key = `insecure_password_${serial_num}`
+	$("#password_dialog .ok_button").on("click", () => {
+		var password = $("#password").val()
+		common.board_control.set_credentials(undefined, password)
+		if($("#password_dialog #remember_password").is(":checked")) {
+			if(serial_num) localStorage[password_key] = password
+		} else {
+			if(serial_num) delete localStorage[password_key]
+		}
+		password_dialog(false)
+	})
+	$("#password_dialog .cancel_button").on("click", () => {
+		$("#password").val($("#password").data("backup"))
+		if(password_key in localStorage) {
+			$("#password_dialog #remember_password").prop("checked", true)
+		} else {
+			$("#password_dialog #remember_password").prop("checked", false)
+		}
+		password_dialog(false)
+	})
+	$("#password_dialog #password").on("keypress", (e) => {
+		if(e.which == 13) {
+			$("#password_dialog .ok_button").click()
+			return false
+		}
+		return true
+	})
+	$(".show_password_dialog").on(
+		"click", (e) => { password_dialog() }
+	)
+	if(serial_num) {
+		if(password_key in localStorage) {
+			const pass_mem = localStorage[password_key]
+			common.board_control.set_credentials(undefined, pass_mem)
+			$("#password").val(common.board_control.get_password())
+			$("#password_dialog #remember_password").prop("checked", true)
+		}
+	}
+}
+
+/*****************************************************************
+* Parse error messages
+*/
 
 async function get_error_message(response, message) {
-	const status = await response.status;
-	const error = await response.statusText;
-	var error_message = "";
+	const status = await response.status
+	const error = await response.statusText
+	var error_message = ""
 	switch(status) {
 	case 401:
 		error_message = `${message}: Bad password !`
-		break;
+		break
 	case 403:
 		error_message = `${message}: Not authorized !`
-		break;
+		break
 	case 409:
 		error_message = `${message}: Drive read-only !`
-		break;
+		break
 	default:
 		error_message = `${message}: ${error} !`
 	}
 	return error_message
 }
 
+/*****************************************************************
+* Create or refresh the list of files
+*/
+
 async function refresh_list() {
 	if (refreshing) {
-		return;
+		return
 	}
-	refreshing = true;
+	refreshing = true
 	try {
-		var top = Math.floor($('#file_list_list').height() / 2 - $('#file_list_loading_image').height() / 2);
-		$('#file_list_loading_image').css("top", `${top}px`);
-		$('#file_list_loading_image').show();
-		$('#file_list_error').hide();
-		$('#file_list_list').addClass("loading");
+		var top = Math.floor($('#file_list_list').height() / 2 - $('#file_list_loading_image').height() / 2)
+		$('#file_list_loading_image').css("top", `${top}px`)
+		$('#file_list_loading_image').show()
+		$('#file_list_error').hide()
+		$('#file_list_list').addClass("loading")
 
 		if (current_path == "") {
-			current_path = "/";
+			current_path = "/"
 		}
 
 		var drive_name = common.board_control.drive_name || "CIRCUITPY"
-		var pwd = $('#pwd .dir_path');
+		var pwd = $('#pwd .dir_path')
 		var pwd_link = `<a class="files_list_dir dir" href="?path=/#files" data-path="/">${drive_name}</a>/`
-		var fullpath = "/";
+		var fullpath = "/"
 		for(var path of current_path.split("/")) {
 			if(path != "") {
-				fullpath += path + "/";
-				pwd_link += `<a href="?path=${fullpath}#files" data-path="${fullpath}" class="dir files_list_dir">${path}</a>/`;
+				fullpath += path + "/"
+				pwd_link += `<a href="?path=${fullpath}#files" data-path="${fullpath}" class="dir files_list_dir">${path}</a>/`
 			}
 		}
-		pwd.html(pwd_link);
+		pwd.html(pwd_link)
 
-		var response = await common.board_control.list_dir(current_path);
+		var response = await common.board_control.list_dir(current_path)
 
 		if (! response.ok) {
-			$('#file_list_error').show();
-			$('#file_list_body tr').remove();
-			const message = `Directory listing failed`;
-			var error_message = await get_error_message(response, message);
-			console.log(error_message);
-			$("#file_list_error_label").html(error_message);
+			$('#file_list_error').show()
+			$('#file_list_body tr').remove()
+			const message = `Directory listing failed`
+			var error_message = await get_error_message(response, message)
+			console.log(error_message)
+			$("#file_list_error_label").html(error_message)
 			//
 			if(response.status == 401) {
 				await password_dialog()
 			}
-			return;
+			return
 		}
 
-		var dir_files_list = response.content;
-		var new_children = [];
-		var template = $('#file_list_template');
+		var dir_files_list = response.content
+		var new_children = []
+		var template = $('#file_list_template')
 
 		if (current_path != "/") {
-			var clone = template.clone();
+			var clone = template.clone()
 			clone.prop("id", "")
-			var td = clone.find("td");
-			td[0].innerHTML = "⬆️";
-			var path_link = clone.find("a.path");
-			let parent = new URL("..", "file://" + current_path);
-			var file_path = parent.pathname;
-			path_link.prop("href", tools.url_here({"path": parent.pathname}));
-			path_link.addClass("files_list_dir");
-			path_link.data("path", file_path);
-			path_link.html("..");
+			var td = clone.find("td")
+			td[0].innerHTML = "⬆️"
+			var path_link = clone.find("a.path")
+			let parent = new URL("..", "file://" + current_path)
+			var file_path = parent.pathname
+			path_link.prop("href", tools.url_here({"path": parent.pathname}))
+			path_link.addClass("files_list_dir")
+			path_link.data("path", file_path)
+			path_link.html("..")
 			path_link.prop("target", "")
 			path_link.on("click", load_directory)
 			// Remove the delete button
-			clone.find(".buttons").html("");
-			new_children.push(clone);
+			clone.find(".buttons").html("")
+			new_children.push(clone)
 		}
 
 		dir_files_list.sort((a,b) => {
-			return a.name.localeCompare(b.name);
+			return a.name.localeCompare(b.name)
 		})
 
 		for (const file_info of dir_files_list) {
 			// Clone the new row and insert it into the table
-			var clone = template.clone();
+			var clone = template.clone()
 			clone.prop("id", "")
-			var td = clone.find("td");
-			var file_path = current_path + file_info.name;
+			var td = clone.find("td")
+			var file_path = current_path + file_info.name
 			// TODO: this is backend-specific
 			// -> make the backend cooperate with this to get the "direct reference"
 			// for web workflow it is currently the direct URL, though it should
 			// not remain so in the future.
 			let api_url = common.board_control.api_url(file_path)
 			if (file_info.directory) {
-				file_path += "/";
-				api_url += "/";
+				file_path += "/"
+				api_url += "/"
 			}
 			const ext_icons = [
 				[["txt", "py", "js", "json"], "📄"],
@@ -168,20 +305,20 @@ async function refresh_list() {
 				[["jpg", "jpeg", "png", "bmp", "gif"], "🖼"],
 				[["wav", "mp3", "ogg"], "🎵"],
 			]
-			var icon = "❓";
+			var icon = "❓"
 			if (current_path == "/" && SECRETS.includes(file_info.name)) {
-				icon = "🔑"; // 🔐
+				icon = "🔑" // 🔐
 			} else if (current_path == "/" && HIDDEN.includes(file_info.name)) {
 				// hidden names in root
 				if(hide_level >= HIDE.DEFAULT_SYSTEM_FILES) continue
 			} else if (file_info.name.startsWith("._")) {
-				icon = "🍎";
+				icon = "🍎"
 				if(hide_level >= HIDE.ALL_SYSTEM_FILES) continue
 			} else if (file_info.name.startsWith(".")) {
-				icon = "🚫";
+				icon = "🚫"
 				if(hide_level >= HIDE.ALL_DOTTED_FILES) continue
 			} else if (current_path == "/" && file_info.name == "lib") {
-				icon = "📚";
+				icon = "📚"
 // 			} else if (common.library_bundle &&
 // 				(file_info.name.replace(/\.m?py$/, "")
 // 				in common.library_bundle.all_the_modules)
@@ -192,7 +329,7 @@ async function refresh_list() {
 // 					icon = "🐍"
 // 				}
 			} else if (file_info.directory) {
-				icon = "📁";
+				icon = "📁"
 			} else {
 				for(const file_dat of ext_icons) {
 					const ext = file_info.name.split(".").pop()
@@ -202,200 +339,180 @@ async function refresh_list() {
 					}
 				}
 			}
-			td[0].innerHTML = icon;
-			td[1].innerHTML = file_info.file_size;
+			td[0].innerHTML = icon
+			td[1].innerHTML = file_info.file_size
 
 			var path = clone.find("a.path")
 			path.html(file_info.name)
 			path.data("path", file_path)
 			if(file_info.directory) {
-				path.attr("href", tools.url_here({"path": `${file_path}`}));
-				path.addClass("files_list_dir");
+				path.attr("href", tools.url_here({"path": `${file_path}`}))
+				path.addClass("files_list_dir")
 			} else {
-				path.attr("href", api_url);
+				path.attr("href", api_url)
 				path.on("click", open_outside_a)
 			}
-			td[3].innerHTML = (new Date(file_info.modified)).toLocaleString();
-			var delete_button = clone.find(".delete");
-			delete_button.data("path", file_path);
-			delete_button.val(file_path);
-			delete_button.on("click", del);
+			td[3].innerHTML = (new Date(file_info.modified)).toLocaleString()
+			var delete_button = clone.find(".delete")
+			delete_button.data("path", file_path)
+			delete_button.val(file_path)
+			delete_button.on("click", del)
 
-			var edit_button = clone.find(".edit");
-			edit_button.on("click", open_outside_a)
+			var edit_button = clone.find(".edit")
+			edit_button.data("path", file_path)
 			if(file_info.directory) {
 				edit_button.remove()
 			} else {
-				// TODO: this is backend-specific
-				// we want an edit page that is backend agnostic.
-				var edit_url = common.board_control.edit_url(file_path)
-				edit_url.hash = `#${file_path}`;
-				edit_button.attr("href", edit_url);
+				edit_button.attr("href", api_url)
+				edit_button.on("click", open_outside_a)
 			}
 
-			var analyze_button = clone.find(".analyze");
+			var rename_button = clone.find(".rename")
+			rename_button.data("path", file_path)
+			rename_button.attr("href", api_url)
+			rename_button.on("click", rename_dialog_open)
+
+			var analyze_button = clone.find(".analyze")
 			if(file_info.name.endsWith(".py")) {  // || search("requirement") >= 0 ?
-				analyze_button.data("path", file_path);
-				analyze_button.val(api_url);
+				analyze_button.data("path", file_path)
+				analyze_button.val(api_url)
 			} else {
 				analyze_button.hide()
 			}
 
-			new_children.push(clone);
+			new_children.push(clone)
 		}
-		$('#file_list_loading_image').hide();
-		$("#file_list_body tr").remove();
-		$("#file_list_body").append(new_children);
-		$('#file_list_loading_image').hide();
+		$('#file_list_loading_image').hide()
+		$("#file_list_body tr").remove()
+		$("#file_list_body").append(new_children)
+		$('#file_list_loading_image').hide()
 	} catch(e) {
 		console.log("Directory")
 		console.log(e)
 	} finally {
-		refreshing = false;
-		$('#file_list_loading_image').hide();
-		$('#file_list_list').removeClass("loading");
+		refreshing = false
+		$('#file_list_loading_image').hide()
+		$('#file_list_list').removeClass("loading")
 	}
 }
+
+/*****************************************************************
+* Create directory
+*/
 
 async function mkdir(e) {
-	var dir_path = current_path + new_directory_name.value + "/";
-	var response = await common.board_control.create_dir(dir_path);
+	var dir_path = current_path + new_directory_name.value + "/"
+	var response = await common.board_control.create_dir(dir_path)
 	if (response.ok) {
-		refresh_list();
-		new_directory_name.value = "";
-		mkdir_button.disabled = true;
+		refresh_list()
+		new_directory_name.value = ""
+		mkdir_button.disabled = true
 	}
 }
 
+/*****************************************************************
+* Upload file
+*/
+
 async function upload(e) {
-	console.log("upload");
+	console.log("upload")
 	for (const file of files.files) {
-		console.log(file_path, file);
-		var response = await common.board_control.upload_file(current_path + file.name, file);
+		console.log(file_path, file)
+		var response = await common.board_control.upload_file(current_path + file.name, file)
 		if (response.ok) {
-			refresh_list();
-			console.log(files);
-			files.value = "";
-			upload_button.disabled = true;
+			refresh_list()
+			console.log(files)
+			files.value = ""
+			upload_button.disabled = true
 		}
 	}
 }
 
+/*****************************************************************
+* Delete file
+*/
+
 async function del(e) {
-	var path = $(e.target).data("path");
-	console.log("delete", path);
-	var prompt = `Delete ${path}`;
+	var path = $(this).data("path")
+	console.log("delete", path)
+	var prompt = `Delete ${path}`
 	if (path.endsWith("/")) {
-		prompt += " and all of its contents?";
+		prompt += " and all of its contents?"
 	} else {
-		prompt += "?";
+		prompt += "?"
 	}
 	if (confirm(prompt)) {
-		console.log(path);
-		var response = await common.board_control.delete_file(path);
+		console.log(path)
+		var response = await common.board_control.delete_file(path)
 		if (response.ok) {
-			refresh_list();
+			refresh_list()
 		} else {
-			const message = `Deleting ${fn.pathname.substr(3)} failed`;
-			const status = await response.status;
-			const error = await response.statusText;
+			const message = `Deleting ${fn.pathname.substr(3)} failed`
+			const status = await response.status
+			const error = await response.statusText
 			switch(status) {
 			case 401:
-				console.log(`${message}: Bad password !`);
-				break;
+				console.log(`${message}: Bad password !`)
+				break
 			case 403:
-				console.log(`${message}: Not authorized !`);
-				break;
+				console.log(`${message}: Not authorized !`)
+				break
 			case 409:
-				console.log(`${message}: Drive read-only !`);
-				break;
+				console.log(`${message}: Drive read-only !`)
+				break
 			default:
-				console.log(`${message}: ${error} !`);
+				console.log(`${message}: ${error} !`)
 			}
 		}
 	}
-	return false;
+	return false
 }
 
+/*****************************************************************
+* Load a directory in the page without refreshing the window
+*/
+
 function load_directory(e) {
-	var self = $(e.target)
+	var self = $(e.currentTarget)
 	current_path = self.data("path")
 	window.history.pushState({}, '', tools.url_here({'path': current_path}))
 	refresh_list()
 	return false
 }
 
+/*****************************************************************
+* Startup
+*/
+
 async function setup_directory() {
-	let mkdir_button = document.getElementById("mkdir");
-	mkdir_button.onclick = mkdir;
+	let mkdir_button = document.getElementById("mkdir")
+	mkdir_button.onclick = mkdir
 
-	let upload_button = document.getElementById("upload");
-	upload_button.onclick = upload;
+	let upload_button = document.getElementById("upload")
+	upload_button.onclick = upload
 
-	upload_button.disabled = files.files.length == 0;
+	upload_button.disabled = files.files.length == 0
 
 	files.onchange = () => {
-		upload_button.disabled = files.files.length == 0;
+		upload_button.disabled = files.files.length == 0
 	}
 
-	mkdir_button.disabled = new_directory_name.value.length == 0;
+	mkdir_button.disabled = new_directory_name.value.length == 0
 
 	new_directory_name.oninput = () => {
-		mkdir_button.disabled = new_directory_name.value.length == 0;
+		mkdir_button.disabled = new_directory_name.value.length == 0
 	}
 
 	$(document).on("click", ".refresh_list", (e) => {
-		refresh_list();
-	});
-	$(document).on("click", "#file_list .files_list_dir", load_directory);
-
-	/******************************************************************/
+		refresh_list()
+	})
+	$(document).on("click", "#file_list .files_list_dir", load_directory)
 
 	if(common.board_control.supports_credentials) {
-		var info = await common.board_control.device_info()
-		const serial_num = info["serial_num"]
-		const password_key = `insecure_password_${serial_num}`
-		$("#password_dialog .ok_button").on("click", () => {
-			var password = $("#password").val()
-			common.board_control.set_credentials(undefined, password)
-			if($("#password_dialog #remember_password").is(":checked")) {
-				if(serial_num) localStorage[password_key] = password
-			} else {
-				if(serial_num) delete localStorage[password_key]
-			}
-			password_dialog(false)
-		})
-		$("#password_dialog .cancel_button").on("click", () => {
-			$("#password").val($("#password").data("backup"))
-			if(password_key in localStorage) {
-				$("#password_dialog #remember_password").prop("checked", true)
-			} else {
-				$("#password_dialog #remember_password").prop("checked", false)
-			}
-			password_dialog(false)
-		})
-		$("#password_dialog #password").on("keypress", (e) => {
-			if(e.which == 13) {
-				$("#password_dialog .ok_button").click()
-				return false
-			}
-			return true
-		})
-		$("#password_dialog #remember_password").on("click", (e) => {
-			const that = $(e.target)
-		})
-		$(".show_password_dialog").on(
-			"click", (e) => { password_dialog() }
-		)
-		if(serial_num) {
-			if(password_key in localStorage) {
-				const pass_mem = localStorage[password_key]
-				common.board_control.set_credentials(undefined, pass_mem)
-				$("#password").val(common.board_control.get_password())
-				$("#password_dialog #remember_password").prop("checked", true)
-			}
-		}
+		await setup_password_dialog()
 	}
+	
+	await setup_rename_dialog()
 }
 
-export { setup_directory, refresh_list };
+export { setup_directory, refresh_list }

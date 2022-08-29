@@ -164,7 +164,7 @@ async function update_line(new_line, board_libs) {
 }
 
 async function upload_button_call(e) {
-	var button = $(e.target);
+	var button = $(e.currentTarget);
 	var target_module = button.val();
 	var line = button.parents("tr.line");
 	button.prop("disabled", true);
@@ -369,7 +369,9 @@ $("#bundle_list #bundle_install").on("click", (e) => {
 	run_exclusively(() => bundle_install());
 });
 $(document).on("click", "#file_list_list .analyze", (e) => {
-	var path = $(e.target).data("path");
+	var path = $(e.currentTarget).data("path");
+	console.log(e)
+	console.log(path)
 	$(".tab_link_circup").click();
 	run_exclusively(() => auto_install(path));
 	return false;
@@ -392,7 +394,7 @@ $("#hide_updates").on("click", async (e) => {
 });
 
 $(".tab_link").on("click", (e) => {
-	var target = e.target.value;
+	var target = e.currentTarget.value;
 	$(".tab_page").hide();
 	$(".tab_link").removeClass("active")
 	window.location.hash = `#${target}`;
