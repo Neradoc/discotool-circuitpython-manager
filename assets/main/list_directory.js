@@ -30,7 +30,7 @@ const HIDE = {
 
 var hide_level = HIDE.DEFAULT_SYSTEM_FILES
 
-function icon(name) {
+function _icon(name) {
 	return `<img src="assets/images/svg/${name}.svg" />`
 }
 
@@ -264,7 +264,7 @@ async function refresh_list() {
 			var clone = template.clone()
 			clone.prop("id", "")
 			var td = clone.find("td")
-			td[0].innerHTML = "⬆️"
+			td[0].innerHTML = _icon("arrow-bigup")
 			var path_link = clone.find("a.path")
 			let parent = new URL("..", "file://" + current_path)
 			var file_path = parent.pathname
@@ -299,26 +299,30 @@ async function refresh_list() {
 				api_url += "/"
 			}
 			const ext_icons = [
-				[["txt", "py", "js", "json"], "📄"],
-				[["html", "html"], "🌐"],
-				[["mpy"], "🐍"],
-				[["jpg", "jpeg", "png", "bmp", "gif"], "🖼"],
-				[["wav", "mp3", "ogg"], "🎵"],
+				[["txt"], _icon("file-text")],
+				[["py"], _icon("file-code-py")],
+				[["js", "json"], _icon("file-code-curl")],
+				[["html", "html"], _icon("file-code-html")],
+				[["mpy"], `<img src="assets/images/blinka-48.png" />`],
+				[["jpg", "jpeg", "png", "bmp", "gif"], _icon("picture")],
+				[["wav", "mp3", "ogg"], _icon("file-music")],
 			]
-			var icon = "❓"
+			var icon = _icon("file-unknown")
 			if (current_path == "/" && SECRETS.includes(file_info.name)) {
-				icon = "🔑" // 🔐
+				icon = _icon("key")
 			} else if (current_path == "/" && HIDDEN.includes(file_info.name)) {
 				// hidden names in root
 				if(hide_level >= HIDE.DEFAULT_SYSTEM_FILES) continue
 			} else if (file_info.name.startsWith("._")) {
-				icon = "🍎"
+				icon = _icon("apple")
 				if(hide_level >= HIDE.ALL_SYSTEM_FILES) continue
 			} else if (file_info.name.startsWith(".")) {
-				icon = "🚫"
+				icon = _icon("no")
 				if(hide_level >= HIDE.ALL_DOTTED_FILES) continue
 			} else if (current_path == "/" && file_info.name == "lib") {
-				icon = "📚"
+				icon = _icon("folder-lib")
+			} else if (current_path == "/" && file_info.name == "boot_out.txt") {
+				icon = _icon("file-info") // info-circle
 // 			} else if (common.library_bundle &&
 // 				(file_info.name.replace(/\.m?py$/, "")
 // 				in common.library_bundle.all_the_modules)
@@ -326,10 +330,10 @@ async function refresh_list() {
 // 				if(file_info.name.startsWith("adafruit_")) {
 // 					icon = ADAFRUIT_ICON
 // 				} else {
-// 					icon = "🐍"
+// 					icon = ""
 // 				}
 			} else if (file_info.directory) {
-				icon = "📁"
+				icon = _icon("folder")
 			} else {
 				for(const file_dat of ext_icons) {
 					const ext = file_info.name.split(".").pop()
@@ -511,7 +515,7 @@ async function setup_directory() {
 	if(common.board_control.supports_credentials) {
 		await setup_password_dialog()
 	}
-	
+
 	await setup_rename_dialog()
 }
 

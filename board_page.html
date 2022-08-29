@@ -21,7 +21,8 @@ SPDX-License-Identifier: MIT
 		<span class="icon">
 			<img class="icon_usb" src="assets/images/icon-usb.png"/>
 			<img class="icon_web" src="assets/images/icon-web.png"/>
-			<img class="icon_locked" src="assets/images/icon-locked.png"/>
+			<!-- <img class="icon_locked" src="assets/images/icon-locked.png"/> -->
+			<img class="icon_locked" src="assets/images/svg/lock.svg"/>
 		</span>
 		<span class="board_name">Loading…</span>
 	</h1>
@@ -59,7 +60,7 @@ SPDX-License-Identifier: MIT
 			<thead>
 				<tr>
 					<th id="pwd" colspan="4">
-						<img class="icon_locked" src="assets/images/icon-locked.png"/>
+						<img class="icon_locked" src="assets/images/svg/lock.svg"/>
 						<span class="dir_path"></span>
 					</th>
 					<th colspan="1"><button class="refresh_list" title="reload"><img src="assets/images/svg/reload.svg" /></button></th>
@@ -74,7 +75,7 @@ SPDX-License-Identifier: MIT
 			</thead>
 			<tbody id="file_list_error">
 				<tr><td colspan="99">
-					<div id="file_list_error_image">&#9888;&#65039;</div>
+					<div id="file_list_error_image"><img src="assets/images/svg/sign-alert.svg" /></div>
 					<div id="file_list_error_label"></div>
 				</td></tr>
 			</tbody>
@@ -87,7 +88,7 @@ SPDX-License-Identifier: MIT
 					<td class="modified"></td>
 					<td class="buttons">
 						<a class="rename" title="Rename"><img src="assets/images/svg/edit-line.svg" /></a>
-						<a class="delete" title="Delete"><img src="assets/images/svg/delete.svg" /></a>
+						<a class="delete" title="Delete"><img src="assets/images/svg/trash-can.svg" /></a>
 						<a href="" target="_blank" class="edit" title="Edit/View">
 							<span class="pencil"><img src="assets/images/svg/edit-file.svg" /></span>
 							<span class="view"><img src="assets/images/svg/file-text.svg" /></span>
@@ -104,7 +105,7 @@ SPDX-License-Identifier: MIT
 			<button type="submit" id="upload">Upload</button>
 		</group>
 		<group>
-			+📁&nbsp;<input type="text" placeholder="New Directory" id="name" />
+			<img class="mkdir_icon" src="assets/images/svg/folder-plus.svg" /> <input type="text" placeholder="New Directory" id="name" />
 			<button type="submit" id="mkdir">Create Directory</button>
 		</group>
 		<group class="install_buttons">

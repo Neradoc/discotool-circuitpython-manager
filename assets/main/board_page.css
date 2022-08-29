@@ -28,6 +28,8 @@ SPDX-License-Identifier: MIT
 	--contrast-color: #444;
 	--body-background: white;
 	--body-color: black;
+	--svg-border: 1px;
+	--svg-glow: none;
 }
 @media (prefers-color-scheme: dark) {
 	:root {
@@ -41,6 +43,8 @@ SPDX-License-Identifier: MIT
 		--contrast-color: #CCC;
 		--body-background: #15141a;
 		--body-color: white;
+		--svg-border: 0.5px;
+		--svg-glow: drop-shadow(var(--svg-border) 0 0 antiquewhite) drop-shadow(calc(-1 * var(--svg-border)) 0 0 antiquewhite) drop-shadow(0 var(--svg-border) 0 antiquewhite) drop-shadow(0 calc(-1 * var(--svg-border)) 0 antiquewhite);
 	}
 }
 
@@ -97,8 +101,11 @@ body.workflow_type_web div.web_workflow { display: block; }
 	top: 0px;
 	left: calc(50% - 24px);
 }
-.board_locked .icon_locked {
-	display: auto;
+.board_locked #top_title .icon_locked {
+	display: block;
+}
+.icon_locked {
+	filter: var(--svg-glow);
 }
 h3 {
 	padding: 0px;
@@ -209,6 +216,10 @@ tr.even { background: var(--color-pair0); }
 tr.odd { background: var(--color-pair1); }
 
 #file_list td.type { text-align: center; }
+#file_list td.type img {
+	height: 24px;
+	filter: var(--svg-glow);
+}
 #file_list td.size { text-align: right; }
 #file_list td.path {
 	text-align: left;
@@ -239,15 +250,19 @@ tr.odd { background: var(--color-pair1); }
 	font: inherit;
 	line-height: inherit;
 	display: inline-block;
-	height: 26px;
-	width: 26px;
+	height: 25px;
+	width: 25px;
 	vertical-align: middle;
 	background: var(--contrast-clear);
-	border: 1px solid black;
+	/* border: 1px solid black; */
 	border-radius: 4px;
-	padding: 0px;
+	padding: 1px;
 	margin: 0px;
 	text-align: center;
+}
+#file_list .refresh_list {
+	border: none;
+	background: transparent;
 }
 #file_list button img,
 #file_list a img {
@@ -281,6 +296,10 @@ commands group {
 	border-radius: 8px;
 	background: var(--color-pair1);
 }
+commands .mkdir_icon {
+	height: 24px;
+	float: left;
+}
 #file_list_list.loading {
 	opacity: 0.30;
 }
@@ -298,7 +317,14 @@ commands group {
 #file_list_error_image {
 	font-size: 500%;
 }
+#file_list_error_image img {
+	display: block;
+	margin: -10px auto -28px;
+	height: 200px;
+	filter: var(--svg-glow);
+}
 #file_list_error_label {
+	padding: 2px 2px 12px;
 }
 
 #circup_page {
