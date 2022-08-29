@@ -149,6 +149,28 @@ class USBWorkflow extends Workflow {
 			return new WorkflowResponse(false, null);
 		}
 	}
+	async rename_file(from_path, to_path) {
+		try {
+			const from_full_path = path.normalize(path.join(this.root, from_path))
+			const to_full_path = path.normalize(path.join(this.root, to_path))
+			if(from_full_path == to_full_path) {
+				return new WorkflowResponse(true, null, 204, "No changes needed.")
+			}
+			const paths_valid = (
+				from_full_path.startsWith(this.root)
+				&& to_full_path.startsWith(this.root)
+			)
+			if(!paths_valid) {
+				return new WorkflowResponse(false, null, 500, "Path outside of the target drive.");
+			}
+			await fsx.move(from_full_path, to_full_path);
+			return new WorkflowResponse(true, null);
+		} catch(e) {
+			console.log(e)
+			return new WorkflowResponse(false, null);
+		}
+		return new WorkflowResponse(false, null, 500, "ERROR");
+	}
 
 	//##############################################################
 
@@ -213,7 +235,7 @@ class USBWorkflow extends Workflow {
 		}
 		return null;
 	}
-	icon = "💾"
+	icon = "&#128190;"
 	type = "usb"
 	supports_credentials = false
 	static available = (path !== undefined)

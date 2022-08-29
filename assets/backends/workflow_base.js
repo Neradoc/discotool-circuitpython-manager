@@ -62,6 +62,10 @@ class Workflow {
 		console.log("Error: Cannot write to the drive");
 		return new WorkflowResponse(false, null, 409, "ERROR");
 	}
+	async rename_file(from_path, to_path) {
+		console.log("Error: Cannot write to the drive");
+		return new WorkflowResponse(false, null, 409, "ERROR");
+	}
 	api_url(file_path) {
 		return new URL(`file://${file_path}`);
 	}

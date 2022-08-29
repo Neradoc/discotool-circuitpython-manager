@@ -55,7 +55,6 @@ function open_outside_a(e) {
 */
 
 function rename_dialog_close() {
-	refresh_list()
 	$("#rename_dialog").data("path", "")
 	$("#rename_dialog").removeClass("popup_dialog")
 	$("body").removeClass("popup_dialog")
@@ -63,67 +62,65 @@ function rename_dialog_close() {
 function rename_dialog_open(e) {
 	const target = e.currentTarget
 	var path = $(target).data("path")
-	console.log("rename", path)
 	$("#rename_dialog").data("path", path)
 	// TODO: filter path for html ?
+	$("#rename_dialog .error").hide().html("")
 	$("#rename_dialog .ok_button").prop("disabled", false)
 	$("#rename_dialog .cancel_button").prop("disabled", false)
 	$("#rename_dialog .original_name").val(path)
 	$("#rename_dialog .new_name").val(path)
 	$("#rename_dialog").addClass("popup_dialog")
 	$("body").addClass("popup_dialog")
+	$("#rename_dialog .new_name").focus()
 	return false
 }
 async function setup_rename_dialog() {
 	$("#rename_dialog .ok_button").on("click", () => {
 		$("#rename_dialog .ok_button").prop("disabled", true)
 		$("#rename_dialog .cancel_button").prop("disabled", true)
-		var from_path = $("#rename_dialog").data("path")
-		var new_path = $("#rename_dialog .new_name").val()
-		// sanitize the new path
-		// try doing the rename command
-		common.board_control.rename(from_path, to_path).after((res) => {
-			if(res.ok) {
+		try {
+			var from_path = $("#rename_dialog").data("path")
+			var to_path = $("#rename_dialog .new_name").val()
+			// TODO: sanitize the new path ?
+			// try doing the rename command
+			console.log(`Rename “${from_path}” “${to_path}”`)
+			common.board_control.rename_file(from_path, to_path).then((res) => {
 				$("#rename_dialog .ok_button").prop("disabled", false)
 				$("#rename_dialog .cancel_button").prop("disabled", false)
-				rename_dialog_close()
-			} else {
-				// TODO: there was an error doing the thing
-			}
-		});
+				if(res.ok) {
+					rename_dialog_close()
+					refresh_list()
+				} else {
+					// TODO: more info on the error
+					$("#rename_dialog .error").show().html("Operation failed")
+				}
+			})
+		} catch(e) {
+			console.log(e)
+		} finally {
+			$("#rename_dialog .ok_button").prop("disabled", false)
+			$("#rename_dialog .cancel_button").prop("disabled", false)
+		}
 	})
 	$("#rename_dialog .cancel_button").on("click", () => {
 		rename_dialog_close()
 	})
-	$("#rename_dialog #new_name").on("keypress", (e) => {
+	$("#rename_dialog .new_name").on("keydown", (e) => {
 		if(e.which == 13) {
-			$("#password_dialog .ok_button").click()
+			$("#rename_dialog .ok_button").click()
 			return false
 		}
 		return true
 	})
+	$(document).on("keydown", (e) => {
+		if(e.which == 27 && $("body").is(".popup_dialog")) {
+			rename_dialog_close()
+			password_dialog(false)
+			return false
+		}
+		return true;
+	});
 }
-
-async function rename(e) {
-    let fn = new URL(e.target.value);
-    var new_fn = prompt("Rename to ", fn.pathname.substr(3));
-    if (new_fn === null) {
-        return;
-    }
-    let new_uri = new URL("/fs" + new_fn, fn);
-    const response = await fetch(e.target.value,
-        {
-            method: "MOVE",
-            headers: {
-                'X-Destination': new_uri.pathname,
-            },
-        }
-    )
-    if (response.ok) {
-        refresh_list();
-    }
-}
-
 
 /*****************************************************************
 * Password dialog
@@ -135,7 +132,6 @@ async function password_dialog(open=true) {
 		$("body").addClass("popup_dialog")
 		$("#password").data("backup", $("#password").val())
 	} else {
-		await refresh_list()
 		$("#password_dialog").removeClass("popup_dialog")
 		$("body").removeClass("popup_dialog")
 		$("#password").data("backup", "")
@@ -154,6 +150,7 @@ async function setup_password_dialog() {
 			if(serial_num) delete localStorage[password_key]
 		}
 		password_dialog(false)
+		refresh_list()
 	})
 	$("#password_dialog .cancel_button").on("click", () => {
 		$("#password").val($("#password").data("backup"))
@@ -163,6 +160,7 @@ async function setup_password_dialog() {
 			$("#password_dialog #remember_password").prop("checked", false)
 		}
 		password_dialog(false)
+		refresh_list()
 	})
 	$("#password_dialog #password").on("keypress", (e) => {
 		if(e.which == 13) {
@@ -247,7 +245,6 @@ async function refresh_list() {
 			$('#file_list_body tr').remove()
 			const message = `Directory listing failed`
 			var error_message = await get_error_message(response, message)
-			console.log(error_message)
 			$("#file_list_error_label").html(error_message)
 			//
 			if(response.status == 401) {
@@ -391,7 +388,6 @@ async function refresh_list() {
 		$("#file_list_body").append(new_children)
 		$('#file_list_loading_image').hide()
 	} catch(e) {
-		console.log("Directory")
 		console.log(e)
 	} finally {
 		refreshing = false
@@ -419,13 +415,11 @@ async function mkdir(e) {
 */
 
 async function upload(e) {
-	console.log("upload")
+	console.log("Upload")
 	for (const file of files.files) {
-		console.log(file_path, file)
 		var response = await common.board_control.upload_file(current_path + file.name, file)
 		if (response.ok) {
 			refresh_list()
-			console.log(files)
 			files.value = ""
 			upload_button.disabled = true
 		}
@@ -438,7 +432,7 @@ async function upload(e) {
 
 async function del(e) {
 	var path = $(this).data("path")
-	console.log("delete", path)
+	console.log("Delete", path)
 	var prompt = `Delete ${path}`
 	if (path.endsWith("/")) {
 		prompt += " and all of its contents?"
@@ -446,7 +440,6 @@ async function del(e) {
 		prompt += "?"
 	}
 	if (confirm(prompt)) {
-		console.log(path)
 		var response = await common.board_control.delete_file(path)
 		if (response.ok) {
 			refresh_list()

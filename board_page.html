@@ -193,11 +193,14 @@ SPDX-License-Identifier: MIT
 		<button class="ok_button">OK</button>
 	</div>
 	<div id="rename_dialog">
-		Renaming a file/directory.<br/>
-		<pre>From: </pre><input name="original_name" class="original_name" type="text" disabled/><br/>
-		<pre>  To: </pre><input name="new_name" class="new_name" type="text" placeholder=""/><br/>
-		<button class="cancel_button">Cancel</button>
-		<button class="ok_button">OK</button>
+		<p>Renaming a file/directory.</p>
+		<p><label>From: </label><input name="original_name" class="original_name" type="text" disabled/></p>
+		<p><label>  To: </label><input name="new_name" class="new_name" type="text" placeholder=""/></p>
+		<p>
+			<button class="cancel_button">Cancel</button>
+			<button class="ok_button">OK</button>
+		</p>
+		<p class="error"></p>
 	</div>
 </body>
 </html>

@@ -521,6 +521,11 @@ commands .mkdir_icon {
 	border-radius: 8px;
 	padding: 8px 16px;
 }
+#rename_dialog label {
+	display: inline-block;
+	width: 4em;
+	text-align: right;
+}
 #rename_dialog .cancel_button {
 	display: block;
 	float: left;
@@ -528,4 +533,8 @@ commands .mkdir_icon {
 #rename_dialog .ok_button {
 	display: block;
 	float: right;
+}
+#rename_dialog .error {
+	color: red;
+	padding: 0px 8px;
 }

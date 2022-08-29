@@ -129,7 +129,6 @@ class WebWorkflow extends Workflow {
 		});
 		var file_data = await file.async("blob");
 		const file_url = new URL("/fs" + upload_path, this.workflow_url_base);
-		console.log("UPLOAD", file_url.href);
 		const response = await fetch(file_url,
 			{
 				method: "PUT",
@@ -165,6 +164,19 @@ class WebWorkflow extends Workflow {
 			{
 				method: "DELETE",
 				headers: this.headers(),
+			}
+		)
+		return new WebResponse(response, "");
+	}
+	async rename_file(from_path, to_path) {
+		const target_url = this.api_url(from_path)
+		const destination = this.api_url(to_path).pathname
+		const response = await fetch(target_url,
+			{
+				method: "MOVE",
+				headers: this.headers({
+					'X-Destination': destination,
+				}),
 			}
 		)
 		return new WebResponse(response, "");
@@ -236,7 +248,7 @@ class WebWorkflow extends Workflow {
 			return []
 		}
 	}
-	icon = "🌐"
+	icon = "&#127760;"
 	type = "web"
 	supports_credentials = true
 	static available = true
