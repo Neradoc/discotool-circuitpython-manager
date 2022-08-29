@@ -160,7 +160,8 @@ class WebWorkflow extends Workflow {
 		return new WorkflowResponse(true, null);
 	}
 	async delete_file(file_path) {
-		const response = await fetch(file_path,
+		const target_url = this.api_url(file_path)
+		const response = await fetch(target_url,
 			{
 				method: "DELETE",
 				headers: this.headers(),
