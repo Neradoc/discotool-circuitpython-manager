@@ -125,7 +125,7 @@ class WebWorkflow extends Workflow {
 	async upload_file(upload_path, file_data) {
 		var heads = this.headers({
 			'Content-Type': 'application/octet-stream',
-			// 'X-Timestamp': file.lastModified,
+			'X-Timestamp': Date.now() * 1000, // file.lastModified,
 		});
 		const file_url = new URL("/fs" + upload_path, this.workflow_url_base);
 		const response = await fetch(file_url,
