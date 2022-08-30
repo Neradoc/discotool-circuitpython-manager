@@ -122,12 +122,11 @@ class WebWorkflow extends Workflow {
 			return new WebResponse(response, [], false);
 		}
 	}
-	async upload_file(upload_path, file) {
+	async upload_file(upload_path, file_data) {
 		var heads = this.headers({
 			'Content-Type': 'application/octet-stream',
-			'X-Timestamp': file.lastModified,
+			// 'X-Timestamp': file.lastModified,
 		});
-		var file_data = await file.async("blob");
 		const file_url = new URL("/fs" + upload_path, this.workflow_url_base);
 		const response = await fetch(file_url,
 			{
