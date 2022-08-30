@@ -4,7 +4,9 @@
   "description": "A Library manager for Circuitpython and more",
   "main": "main.cjs",
   "scripts": {
-    "start": "electron ."
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "repository": "https://github.com/Neradoc/circuitpython-web-packager",
   "keywords": [
@@ -14,17 +16,49 @@
   "author": "Neradoc",
   "license": "MIT",
   "devDependencies": {
+    "@electron-forge/cli": "^6.0.0-beta.65",
+    "@electron-forge/maker-deb": "^6.0.0-beta.65",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.65",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.65",
+    "@electron-forge/maker-zip": "^6.0.0-beta.65",
     "electron": "^19.0.10",
-    "electron-packager": "^15.5.1",
     "electron-rebuild": "^3.2.9"
   },
   "type": "module",
   "dependencies": {
     "drivelist": "^11.0.0",
     "electron-log": "^4.4.8",
+    "electron-squirrel-startup": "^1.0.0",
     "fs": "^0.0.1-security",
     "fs-extra": "^10.1.0",
     "multicast-dns": "^7.2.5",
     "path": "^0.12.7"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {},
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "circup_electron_app"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ]
+    }
   }
 }
