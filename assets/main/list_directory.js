@@ -485,13 +485,12 @@ async function setup_directory() {
 	let mkdir_button = document.getElementById("mkdir")
 	mkdir_button.onclick = mkdir
 
-	let upload_button = document.getElementById("upload")
-	upload_button.onclick = upload
-
-	upload_button.disabled = files.files.length == 0
+	let upload_button = $("#upload_button")
+	upload_button.on("click", upload)
+	upload_button.prop("disabled", files.files.length == 0)
 
 	files.onchange = () => {
-		upload_button.disabled = files.files.length == 0
+		upload_button.prop("disabled", files.files.length == 0)
 	}
 
 	mkdir_button.disabled = new_directory_name.value.length == 0

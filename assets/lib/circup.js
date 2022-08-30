@@ -41,7 +41,8 @@ class Circup {
 			for(var file of module_files) {
 				var upload_path = file.name.replace(/^[^\/]+\//, "/");
 				// var upload_path = file.name.replace(/^.+?\/lib\//, "/lib/");
-				await this.workflow.upload_file(upload_path, file);
+				const file_content = await file.async("blob");
+				await this.workflow.upload_file(upload_path, file_content);
 			}
 		}
 	}
