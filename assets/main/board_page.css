@@ -17,6 +17,7 @@ body.workflow_type_web div.web_workflow { display: block; }
 {
 	position: relative;
 	vertical-align: sub;
+	filter: var(--svg-glow);
 }
 #top_title .icon img {
 	display: none;
@@ -142,11 +143,21 @@ tr:nth-child(odd) { background: var(--color-pair1); }
 tr.even { background: var(--color-pair0); }
 tr.odd { background: var(--color-pair1); }
 
-#file_list td.type { text-align: center; }
+#file_list thead a { display: inline-block; }
+#file_list .go_back_up {
+	display: none;
+/* 
+	background: var(--contrast-clear);
+	border-radius: 4px;
+	padding: 0px 4px 0px 2px;
+ */
+}
+#file_list .go_back_up img,
 #file_list td.type img {
 	height: 24px;
 	filter: var(--svg-glow);
 }
+#file_list td.type { text-align: center; }
 #file_list td.size { text-align: right; }
 #file_list td.path {
 	text-align: left;

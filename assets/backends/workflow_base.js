@@ -101,7 +101,10 @@ class Workflow {
 			.map((item) => item.replace(/\.m?py$/,""));
 		return lib_list;
 	}
-	icon = "🐍"
+	async get_identifier() {
+		return await this.serial_num()
+	}
+	icon = "&#128013;"
 	type = "base"
 	supports_credentials = false
 	static available = false

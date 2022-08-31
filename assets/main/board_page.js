@@ -292,9 +292,10 @@ async function init_page() {
 		$("body").addClass("board_locked")
 	}
 	// load some data into the page
+	const serial_num = await board_control.serial_num()
 	$("#circup_page .title .circuitpy_version").html(await board_control.cp_version());
-	$("#circup_page .title .serial_number").html(await board_control.serial_num());
-	$("#welcome_page .serial_number").html(await board_control.serial_num());
+	$("#circup_page .title .serial_number").html(serial_num);
+	$("#welcome_page .serial_number").html(serial_num);
 	// circup loading
 	$(".update_all, .auto_install").prop("disabled", true)
 	$("#circup_page .loading").show()
@@ -309,8 +310,10 @@ async function init_page() {
 	// board inits
 	var prom2 = (async () => {
 		// *** title
+		const name = await board_control.get_identifier()
 		$(`#top_title .icon_${workflow_type}`).show()
 		$(".board_name").html(vinfo.board_name)
+		$("title").html(`${vinfo.board_name} - ${name}`)
 		$(".circuitpy_version").html(vinfo.version)
 		$("#version_info_subtitle .subtitle_text").show()
 		// *** file list

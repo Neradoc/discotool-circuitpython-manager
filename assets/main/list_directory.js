@@ -257,23 +257,13 @@ async function refresh_list() {
 		var new_children = []
 		var template = $('#file_list_template')
 
+		var link = $("#file_list .go_back_up")
 		if (current_path != "/") {
-			var clone = template.clone()
-			clone.prop("id", "")
-			var td = clone.find("td")
-			td[0].innerHTML = _icon("arrow-bigup")
-			var path_link = clone.find("a.path")
-			let parent = new URL("..", "file://" + current_path)
-			var file_path = parent.pathname
-			path_link.prop("href", tools.url_here({"path": parent.pathname}))
-			path_link.addClass("files_list_dir")
-			path_link.data("path", file_path)
-			path_link.html("..")
-			path_link.prop("target", "")
-			path_link.on("click", load_directory)
-			// Remove the delete button
-			clone.find(".buttons").html("")
-			new_children.push(clone)
+			const parent = new URL("..", "file://" + current_path)
+			link.prop("href", tools.url_here({"path": parent.pathname}))
+			link.show()
+		} else {
+			link.hide()
 		}
 
 		dir_files_list.sort((a,b) => {

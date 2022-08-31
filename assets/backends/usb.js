@@ -170,9 +170,6 @@ class USBWorkflow extends Workflow {
 		}
 		return new WorkflowResponse(false, null, 500, "ERROR");
 	}
-
-	//##############################################################
-
 	api_url(file_path) {
 		var full_path = path.join(this.root, file_path);
 		return new URL(`file://${full_path}`);
@@ -184,6 +181,12 @@ class USBWorkflow extends Workflow {
 	repl_url() {
 		return "";
 	}
+	async get_identifier() {
+		return this.root
+	}
+
+	//##############################################################
+
 	static async find_devices() {
 		var drives = await drivelist.list();
 		var devices_list = [];

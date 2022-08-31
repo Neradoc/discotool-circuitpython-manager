@@ -192,6 +192,9 @@ class WebWorkflow extends Workflow {
 	repl_url() {
 		return new URL("/cp/serial/", this.workflow_url_base);
 	}
+	async get_identifier() {
+		return (await this.device_info()).hostname + ".local"
+	}
 
 	//##############################################################
 
