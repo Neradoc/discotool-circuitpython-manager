@@ -96,7 +96,7 @@ async function detect_usb() {
 				link.prop("title", drive_path)
 				var board_info = all_dev_line.find(".board_info")
 				board_info.html(link.href)
-				link.show()
+				link.addClass("show")
 				if(await wf.is_editable()) {
 					all_dev_line.addClass("usb_editable")
 					all_dev_line.removeClass("usb_locked")
@@ -172,7 +172,7 @@ async function detect_web() {
 			link.prop("title", device.ip)
 			var board_info = all_dev_line.find(".board_info")
 			board_info.html(link.href)
-			link.show()
+			link.addClass("show")
 			if(await wf.is_editable()) {
 				all_dev_line.addClass("web_editable")
 				all_dev_line.removeClass("web_locked")

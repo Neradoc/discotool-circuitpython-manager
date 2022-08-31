@@ -4,32 +4,47 @@ const path = require('path')
 
 // change the theme manually ?
 // nativeTheme.themeSource = "light"
+COLUMN_MODE = true
 
-const browser_window_options = {
-	width: 820,
-	height: 800,
-	minWidth: 600,
-	minHeight: 600,
-	webPreferences: {
-		preload: path.join(__dirname, 'preload.cjs'),
-		nodeIntegration: true,
-		nodeIntegrationInWorker: true,
-		contextIsolation: false,
+function browser_window_options(changes={}, other_changes={}) {
+	var data = {
+		width: 820,
+		height: 800,
+		minWidth: 600,
+		minHeight: 600,
+		webPreferences: {
+			// Open all the windows with preload.cjs
+			preload: path.join(__dirname, 'preload.cjs'),
+			nodeIntegration: true,
+			nodeIntegrationInWorker: true,
+			contextIsolation: false,
+		}
 	}
+	for(key in changes) {
+		data[key] = changes[key]
+	}
+	for(key in other_changes) {
+		data.webPreferences[key] = other_changes[key]
+	}
+	return data
 }
 
 function createWindow () {
+	var settings = {}
+	if(COLUMN_MODE) {
+		settings = { width: 350, height: 800, minWidth: 300, minHeight: 400 }
+	}
+
 	// Create the browser window.
-	const mainWindow = new BrowserWindow(browser_window_options)
+	const mainWindow = new BrowserWindow(browser_window_options(settings))
 
 	// and load the index.html of the app.
 	mainWindow.loadFile('index.html')
 
-	// Open all the windows with preload.cjs ?
 	mainWindow.webContents.setWindowOpenHandler((details) => {
 		return {
 			action: 'allow',
-			overrideBrowserWindowOptions: browser_window_options
+			overrideBrowserWindowOptions: browser_window_options()
 		}
 	})
 
@@ -49,7 +64,7 @@ function createWindow () {
 const board_page = "board_page.html"
 
 function openBoard (url) {
-	const new_window = new BrowserWindow(browser_window_options)
+	const new_window = new BrowserWindow(browser_window_options())
 	new_window.loadFile(board_page, {
 		query: { "dev": url }
 	})
@@ -58,7 +73,7 @@ function openBoard (url) {
 	new_window.webContents.setWindowOpenHandler((details) => {
 		return {
 			action: 'allow',
-			overrideBrowserWindowOptions: browser_window_options
+			overrideBrowserWindowOptions: browser_window_options()
 		}
 	})
 }

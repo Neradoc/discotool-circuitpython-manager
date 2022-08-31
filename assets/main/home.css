@@ -22,6 +22,24 @@ SPDX-License-Identifier: MIT
 	}
 }
 
+/* 
+body {
+	overflow: hidden;
+}
+#content {
+	width: 100vw;
+	height: 100vh;
+	overflow-y: scroll;
+	scrollbar-color: var(--body-background) var(--body-color);
+}
+#content::-webkit-scrollbar-track {
+	background-color: green var(--body-background);
+}
+#content::-webkit-scrollbar-thumb {
+	background-color: red; var(--body-color);
+}
+ */
+
 h3 { display:none; }
 button, input {
 	font: inherit;
@@ -118,6 +136,9 @@ button, input {
 	text-align: center;
 	margin-left: 4px;
 	padding: 4px;
+}
+.board_line .board_link.show {
+	display: inline;
 }
 .board_line .board_link img {
 	height:32px;

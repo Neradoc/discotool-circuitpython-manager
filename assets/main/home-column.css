@@ -1,0 +1,50 @@
+/*
+SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
+SPDX-License-Identifier: MIT
+*/
+
+#home_actions {
+	display: block;
+	padding: 0px;
+	margin: 0px;
+	background: transparent;
+	border: none;
+}
+#home_actions > div {
+	margin: 2px;
+	padding: 4px 8px;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+}
+#prompt_refresh .phrase { display: none; }
+#prompt_refresh .phrase_column { display: inline; }
+#prompt_refresh {
+	height: 3em;
+}
+#reload_boards {
+	position: absolute;
+	right: 8px;
+	top: auto;
+	bottom: 4px;
+}
+
+#all_boards_list > div {
+	padding: 2px;
+}
+.board_line {
+	display: block;
+}
+.board_line .board_link {
+	position: relative;
+	text-align: center;
+	margin: 0px;
+	padding: 4px;
+}
+.board_line .board_link.show {
+	display: block;
+}
+.board_line .board_name_div {
+	text-align: center;
+	padding: 8px 4px;
+}
