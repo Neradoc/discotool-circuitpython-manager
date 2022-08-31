@@ -36,7 +36,10 @@
   },
   "config": {
     "forge": {
-      "packagerConfig": {},
+      "packagerConfig": {
+        "asar": false,
+        "ignore": "^/_.*"
+      },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
