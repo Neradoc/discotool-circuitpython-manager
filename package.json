@@ -4,9 +4,7 @@
   "description": "A Library manager for Circuitpython and more",
   "main": "main.cjs",
   "scripts": {
-    "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make"
+    "start": "electron ."
   },
   "repository": "https://github.com/Neradoc/circuitpython-web-packager",
   "keywords": [
@@ -16,22 +14,12 @@
   "author": "Neradoc",
   "license": "MIT",
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.0-beta.65",
-    "@electron-forge/maker-deb": "^6.0.0-beta.65",
-    "@electron-forge/maker-rpm": "^6.0.0-beta.65",
-    "@electron-forge/maker-squirrel": "^6.0.0-beta.65",
-    "@electron-forge/maker-zip": "^6.0.0-beta.65",
-    "electron": "^19.0.10",
-    "electron-forge": "^5.2.4",
+    "electron": "^20.1.0",
     "electron-rebuild": "^3.2.9"
   },
   "type": "module",
   "dependencies": {
     "drivelist": "^11.0.0",
-    "electron-log": "^4.4.8",
-    "electron-prebuilt-compile": "^8.2.0",
-    "electron-squirrel-startup": "^1.0.0",
-    "fs": "^0.0.1-security",
     "fs-extra": "^10.1.0",
     "multicast-dns": "^7.2.5",
     "node-powershell": "^5.0.1",
