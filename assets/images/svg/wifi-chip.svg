@@ -1,13 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-router" width="44" height="44" viewBox="2 2 20 20" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
   <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
 
-  <g transform="translate(0.5 0.5) scale(1 0.9)">
-    <rect x="3.5" y="13" width="17" height="8" rx="2" fill="#D783FF"/>
+  <g transform="translate(0 -0.5)">
+    <rect x="3.5" y="13" width="17" height="7" rx="2" fill="#D783FF"/>
 
-    <path d="M 2.5 16 l2,0 l0,2 l-2,0 z"
+<!-- 
+    <circle cx="6" cy="15.5" r="1" stroke-width="0" fill="#000"/>
+    <circle cx="9" cy="15.5" r="1" stroke-width="0" fill="#000"/>
+    <path d="M5.5 17.5 a4 4 0 0 0 4 0" stroke-width="0.5" />
+ -->
+    <circle cx="7" cy="17.7" r="0.8" stroke-width="0" fill="#000"/>
+    <circle cx="10" cy="17.7" r="0.8" stroke-width="0" fill="#000"/>
+
+    <path d="M 14 15 l4,0 l0,3.2 l-4,0 z"
+      stroke-width="0.4" stroke="#000" fill="#000"
       stroke-linecap="square" stroke-linejoin="miter" />
-    <line x1="17" y1="17" x2="17" y2="17.01" />
-    <line x1="13" y1="17" x2="13" y2="17.01" />
+
 
     <g transform="translate(0 0)">
       <path d="M 18 13 l 0 -1.5" />
@@ -17,7 +25,7 @@
       <path d="M  6 13 l 0 -1.5" />
     </g>
 
-    <g transform="translate(0 9.5)">
+    <g transform="translate(0 8.5)">
       <path d="M 18 13 l 0 -1.5" />
       <path d="M 15 13 l 0 -1.5" />
       <path d="M 12 13 l 0 -1.5" />
@@ -28,7 +36,7 @@
     <path d="M 15 13 l 0 -4" />
   </g>
 
-  <g transform="translate(2 -0.5) scale(0.9 1)" stroke-width="1">
+  <g transform="translate(1.5 -0.5) scale(0.9 1)" stroke-width="1">
     <path d="M11.75 7.75a4 4 0 0 1 6.5 0" />
     <path d="M8.5 6.5a8 8 0 0 1 13 0" />
   </g>
