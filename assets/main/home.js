@@ -47,6 +47,8 @@ async function insert_line(all_dev_line, name) {
 	if(!added) {
 		$("#all_boards_list").append(all_dev_line)
 	}
+	const num_boards = $(".board_line").length
+	$("#prompt_refresh .board_counter .count").html(`${num_boards}`)
 }
 
 async function detect_usb() {
@@ -213,7 +215,7 @@ async function detect_boards() {
 		clearInterval(update_timer)
 		update_timer_running = false
 	}
-	$("#all_list_load").show()
+	$("#prompt_refresh").addClass("loading")
 	$(".workflow_empy").hide()
 	$(".workflow_loading").show()
 	$(".board_line").remove()
@@ -233,20 +235,20 @@ async function detect_boards() {
 	])
 	await sleep(2)
 	await detect_web()
-	$("#all_list_load").hide()
+	$("#prompt_refresh").removeClass("loading")
 	$(".board_name_load").hide()
 	// no await ?
 	update_timer = setInterval(async () => {
 		try {
 			if(update_timer_running) return false
-			$("#all_list_refresh").show()
+			$("#prompt_refresh").addClass("refresh")
 			await detect_usb()
 			await detect_web()
 			await detect_ble()
 		} catch(e) {
 			console.log(e)
 		}
-		$("#all_list_refresh").hide()
+		$("#prompt_refresh").removeClass("refresh")
 		update_timer_running = false
 	}, 10000)
 }

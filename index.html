@@ -17,7 +17,7 @@ SPDX-License-Identifier: MIT
 	<script src="assets/extlib/jszip.min.js"></script>
 	<script src="assets/main/home.js" defer="true" type="module"></script>
 </head>
-<body>
+<body class="drop_zone">
 <!-- 
 	<header>
 	<h1 id="top_title">Welcome</h1>
@@ -30,13 +30,13 @@ SPDX-License-Identifier: MIT
 			<div id="usb_open_panel" class="usb_workflow">
 				<span>
 				<input id="select_files_input" type="file" webkitdirectory directory/>
-				Drop a drive on the window or:<br/>
+				Drop disk drive here or:<br/>
 				<button id="file_select_button">Open a CIRCUITPY drive</button>
 				</span>
 			</div>
 			<div id="web_open_panel" class="web_workflow">
 				<span>
-				Connect to Web Workflow with IP:<br/>
+				Connect to URL or IP:<br/>
 				<input class="web_input" type="text"/>
 				<button class="web_go">GO</button>
 				</span>
@@ -49,11 +49,9 @@ SPDX-License-Identifier: MIT
 			</div>
 		</div>
 		<div id="prompt_refresh">
-			<span class="phrase">Select a method to connect to a board.</span>
-			<span class="phrase_column">Choose a board.</span>
-			<button id="reload_boards">Refresh List</button>
-			<span id="all_list_load">Loading <img class="small_load_image" src="assets/images/loading_black.gif" /></span>
-			<span id="all_list_refresh">Auto-refresh <img class="small_load_image" src="assets/images/loading_black.gif" /></span>
+			<span class="board_counter"><span class="count">0</span> boards.</span></span>
+			<span class="loading_label"><img class="small_load_image" src="assets/images/loading_black.gif" /></span>
+			<button id="reload_boards">Reload</button>
 		</div>
 		<div id="all_boards_list">
 			<div id="template_board_all" class="template_board">
@@ -62,14 +60,14 @@ SPDX-License-Identifier: MIT
 					<!-- <img class="board_name_load small_load_image" src="assets/images/loading_black.gif" /> -->
 				</div>
 				<a class="board_link link_usb" display="none" href="BAD_URL" target="_blank">
-					<img src="assets/images/icon-usb.png"/>
-					<img class="locked" src="assets/images/icon-locked.png"/>
+					<img src="assets/images/svg/usb-dongle.svg"/>
+					<img class="locked" src="assets/images/svg/lock.svg"/>
 					<!-- <img class="editable" src="assets/images/icon-editable.png"/> -->
 					<span class="name">DRIVE NAME</span>
 				</a>
 				<a class="board_link link_web" display="none" href="?dev=http://circuitpython.local" target="_blank">
-					<img src="assets/images/icon-web.png"/>
-					<img class="locked" src="assets/images/icon-locked.png"/>
+					<img src="assets/images/svg/wifi-chip.svg"/>
+					<img class="locked" src="assets/images/svg/lock.svg"/>
 					<!-- <img class="editable" src="assets/images/icon-editable.png"/> -->
 					<span class="name">LOAD WEB</span>
 				</a>
@@ -94,6 +92,11 @@ SPDX-License-Identifier: MIT
 		<div id="usb_boards_list_empty" class="workflow_empy">No USB drive detected.</div>
 		<div id="web_boards_list_empty" class="workflow_empy">No Wifi board detected.</div>
 		<div id="ble_boards_list_empty" class="workflow_empy">No BLE board detected.</div>
+	</div>
+	<div id="blanket"></div>
+	<div id="blanket_img">
+		<img src="assets/images/svg/download-bucket.svg" /><br/>
+		Drop drive to open
 	</div>
 </content>
 </body>

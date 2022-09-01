@@ -5,6 +5,18 @@ SPDX-License-Identifier: MIT
 const fs = window.moduleFs;
 const fss = window.moduleFss;
 
+var hoverer = null
+function update_hovered() {
+	if(hoverer !== null) {
+		clearTimeout(hoverer)
+		hoverer = null
+	}
+	$(".drop_zone").addClass("being_hovered");
+	hoverer = setTimeout(() => {
+		$(".drop_zone").removeClass("being_hovered");
+	}, 1000)
+}
+
 async function look_at_files(files_dropped) {
 	if(files_dropped.length > 0) {
 		var file  = files_dropped[0]
@@ -37,7 +49,6 @@ $(document).on("click", "#file_select_button", (e) => {
 	})
 });
 
-// $(document).on("drop", ".drop_zone"
 $(window).on("drop", (event) => {
 	event.stopPropagation();
 	event.preventDefault();
@@ -66,7 +77,7 @@ $(window).on("drop", (event) => {
 	return false
 });
 $(window).on("dragenter", (event) => {
-	$(".drop_zone").addClass("being_hovered");
+	update_hovered();
 	event.stopPropagation();
 	event.preventDefault();
 });
@@ -76,6 +87,7 @@ $(window).on("dragexit", (event) => {
 	event.preventDefault();
 });
 $(window).on("dragover", (event) => {
+	update_hovered()
 	event.stopPropagation();
 	event.preventDefault();
 });

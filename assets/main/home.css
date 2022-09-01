@@ -64,15 +64,32 @@ button, input {
 #prompt_refresh {
 	position: relative;
 	background: var(--input-background);
+	height: 1.25em;
 }
-#all_list_refresh { display: none; }
-#all_list_load, #all_list_refresh, #reload_boards {
-	margin: 0px 4px;
+#prompt_refresh .board_counter {
+	float: left;
+}
+#prompt_refresh .loading_label {
+	display: none;
+}
+#prompt_refresh.loading .loading_label {
+	float: left;
+	display: inline-block;
+	margin-left: 10px;
 }
 #reload_boards {
 	position: absolute;
 	right: 8px;
 	top: 4px;
+}
+#prompt_refresh.loading #reload_boards,
+#prompt_refresh.refresh #reload_boards {
+	opacity: 0.8;
+}
+#prompt_refresh .small_load_image {
+	display: inline-block;
+	height: 22px;
+
 }
 
 #home_actions {
@@ -143,6 +160,7 @@ button, input {
 .board_line .board_link img {
 	height:32px;
 	vertical-align: bottom;
+	filter: var(--svg-glow);
 }
 .board_line .board_link img.locked {
 	position: absolute;
@@ -200,4 +218,38 @@ div#all_boards_list {
 }
 #all_boards_list > div:nth-child(odd) {
 	background: var(--color-pair1);
+}
+
+#blanket_img, #blanket { display: none; }
+.drop_zone.being_hovered #blanket {
+	display: block;
+	position: fixed;
+	z-index: 100;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	background: black;
+	opacity: 0.5;
+}
+.drop_zone.being_hovered #blanket_img {
+	--border: 4px;
+	text-align: center;
+	display: block;
+	position: absolute;
+	z-index: 200;
+	top: 30%;
+	left: 5%;
+	width: 90%;
+	/* background: rgba(0,0,0,0.8); */
+	padding: 16px 4px;
+	font-size: 200%;
+	filter: drop-shadow(var(--border) 0 0 black)
+			drop-shadow(calc(-1 * var(--border)) 0 0 black)
+			drop-shadow(0 var(--border) 0 black)
+			drop-shadow(0 calc(-1 * var(--border)) 0 black);
+}
+.drop_zone.being_hovered #blanket_img img {
+	height: 96px;
+	filter: var(--svg-glow);
 }

@@ -18,11 +18,11 @@ SPDX-License-Identifier: MIT
 		align-items: center;
 		text-align: center;
 	}
+	#prompt_refresh {
+		display: block;
+	}
 	#prompt_refresh .phrase { display: none; }
 	#prompt_refresh .phrase_column { display: inline; }
-	#prompt_refresh {
-		height: 3em;
-	}
 	#reload_boards {
 		position: absolute;
 		right: 8px;
@@ -31,7 +31,7 @@ SPDX-License-Identifier: MIT
 	}
 
 	#all_boards_list > div {
-		padding: 2px;
+		padding: 2px 12px;
 	}
 	.board_line {
 		display: block;
