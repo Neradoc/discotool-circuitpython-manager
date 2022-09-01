@@ -33,7 +33,11 @@ async function start_circup() {
 		cpver = await board_control.cp_version()
 		// 2 - setup the library bundle with the version from the board
 		// init circup with the CP version
-		common.set_library_bundle(new LibraryBundle(BUNDLE_ACCESS, cpver));
+		if(common.is_electron) {
+			common.set_library_bundle(new LibraryBundle(null, cpver[0]));
+		} else {
+			common.set_library_bundle(new LibraryBundle(BUNDLE_ACCESS, cpver[0]));
+		}
 		await common.library_bundle.setup_the_modules_list();
 		// 3 - setup the circup updates manager for the actions
 		circup = new Circup(common.library_bundle, board_control)

@@ -7,6 +7,8 @@ import {WORKFLOW_USERNAME, WORKFLOW_PASSWORD} from "../../config.js";
 import { WebWorkflow } from "../backends/web.js";
 import { USBWorkflow } from "../backends/usb.js";
 
+export const is_electron = window && window.process && window.process.type == "renderer"
+
 export var library_bundle = null;
 export var board_control = null
 export async function start() {

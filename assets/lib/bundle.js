@@ -10,7 +10,8 @@ const AccessMode = {
 	LINK: 3,
 };
 class LibraryBundle {
-	constructor(bundle_access=null, cpvcer=7) {
+	constructor(bundle_access=null, cpver=7) {
+		console.log(cpver)
 		if(bundle_access == null) {
 			this.BUNDLE_ACCESS = AccessMode.GITHUB;
 			this.BUNDLE_URL = "https://github.com/";
@@ -38,7 +39,7 @@ class LibraryBundle {
 			"Neradoc/Circuitpython_Keyboard_Layouts",
 		];
 		// circuitpython version here for URLs (7.x)
-		this.cp_version_url = `${cpvcer}.x`;
+		this.cp_version_url = `${cpver}.x`;
 		// full modules list from the github bundles
 		this.all_the_modules = null;
 		// the circuitpython bundles from github
