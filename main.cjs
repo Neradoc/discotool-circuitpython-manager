@@ -61,7 +61,7 @@ function createWindow () {
 	})
 }
 
-const board_page = "board_page.html"
+const board_page = "html/board-template.html"
 
 function openBoard (url) {
 	const new_window = new BrowserWindow(browser_window_options())
