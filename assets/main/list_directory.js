@@ -48,138 +48,6 @@ function open_outside_a(e) {
 }
 
 /*****************************************************************
-* File rename dialog
-*/
-
-function rename_dialog_close() {
-	$("#rename_dialog").data("path", "")
-	$("#rename_dialog").removeClass("popup_dialog")
-	$("body").removeClass("popup_dialog")
-}
-function rename_dialog_open(e) {
-	const target = e.currentTarget
-	var path = $(target).data("path")
-	$("#rename_dialog").data("path", path)
-	// TODO: filter path for html ?
-	$("#rename_dialog .error").hide().html("")
-	$("#rename_dialog .ok_button").prop("disabled", false)
-	$("#rename_dialog .cancel_button").prop("disabled", false)
-	$("#rename_dialog .original_name").val(path)
-	$("#rename_dialog .new_name").val(path)
-	$("#rename_dialog").addClass("popup_dialog")
-	$("body").addClass("popup_dialog")
-	$("#rename_dialog .new_name").focus()
-	return false
-}
-async function setup_rename_dialog() {
-	$("#rename_dialog .ok_button").on("click", () => {
-		$("#rename_dialog .ok_button").prop("disabled", true)
-		$("#rename_dialog .cancel_button").prop("disabled", true)
-		try {
-			var from_path = $("#rename_dialog").data("path")
-			var to_path = $("#rename_dialog .new_name").val()
-			// TODO: sanitize the new path ?
-			// try doing the rename command
-			console.log(`Rename “${from_path}” “${to_path}”`)
-			common.board_control.rename_file(from_path, to_path).then((res) => {
-				$("#rename_dialog .ok_button").prop("disabled", false)
-				$("#rename_dialog .cancel_button").prop("disabled", false)
-				if(res.ok) {
-					rename_dialog_close()
-					refresh_list()
-				} else {
-					// TODO: more info on the error
-					$("#rename_dialog .error").show().html("Operation failed")
-				}
-			})
-		} catch(e) {
-			console.log(e)
-		} finally {
-			$("#rename_dialog .ok_button").prop("disabled", false)
-			$("#rename_dialog .cancel_button").prop("disabled", false)
-		}
-	})
-	$("#rename_dialog .cancel_button").on("click", () => {
-		rename_dialog_close()
-	})
-	$("#rename_dialog .new_name").on("keydown", (e) => {
-		if(e.which == 13) {
-			$("#rename_dialog .ok_button").click()
-			return false
-		}
-		return true
-	})
-	$(document).on("keydown", (e) => {
-		if(e.which == 27 && $("body").is(".popup_dialog")) {
-			rename_dialog_close()
-			password_dialog(false)
-			return false
-		}
-		return true;
-	});
-}
-
-/*****************************************************************
-* Password dialog
-*/
-
-async function password_dialog(open=true) {
-	if(open) {
-		$("#password_dialog").addClass("popup_dialog")
-		$("body").addClass("popup_dialog")
-		$("#password").data("backup", $("#password").val())
-	} else {
-		$("#password_dialog").removeClass("popup_dialog")
-		$("body").removeClass("popup_dialog")
-		$("#password").data("backup", "")
-	}
-}
-async function setup_password_dialog() {
-	var info = await common.board_control.device_info()
-	const serial_num = info["serial_num"]
-	const password_key = `insecure_password_${serial_num}`
-	$("#password_dialog .ok_button").on("click", () => {
-		var password = $("#password").val()
-		common.board_control.set_credentials(undefined, password)
-		if($("#password_dialog #remember_password").is(":checked")) {
-			if(serial_num) localStorage[password_key] = password
-		} else {
-			if(serial_num) delete localStorage[password_key]
-		}
-		password_dialog(false)
-		refresh_list()
-	})
-	$("#password_dialog .cancel_button").on("click", () => {
-		$("#password").val($("#password").data("backup"))
-		if(password_key in localStorage) {
-			$("#password_dialog #remember_password").prop("checked", true)
-		} else {
-			$("#password_dialog #remember_password").prop("checked", false)
-		}
-		password_dialog(false)
-		refresh_list()
-	})
-	$("#password_dialog #password").on("keypress", (e) => {
-		if(e.which == 13) {
-			$("#password_dialog .ok_button").click()
-			return false
-		}
-		return true
-	})
-	$(".show_password_dialog").on(
-		"click", (e) => { password_dialog() }
-	)
-	if(serial_num) {
-		if(password_key in localStorage) {
-			const pass_mem = localStorage[password_key]
-			common.board_control.set_credentials(undefined, pass_mem)
-			$("#password").val(common.board_control.get_password())
-			$("#password_dialog #remember_password").prop("checked", true)
-		}
-	}
-}
-
-/*****************************************************************
 * Parse error messages
 */
 
@@ -245,7 +113,7 @@ async function refresh_list() {
 			$("#file_list_error_label").html(error_message)
 			//
 			if(response.status == 401) {
-				await password_dialog()
+				await password_dialog_open()
 			}
 			return
 		}
@@ -457,6 +325,139 @@ function load_directory(e) {
 }
 
 /*****************************************************************
+* File rename dialog
+*/
+
+function rename_dialog_close() {
+	$("#rename_dialog").data("path", "")
+	$("#rename_dialog").removeClass("popup_dialog")
+	$("body").removeClass("popup_dialog")
+}
+function rename_dialog_open(e) {
+	const target = e.currentTarget
+	var path = $(target).data("path")
+	$("#rename_dialog").data("path", path)
+	// TODO: filter path for html ?
+	$("#rename_dialog .error").hide().html("")
+	$("#rename_dialog .ok_button").prop("disabled", false)
+	$("#rename_dialog .cancel_button").prop("disabled", false)
+	$("#rename_dialog .original_name").val(path)
+	$("#rename_dialog .new_name").val(path)
+	$("#rename_dialog").addClass("popup_dialog")
+	$("body").addClass("popup_dialog")
+	$("#rename_dialog .new_name").focus()
+	return false
+}
+function rename_dialog_ok() {
+	$("#rename_dialog .ok_button").prop("disabled", true)
+	$("#rename_dialog .cancel_button").prop("disabled", true)
+	try {
+		var from_path = $("#rename_dialog").data("path")
+		var to_path = $("#rename_dialog .new_name").val()
+		// TODO: sanitize the new path ?
+		// try doing the rename command
+		console.log(`Rename “${from_path}” “${to_path}”`)
+		if(to_path.startsWith(from_path)) {
+			console.log("Cannot move a directory into itself.")
+			$("#rename_dialog .error").show().html("Operation failed")
+			return
+		}
+		common.board_control.rename_file(from_path, to_path).then((res) => {
+			$("#rename_dialog .ok_button").prop("disabled", false)
+			$("#rename_dialog .cancel_button").prop("disabled", false)
+			if(res.ok) {
+				rename_dialog_close()
+				refresh_list()
+			} else {
+				// TODO: more info on the error
+				$("#rename_dialog .error").show().html("Operation failed")
+			}
+		})
+	} catch(e) {
+		console.log(e)
+	} finally {
+		$("#rename_dialog .ok_button").prop("disabled", false)
+		$("#rename_dialog .cancel_button").prop("disabled", false)
+	}
+}
+async function setup_rename_dialog() {
+	$("#rename_dialog .ok_button").on("click", rename_dialog_ok)
+	$("#rename_dialog .cancel_button").on("click", rename_dialog_close)
+	$("#rename_dialog .new_name").on("keydown", (e) => {
+		if(e.which == 13) {
+			$("#rename_dialog .ok_button").click()
+			return false
+		}
+		return true
+	})
+}
+
+/*****************************************************************
+* Password dialog
+*/
+
+async function password_dialog_close() {
+	$("#password_dialog").removeClass("popup_dialog")
+	$("body").removeClass("popup_dialog")
+	$("#password").data("backup", "")
+}
+async function password_dialog_open() {
+	$("#password_dialog").addClass("popup_dialog")
+	$("body").addClass("popup_dialog")
+	$("#password").data("backup", $("#password").val())
+}
+async function password_dialog_ok() {
+	var info = await common.board_control.device_info()
+	const serial_num = info["serial_num"]
+	const password_key = `insecure_password_${serial_num}`
+	const password = $("#password").val()
+	common.board_control.set_credentials(undefined, password)
+	if($("#password_dialog #remember_password").is(":checked")) {
+		if(serial_num) localStorage[password_key] = password
+	} else {
+		if(serial_num) delete localStorage[password_key]
+	}
+	password_dialog_close()
+	refresh_list()
+}
+async function password_dialog_cancel() {
+	var info = await common.board_control.device_info()
+	const serial_num = info["serial_num"]
+	const password_key = `insecure_password_${serial_num}`
+	$("#password").val($("#password").data("backup"))
+	if(password_key in localStorage) {
+		$("#password_dialog #remember_password").prop("checked", true)
+	} else {
+		$("#password_dialog #remember_password").prop("checked", false)
+	}
+	password_dialog_close()
+	refresh_list()
+}
+async function setup_password_dialog() {
+	var info = await common.board_control.device_info()
+	const serial_num = info["serial_num"]
+	const password_key = `insecure_password_${serial_num}`
+	$("#password_dialog .ok_button").on("click", password_dialog_ok)
+	$("#password_dialog .cancel_button").on("click", password_dialog_cancel)
+	$("#password_dialog #password").on("keypress", (e) => {
+		if(e.which == 13) {
+			$("#password_dialog .ok_button").click()
+			return false
+		}
+		return true
+	})
+	if(serial_num) {
+		if(password_key in localStorage) {
+			const pass_mem = localStorage[password_key]
+			common.board_control.set_credentials(undefined, pass_mem)
+			$("#password").val(common.board_control.get_password())
+			$("#password_dialog #remember_password").prop("checked", true)
+		}
+	}
+	$(".show_password_dialog").on("click", password_dialog_open)
+}
+
+/*****************************************************************
 * Startup
 */
 
@@ -484,11 +485,21 @@ async function setup_directory() {
 	})
 	$(document).on("click", "#file_list .files_list_dir", load_directory)
 
+	// setup dialogs
 	if(common.board_control.supports_credentials) {
 		await setup_password_dialog()
 	}
-
 	await setup_rename_dialog()
+	
+	// setup closing dialogs with escape
+	$(document).on("keydown", (e) => {
+		if(e.which == 27 && $("body").is(".popup_dialog")) {
+			rename_dialog_close()
+			password_dialog_close()
+			return false
+		}
+		return true;
+	});
 }
 
 export { setup_directory, refresh_list }
