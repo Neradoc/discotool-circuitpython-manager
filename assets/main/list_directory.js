@@ -28,7 +28,7 @@ const HIDE = {
 var hide_level = HIDE.DEFAULT_SYSTEM_FILES
 
 function _icon(name) {
-	return `<img src="assets/images/svg/${name}.svg" />`
+	return `<img src="assets/svg/${name}.svg" />`
 }
 
 /*****************************************************************
