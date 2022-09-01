@@ -52,7 +52,7 @@ async function install_all() {
 		var button = $(line).find(".upload button");
 		var module_name = button.val();
 		if(modules.includes(module_name)) {
-			await upload_button_call({ "target":button });
+			await upload_button_call({ "currentTarget":button });
 		}
 	}
 	$(".install_buttons").prop("disabled", !is_editable);

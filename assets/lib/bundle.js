@@ -11,7 +11,6 @@ const AccessMode = {
 };
 class LibraryBundle {
 	constructor(bundle_access=null, cpver=7) {
-		console.log(cpver)
 		if(bundle_access == null) {
 			this.BUNDLE_ACCESS = AccessMode.GITHUB;
 			this.BUNDLE_URL = "https://github.com/";
