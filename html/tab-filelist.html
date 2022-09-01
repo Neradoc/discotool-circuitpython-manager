@@ -1,0 +1,75 @@
+<!--
+SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
+SPDX-License-Identifier: MIT
+-->
+<div id="file_list" class="tab_page tab_page_files">
+	<table id="file_list_list" class="loading">
+		<thead>
+			<tr>
+				<th colspan="1"><a class="go_back_up" title="Parent directory"><img src="assets/images/svg/arrow-bigup.svg" /></a></th>
+				<th id="pwd" colspan="3">
+					<img class="icon_locked" src="assets/images/svg/lock.svg"/>
+					<span class="dir_path"></span>
+				</th>
+				<th colspan="1"><button class="refresh_list" title="Reload"><img src="assets/images/svg/reload.svg" /></button></th>
+			</tr>
+			<tr>
+				<th>Type</th>
+				<th>Size</th>
+				<th>Path</th>
+				<th>Modified</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody id="file_list_error">
+			<tr><td colspan="99">
+				<div id="file_list_error_image"><img src="assets/images/svg/sign-alert.svg" /></div>
+				<div id="file_list_error_label"></div>
+			</td></tr>
+		</tbody>
+		<tbody id="file_list_body"></tbody>
+		<tbody class="template">
+			<tr id="file_list_template">
+				<td class="type"></td>
+				<td class="size"></td>
+				<td class="path"><a class="path" target="_blank"></a></td>
+				<td class="modified"></td>
+				<td class="buttons">
+					<a class="rename" title="Rename"><img src="assets/images/svg/edit-line.svg" /></a>
+					<a class="delete" title="Delete"><img src="assets/images/svg/trash-can.svg" /></a>
+					<a href="" target="_blank" class="edit" title="Edit/View">
+						<span class="pencil"><img src="assets/images/svg/edit-file.svg" /></span>
+						<span class="view"><img src="assets/images/svg/file-text.svg" /></span>
+					</a>
+					<a class="analyze" title="Auto Install Dependencies"><img src="assets/images/svg/magnifying-glass.svg" /></a>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<div id="file_list_loading_image"><img src="assets/images/loading_black.gif" /></div>
+	<commands>
+	<group>
+		<input type="file" id="files_upload" name="files" multiple />
+		<button type="submit" id="upload_button">Upload</button>
+	</group>
+	<group>
+		<img class="mkdir_icon" src="assets/images/svg/folder-plus.svg" /> <input type="text" placeholder="New Directory" id="new_directory_name" />
+		<button type="submit" id="mkdir">Create Directory</button>
+	</group>
+	<group class="install_buttons">
+		<button type="submit" class="auto_install">Auto Install...</button>
+		<button type="submit" class="update_all">Update All...</button>
+	</group>
+	</command>
+</div>
+
+<div id="rename_dialog">
+	<p>Renaming a file/directory.</p>
+	<p><label>From: </label><input name="original_name" class="original_name" type="text" disabled/></p>
+	<p><label>  To: </label><input name="new_name" class="new_name" type="text" placeholder=""/></p>
+	<p>
+		<button class="cancel_button">Cancel</button>
+		<button class="ok_button">OK</button>
+	</p>
+	<p class="error"></p>
+</div>

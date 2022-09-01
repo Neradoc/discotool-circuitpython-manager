@@ -1,0 +1,20 @@
+<!--
+SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
+SPDX-License-Identifier: MIT
+-->
+<div id="bundle_list" class="tab_page tab_page_bundle hide">
+	<!-- <h3>Bundle Library Installer</h3> -->
+	<p>Install libraries from the bundles. Select the modules you want in the list, and send them and their dependencies to the installer.</p>
+	<div id="bundle_filter">
+		<input name="bundle_filter" value="" placeholder="Enter library name to filter"/>
+		<button id="bundle_clear_search">Clear</button>
+		<button id="bundle_deselect_all">Deselect All</button>
+		<button id="bundle_install" disabled>Install These Dependencies...</button>
+	</div>
+	<div class="lists">
+		<div class="title">Modules <span id="nselected"></span></div>
+		<div class="title">Dependencies (<span class="num_deps">0</span>)</div>
+		<div id="bundle_modules" class="liste"><img class="loading_image" src="assets/images/loading_black_small.gif"/></div>
+		<div id="bundle_dependencies" class="liste"></div>
+	</div>
+</div>

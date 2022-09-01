@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--
+SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
+SPDX-License-Identifier: MIT
+-->
+	<title></title>
+	<base href="../" />
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Security-Policy"
+		  content="default-src 'self'; connect-src *">
+	<link rel="shortcut icon" type="image/jpg" href="assets/images/favicon.png"/>
+	<link rel="stylesheet" href="assets/main/common.css">
+	<link rel="stylesheet" href="assets/main/board_page.css">
+	<script src="assets/extlib/jquery.min.js"></script>
+	<script src="assets/extlib/jszip.min.js"></script>
+	<script src="assets/main/board_page.js" defer="true" type="module"></script>
+</head>
+<body>
+	<header>
+	<h1 id="top_title">
+		<span class="icon">
+			<img class="icon_usb" src="assets/images/svg/usb-dongle.svg"/>
+			<img class="icon_web" src="assets/images/svg/wifi-chip.svg"/>
+			<img class="icon_locked" src="assets/images/svg/lock.svg"/>
+		</span>
+		<span class="board_name">Loading…</span>
+	</h1>
+	<!--<p id="version_info_subtitle">
+		<span class="subtitle_text">With Circuipython
+		<span class="circuitpy_version"></span>.</span>
+	</p>-->
+	</header>
+	<content>
+		<div id="tablist">
+			<button class="tab_link tab_link_welcome"
+				value="welcome">Welcome</button>
+			<button class="tab_link tab_link_files active"
+				value="files">Files Browser</button>
+			<button class="tab_link tab_link_bundle"
+				value="bundle">Library Bundles</button>
+			<button class="tab_link tab_link_circup"
+				value="circup">Installer</button>
+		</div>
+		<div id="welcome_page" class="include" data-src="tab-welcome"></div>
+		<div id="file_list" class="include" data-src="tab-filelist"></div>
+		<div id="bundle_list" class="include" data-src="tab-bundle"></div>
+		<div id="circup_page" class="include" data-src="tab-installer"></div>
+	</content>
+	<div id="small_load_image"><img class="small_load_image" src="assets/images/loading_black_small.gif" /></div>
+	<div id="blanket"></div>
+	<div id="password_dialog" class="include" data-src="dialog-password"></div>
+</body>
+</html>

@@ -10,7 +10,7 @@ import { WebWorkflow } from "../backends/web.js";
 import { USBWorkflow } from "../backends/usb.js";
 import { BLEWorkflow } from "../backends/ble.js";
 
-const BOARD_PAGE = "html/board_page.html"
+const BOARD_PAGE = "html/board-template.html"
 var update_timer = null
 var update_timer_running = false
 

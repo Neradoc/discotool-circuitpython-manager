@@ -19,8 +19,7 @@ var circup = null
 
 const DEBUG = tools.DEBUG;
 const LINE_HIDE_DELAY = 800;
-const LOADING_IMAGE = $("#small_load_image").html();
-
+var LOADING_IMAGE = "";
 var modules_to_update = [];
 var cpver = null;
 var install_running = false;
@@ -272,6 +271,19 @@ async function bundle_install() {
 }
 
 async function init_page() {
+	for(const item of $(".include")) {
+		// get the include file name
+		const source = $(item).data("src") + ".html"
+		// get the include content
+		const response = await fetch(`html/${source}`)
+		const loaded = await response.text()
+		// put it in
+		$(item).replaceWith(loaded)
+	}
+	//
+	LOADING_IMAGE = $("#small_load_image").html()
+	setup_events()
+	//
 	var tab = window.location.hash.substr(1);
 	try {
 		$(`.tab_link_${tab}`).click();
@@ -351,58 +363,60 @@ async function run_exclusively(command) {
 	}
 }
 
-$("#welcome_page a").on("click", tools.open_outside_sync)
+function setup_events() {
+	$("#welcome_page a").on("click", tools.open_outside_sync)
 
-$(".auto_install").on("click", async (e) => {
-	$(".tab_link_circup").click();
-	await run_exclusively(async () => {
-		for(const code of CODE_FILES) {
-			if(await auto_install(code)) {
-				return
+	$(".auto_install").on("click", async (e) => {
+		$(".tab_link_circup").click();
+		await run_exclusively(async () => {
+			for(const code of CODE_FILES) {
+				if(await auto_install(code)) {
+					return
+				}
 			}
 		}
-	}
-	);
-});
-$(".update_all").on("click", (e) => {
-	$(".tab_link_circup").click();
-	run_exclusively(() => update_all());
-});
-$("#bundle_list #bundle_install").on("click", (e) => {
-	run_exclusively(() => bundle_install());
-});
-$(document).on("click", "#file_list_list .analyze", (e) => {
-	var path = $(e.currentTarget).data("path");
-	console.log(e)
-	console.log(path)
-	$(".tab_link_circup").click();
-	run_exclusively(() => auto_install(path));
-	return false;
-});
+		);
+	});
+	$(".update_all").on("click", (e) => {
+		$(".tab_link_circup").click();
+		run_exclusively(() => update_all());
+	});
+	$("#bundle_list #bundle_install").on("click", (e) => {
+		run_exclusively(() => bundle_install());
+	});
+	$(document).on("click", "#file_list_list .analyze", (e) => {
+		var path = $(e.currentTarget).data("path");
+		console.log(e)
+		console.log(path)
+		$(".tab_link_circup").click();
+		run_exclusively(() => auto_install(path));
+		return false;
+	});
 
-$("#button_install_all").on("click", (e) => {
-	install_all();
-});
-$("#toggle_updates").on("click", async (e) => {
-	show_up_to_date = !show_up_to_date;
-	await update_circup_table();
-});
-$("#show_updates").on("click", async (e) => {
-	show_up_to_date = true;
-	await update_circup_table();
-});
-$("#hide_updates").on("click", async (e) => {
-	show_up_to_date = false;
-	await update_circup_table();
-});
+	$("#button_install_all").on("click", (e) => {
+		install_all();
+	});
+	$("#toggle_updates").on("click", async (e) => {
+		show_up_to_date = !show_up_to_date;
+		await update_circup_table();
+	});
+	$("#show_updates").on("click", async (e) => {
+		show_up_to_date = true;
+		await update_circup_table();
+	});
+	$("#hide_updates").on("click", async (e) => {
+		show_up_to_date = false;
+		await update_circup_table();
+	});
 
-$(".tab_link").on("click", (e) => {
-	var target = e.currentTarget.value;
-	$(".tab_page").hide();
-	$(".tab_link").removeClass("active")
-	window.location.hash = `#${target}`;
-	$(`.tab_page_${target}`).show();
-	$(`.tab_link_${target}`).addClass("active");
-});
+	$(".tab_link").on("click", (e) => {
+		var target = e.currentTarget.value;
+		$(".tab_page").hide();
+		$(".tab_link").removeClass("active")
+		window.location.hash = `#${target}`;
+		$(`.tab_page_${target}`).show();
+		$(`.tab_link_${target}`).addClass("active");
+	});
+}
 
 init_page();

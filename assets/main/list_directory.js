@@ -14,10 +14,7 @@ const HIDDEN = [
 	"System Volume Information",
 ]
 const SECRETS = [".env", "secrets.py"]
-const ADAFRUIT_ICON = '<img src="assets/images/icon-adafruit.png" class="adafruit_logo"/>'
 
-let new_directory_name = document.getElementById("name")
-let files = document.getElementById("files_upload")
 var current_path = tools.current_path
 var refreshing = false
 
@@ -310,15 +307,6 @@ async function refresh_list() {
 				icon = _icon("folder-lib")
 			} else if (current_path == "/" && file_info.name == "boot_out.txt") {
 				icon = _icon("file-info") // info-circle
-// 			} else if (common.library_bundle &&
-// 				(file_info.name.replace(/\.m?py$/, "")
-// 				in common.library_bundle.all_the_modules)
-// 			) {
-// 				if(file_info.name.startsWith("adafruit_")) {
-// 					icon = ADAFRUIT_ICON
-// 				} else {
-// 					icon = ""
-// 				}
 			} else if (file_info.directory) {
 				icon = _icon("folder")
 			} else {
@@ -391,11 +379,11 @@ async function refresh_list() {
 */
 
 async function mkdir(e) {
-	var dir_path = current_path + new_directory_name.value + "/"
+	var dir_path = current_path + $("#new_directory_name").val() + "/"
 	var response = await common.board_control.create_dir(dir_path)
 	if (response.ok) {
 		refresh_list()
-		new_directory_name.value = ""
+		$("#new_directory_name").val("")
 		mkdir_button.disabled = true
 	}
 }
@@ -406,11 +394,12 @@ async function mkdir(e) {
 
 async function upload(e) {
 	console.log("Upload")
-	for (const file of files.files) {
+	const files_upload = document.getElementById("files_upload")
+	for (const file of files_upload.files) {
 		var response = await common.board_control.upload_file(current_path + file.name, file)
 		if (response.ok) {
 			refresh_list()
-			files.value = ""
+			files_upload.value = ""
 			upload_button.disabled = true
 		}
 	}
@@ -472,22 +461,23 @@ function load_directory(e) {
 */
 
 async function setup_directory() {
-	let mkdir_button = document.getElementById("mkdir")
-	mkdir_button.onclick = mkdir
-
 	let upload_button = $("#upload_button")
+	let mkdir_button = document.getElementById("mkdir")
+	let files_upload = document.getElementById("files_upload")
+
 	upload_button.on("click", upload)
-	upload_button.prop("disabled", files.files.length == 0)
+	upload_button.prop("disabled", files_upload.files.length == 0)
 
-	files.onchange = () => {
-		upload_button.prop("disabled", files.files.length == 0)
+	files_upload.onchange = () => {
+		upload_button.prop("disabled", files_upload.files.length == 0)
 	}
 
-	mkdir_button.disabled = new_directory_name.value.length == 0
+	mkdir_button.onclick = mkdir
+	mkdir_button.disabled = $("#new_directory_name").val().length == 0
 
-	new_directory_name.oninput = () => {
-		mkdir_button.disabled = new_directory_name.value.length == 0
-	}
+	$("#new_directory_name").on("input", () => {
+		mkdir_button.disabled = $("#new_directory_name").val().length == 0
+	})
 
 	$(document).on("click", ".refresh_list", (e) => {
 		refresh_list()
