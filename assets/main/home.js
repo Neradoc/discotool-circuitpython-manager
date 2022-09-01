@@ -80,6 +80,7 @@ async function detect_usb() {
 					var all_dev_line = template_all.clone()
 					all_dev_line.prop("id", line_id)
 					all_dev_line.addClass("board_line")
+					all_dev_line.removeClass("template_board")
 					await insert_line(all_dev_line, name)
 				} else {
 					board = boards[serial]
@@ -156,6 +157,7 @@ async function detect_web() {
 				var all_dev_line = template_all.clone()
 				all_dev_line.prop("id", line_id)
 				all_dev_line.addClass("board_line")
+				all_dev_line.removeClass("template_board")
 				await insert_line(all_dev_line, name)
 			} else {
 				board = boards[serial]
