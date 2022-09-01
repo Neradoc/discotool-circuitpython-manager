@@ -297,7 +297,14 @@ commands .mkdir_icon {
 #circup_page table .name { width: 100%; }
 #circup_page table .board_version { white-space: nowrap; }
 #circup_page table .bundle_version { white-space: nowrap; }
-#circup_page table .status_icon {}
+#circup_page table .status_icon {
+	padding: 0px 2px;
+}
+#circup_page table .status_icon img {
+	display: block;
+	height: 24px;
+	text-align: center;
+}
 #circup_page table .status {
 	white-space: nowrap;
 	min-width: 128px;
@@ -306,9 +313,11 @@ commands .mkdir_icon {
 #circup_page .line.module_exists {
 	color: var(--disabled-color);
 }
+#circup_page .module_exists .status_icon img,
 #circup_page .module_exists .upload button {
 	opacity: 0.5;
 }
+
 #circup_page .line.update_module { }
 #circup_page .line.major_update_module { }
 #circup_page .line.new_module { }

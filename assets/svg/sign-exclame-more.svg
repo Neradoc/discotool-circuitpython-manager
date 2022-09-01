@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-alert-circle" width="44" height="44" viewBox="2 2 20 20" stroke-width="3" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <circle cx="12" cy="12" r="9" fill="#FF0" stroke-width="1.5"/>
+  <line x1="12" y1="7.5" x2="12" y2="12.5" />
+  <line x1="12" y1="16.5" x2="12.01" y2="16.5" />
+</svg>

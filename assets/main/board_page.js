@@ -26,6 +26,10 @@ var install_running = false;
 var show_up_to_date = false;
 var is_editable = false;
 
+function _icon(name) {
+	return `<img src="assets/svg/${name}.svg" />`
+}
+
 async function start_circup() {
 	if (circup == null) {
 		// 1 - setup the board control as selected if not already
@@ -134,33 +138,33 @@ async function update_line(new_line, board_libs) {
 	if(version === circup.BAD_MPY) {
 		// bad mpy file
 		new_line.addClass("bad_mpy_module");
-		new_line.find(".status_icon").html("&#9888;&#65039;");
+		new_line.find(".status_icon").html(_icon("sign-stop"));
 		new_line.find(".status").html("Bad MPY Format");
 	} else if(version === null) {
 		// no file
 		new_line.addClass("new_module");
-		new_line.find(".status_icon").html("&#10069;");
+		new_line.find(".status_icon").html(_icon("sign-alert"));
 		new_line.find(".status").html("Missing Module");
 	} else if(version === false) {
 		// invalid file, replace
 		new_line.addClass("invalid_module");
-		new_line.find(".status_icon").html("&#9888;&#65039;");
+		new_line.find(".status_icon").html(_icon("sign-stop"));
 		new_line.find(".status").html("Module Invalid");
 	} else if(module.version == version) {
 		// no need to update
 		new_line.addClass("module_exists");
-		new_line.find(".status_icon").html("&#10004;&#65038;");
+		new_line.find(".status_icon").html(_icon("sign-check"));
 		new_line.find(".status").html("Up To Date");
 		dont_need_update(module_name);
 	} else if(module.version[0] != version[0]) {
 		// this is a major update
 		new_line.addClass("major_update_module");
-		new_line.find(".status_icon").html("&#8252;&#65039;");
+		new_line.find(".status_icon").html(_icon("sign-exclame-double"));
 		new_line.find(".status").html("Major Update");
 	} else {
 		// this is a normal update
 		new_line.addClass("update_module");
-		new_line.find(".status_icon").html("&#10071;&#65039;");
+		new_line.find(".status_icon").html(_icon("sign-exclame"));
 		new_line.find(".status").html("Update Available");
 	}
 	new_line.find(".upload button").prop("disabled", !is_editable);

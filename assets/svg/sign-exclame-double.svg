@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-alert-circle" width="44" height="44" viewBox="2 2 20 20" stroke-width="3" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <circle cx="12" cy="12" r="9" fill="#FFF" stroke-width="1.5"/>
+  <g transform="translate(9.6 7.5)">
+    <line x1="0" y1="0" x2="0" y2="5" />
+    <line x1="0" y1="9" x2="0.01" y2="9" />
+  </g>
+  <g transform="translate(14.4 7.5)">
+    <line x1="0" y1="0" x2="0" y2="5" />
+    <line x1="0" y1="9" x2="0.01" y2="9" />
+  </g>
+</svg>
