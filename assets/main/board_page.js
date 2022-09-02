@@ -25,6 +25,7 @@ var cpver = null;
 var install_running = false;
 var show_up_to_date = false;
 var is_editable = false;
+var redo_install_button_callback = null
 
 function _icon(name) {
 	return `<img src="assets/svg/${name}.svg" />`
@@ -115,6 +116,9 @@ async function update_circup_table() {
 	if(modules_to_update.length == 0 && n_modules > 0) {
 		$("#circup_page .all_up_to_date").show()
 		$("#circup_page .loading").hide();
+	}
+	if(n_modules == 0) {
+		$("#circup_page .no_dependency_found").show()
 	}
 }
 
@@ -247,6 +251,7 @@ async function auto_install(file_name) {
 	$("#circup_page .loading").append(`<br/>Loading modules from <b>${file_name}</b>...`);
 	const imports = common.library_bundle.get_imports_from_python(code_content);
 	// do the thing
+	redo_install_button_callback = () => { auto_install(file_name) }
 	await run_update_process(imports);
 	return true;
 }
@@ -259,6 +264,7 @@ async function update_all() {
 	// get the list of libraries from the board
 	var libs_list = await board_control.get_lib_modules();
 	// do the thing
+	redo_install_button_callback = update_all
 	await run_update_process(libs_list);
 	// TODO: update circup table ?
 }
@@ -273,6 +279,7 @@ async function bundle_install() {
 		await pre_update_process();
 		$("#circup_page .loading").append(`<br/>Loading libraries selected from the bundles...`);
 		$("#circup_page .title .filename").html("selected bundle modules");
+		redo_install_button_callback = bundle_install
 		// do the thing
 		await run_update_process(libs_list);
 	}
@@ -425,6 +432,11 @@ function setup_events() {
 		$(`.tab_page_${target}`).show();
 		$(`.tab_link_${target}`).addClass("active");
 	});
+
+	$("#circup_page .title button").on("click", async (e) => {
+		// await pre_update_process()
+		if(redo_install_button_callback) redo_install_button_callback()
+	})
 }
 
 init_page();

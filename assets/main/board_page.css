@@ -271,6 +271,17 @@ commands .mkdir_icon {
 #circup_page .hide {
 	display: none;
 }
+#circup_page .title button {
+	position: relative;
+	top: 4px;
+	display: inline-block;
+	padding: 0px;
+	border: 0px;
+}
+#circup_page .icon {
+	display: block;
+	height: 20px;
+}
 #pwd {
 	font-size: 120%;
 	padding: 8px;
