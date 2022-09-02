@@ -349,7 +349,7 @@ async function delete_a_file(e) {
 
 function open_secret(e) {
 	var path = $(this).data("path")
-	var prompt = `${path}\nMight contain readable passwords.\nAre you sure you want to open it ?`
+	var prompt = `The file: "${path}"\ncan contain readable passwords.\nAre you sure you want to open it ?`
 	if (confirm(prompt)) {
 		open_outside_a(e)
 	}
