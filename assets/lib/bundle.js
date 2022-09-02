@@ -180,7 +180,7 @@ class LibraryBundle {
 
 	// gets the dependencies of modules, adds them to dependencies
 	get_dependencies(modules, dependencies) {
-		for(module of modules) {
+		for(var module of modules) {
 			if(this.get_module(module) !== false) {
 				if(!dependencies.includes(module)) {
 					dependencies.push(module);
