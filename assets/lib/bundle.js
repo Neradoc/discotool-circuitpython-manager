@@ -104,8 +104,7 @@ class LibraryBundle {
 			var zip_name = `${base_name}-${this.cp_version_url}-mpy-${bundle_tag}.zip`;
 			return `${this.base_github}/${repo}/releases/download/${bundle_tag}/${zip_name}`;
 		case AccessMode.LINK:
-			var bundle_tag = "latest";
-			var zip_url = `${this.BUNDLE_URL}/${repo_name}-${this.cp_version_url}-mpy-${bundle_tag}.zip`;
+			var zip_url = `${this.BUNDLE_URL}/${repo_name}-${this.cp_version_url}-mpy-latest.zip`;
 			return zip_url;
 		}
 		// todo: raise

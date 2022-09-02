@@ -117,8 +117,8 @@ function openBoard (url) {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
 	var winBounds = store.get("mainWindowBounds", {
-		x:null,
-		y:null,
+		x: null,
+		y: null,
 		width: 0,
 		height: 0,
 	})
