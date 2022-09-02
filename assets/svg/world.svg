@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: Copyright (c) 2020-2022 Paweł Kuna, https://tabler-icons.io/
+SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
+SPDX-License-Identifier: MIT
+-->
 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-world" width="44" height="44" viewBox="2 2 20 20" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
   <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
   <circle cx="12" cy="12" r="9" fill="#88F"/>

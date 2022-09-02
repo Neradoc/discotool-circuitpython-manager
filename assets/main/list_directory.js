@@ -168,7 +168,7 @@ async function refresh_list() {
 				[["py"], _icon("file-code-py")],
 				[["js", "json"], _icon("file-code-curl")],
 				[["html", "html"], _icon("file-code-html")],
-				[["mpy"], `<img src="assets/images/blinka-48.png" />`],
+				[["mpy"], _icon("adafruit_blinka_angles-right"],
 				[["jpg", "jpeg", "png", "bmp", "gif"], _icon("picture")],
 				[["wav", "mp3", "ogg"], _icon("file-music")],
 			]
