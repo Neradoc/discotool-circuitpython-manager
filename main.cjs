@@ -1,10 +1,15 @@
 // Modules to control application life and create native browser window
 const { app, BrowserWindow, dialog, ipcMain, nativeTheme } = require('electron')
+const Store = require('electron-store');
 const path = require('path')
+
+var store = new Store()
 
 // change the theme manually ?
 // nativeTheme.themeSource = "light"
 COLUMN_MODE = true
+minX = 40
+minY = 40
 
 function browser_window_options(changes={}, other_changes={}) {
 	var data = {
@@ -29,14 +34,31 @@ function browser_window_options(changes={}, other_changes={}) {
 	return data
 }
 
-function createWindow () {
+function createWindow (winBounds) {
 	var settings = {}
 	if(COLUMN_MODE) {
 		settings = { width: 350, height: 800, minWidth: 300, minHeight: 400 }
 	}
+	browserConfig = browser_window_options(settings)
+
+	console.log("winBounds", winBounds)
+	if(winBounds !== undefined) {
+		if(typeof(winBounds.width) == 'number') {
+			browserConfig.width = Math.max(winBounds.width, browserConfig.minWidth)
+		}
+		if(typeof(winBounds.height) == 'number') {
+			browserConfig.height = Math.max(winBounds.height, browserConfig.minHeight)
+		}
+		if(typeof(winBounds.x) == 'number') {
+			browserConfig.x = Math.max(winBounds.x, minX)
+		}
+		if(typeof(winBounds.y) == 'number') {
+			browserConfig.y = Math.max(winBounds.y, minY)
+		}
+	}
 
 	// Create the browser window.
-	const mainWindow = new BrowserWindow(browser_window_options(settings))
+	const mainWindow = new BrowserWindow(browserConfig)
 
 	// and load the index.html of the app.
 	mainWindow.loadFile('index.html')
@@ -58,6 +80,13 @@ function createWindow () {
 			const dir_url = `file://${dir_path}`
 			openBoard(dir_url)
 		}
+	})
+
+	mainWindow.on("resize", (e) => {
+		store.set("mainWindowBounds", mainWindow.getBounds())
+	})
+	mainWindow.on("moved", (e) => {
+		store.set("mainWindowBounds", mainWindow.getBounds())
 	})
 }
 
@@ -82,12 +111,18 @@ function openBoard (url) {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-	createWindow()
+	var winBounds = store.get("mainWindowBounds", {
+		x:null,
+		y:null,
+		width: 0,
+		height: 0,
+	})
+	createWindow(winBounds)
 
 	app.on('activate', function () {
 		// On macOS it's common to re-create a window in the app when the
 		// dock icon is clicked and there are no other windows open.
-		if (BrowserWindow.getAllWindows().length === 0) createWindow()
+		if (BrowserWindow.getAllWindows().length === 0) createWindow(winBounds)
 	})
 })
 
