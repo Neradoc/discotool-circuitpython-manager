@@ -185,15 +185,17 @@ class LibraryBundle {
 				if(!dependencies.includes(module)) {
 					dependencies.push(module);
 				}
-				var deps = this.get_module(module).dependencies.concat(
-					this.get_module(module).external_dependencies
+				const module_info = this.get_module(module)
+				var deps = module_info.dependencies.concat(
+					module_info.external_dependencies
 				);
-				for(var index in deps) {
-					var depmodule = deps[index];
-					if(dependencies.includes(depmodule)) { continue; }
-					if(this.get_module(depmodule) === false) { continue; }
-					dependencies.push(depmodule);
-					this.get_dependencies([depmodule], dependencies);
+				for(var depmodule of deps) {
+					const dep_info = this.get_module(module)
+					if(dep_info === false) { continue; }
+					const dep_ref_name = dep_info.name
+					if(dependencies.includes(dep_ref_name)) { continue; }
+					dependencies.push(dep_ref_name);
+					this.get_dependencies([dep_ref_name], dependencies);
 				}
 			}
 		}
