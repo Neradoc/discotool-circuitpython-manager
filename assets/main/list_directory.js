@@ -208,7 +208,12 @@ async function refresh_list() {
 				}
 			}
 			td[0].innerHTML = icon
-			td[1].innerHTML = file_info.file_size
+			
+			if(file_info.directory) {
+				td[1].innerHTML = "--"
+			} else {
+				td[1].innerHTML = file_info.file_size
+			}
 
 			var path = clone.find("a.path")
 			path.html(file_info.name)
@@ -509,7 +514,7 @@ async function setup_directory() {
 		const setter = setting
 		$(`#file_list_setup_buttons input[name="${setter}"]`).on("change", (e) => {
 			settings[setter] = $(e.currentTarget).prop("checked")
-			localStorage.getItem(setter, settings[setter])
+			localStorage.setItem(setter, settings[setter])
 			refresh_list()
 		})
 	}
