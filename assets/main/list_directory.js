@@ -13,11 +13,10 @@ const HIDDEN = [
 	".TemporaryItems",
 	"System Volume Information",
 ]
-const SECRETS = [".env", "secrets.py"]
-
-var current_path = tools.current_path
-var refreshing = false
-
+const SECRETS = [
+	".env",
+	"secrets.py",
+]
 const HIDE = {
 	NOTHING: 0,
 	DEFAULT_SYSTEM_FILES: 1,
@@ -25,7 +24,12 @@ const HIDE = {
 	ALL_DOTTED_FILES: 3,
 }
 
-var hide_level = HIDE.DEFAULT_SYSTEM_FILES
+var current_path = tools.current_path
+var refreshing = false
+var settings = {
+	show_system_files: false,
+	sort_directories_first: false,
+}
 
 function _icon(name) {
 	return `<img src="assets/svg/${name}.svg" />`
@@ -131,9 +135,18 @@ async function refresh_list() {
 			link.hide()
 		}
 
-		dir_files_list.sort((a,b) => {
-			return a.name.localeCompare(b.name)
-		})
+		if(settings["sort_directories_first"]) {
+			dir_files_list.sort((a,b) => {
+				if(a.directory != b.directory) {
+					return a.directory ? -1 : 1
+				}
+				return a.name.localeCompare(b.name)
+			})
+		} else {
+			dir_files_list.sort((a,b) => {
+				return a.name.localeCompare(b.name)
+			})
+		}
 
 		for (const file_info of dir_files_list) {
 			// Clone the new row and insert it into the table
@@ -159,8 +172,11 @@ async function refresh_list() {
 				[["jpg", "jpeg", "png", "bmp", "gif"], _icon("picture")],
 				[["wav", "mp3", "ogg"], _icon("file-music")],
 			]
+			var hide_level = settings["show_system_files"] ? HIDE.NOTHING : HIDE.ALL_SYSTEM_FILES
+			var is_secret = false;
 			var icon = _icon("file-unknown")
 			if (current_path == "/" && SECRETS.includes(file_info.name)) {
+				is_secret = true
 				icon = _icon("key")
 			} else if (current_path == "/" && HIDDEN.includes(file_info.name)) {
 				// hidden names in root
@@ -197,7 +213,11 @@ async function refresh_list() {
 				path.addClass("files_list_dir")
 			} else {
 				path.attr("href", api_url)
-				path.on("click", open_outside_a)
+				if(is_secret) {
+					path.on("click", open_secret)
+				} else {
+					path.on("click", open_outside_a)
+				}
 			}
 			td[3].innerHTML = (new Date(file_info.modified)).toLocaleString()
 			var delete_button = clone.find(".delete")
@@ -308,6 +328,19 @@ async function del(e) {
 				console.log(`${message}: ${error} !`)
 			}
 		}
+	}
+	return false
+}
+
+/*****************************************************************
+* Open secret file
+*/
+
+function open_secret(e) {
+	var path = $(this).data("path")
+	var prompt = `${path}\nMight contain readable passwords.\nAre you sure you want to open it ?`
+	if (confirm(prompt)) {
+		open_outside_a(e)
 	}
 	return false
 }
@@ -462,6 +495,21 @@ async function setup_password_dialog() {
 */
 
 async function setup_directory() {
+	// settings
+	for(const setting of ["show_system_files", "sort_directories_first"]) {
+		settings[setting] = localStorage.getItem(setting, false)
+		$(`#file_list_setup_buttons input[name="${setting}"]`).prop(
+			"checked", settings[setting]
+		)
+		const setter = setting
+		$(`#file_list_setup_buttons input[name="${setter}"]`).on("change", (e) => {
+			settings[setter] = $(e.currentTarget).prop("checked")
+			localStorage.getItem(setter, settings[setter])
+			refresh_list()
+		})
+	}
+
+	// setup thingies
 	let upload_button = $("#upload_button")
 	let mkdir_button = document.getElementById("mkdir")
 	let files_upload = document.getElementById("files_upload")
@@ -476,6 +524,7 @@ async function setup_directory() {
 	mkdir_button.onclick = mkdir
 	mkdir_button.disabled = $("#new_directory_name").val().length == 0
 
+	/// setup other buttons and things
 	$("#new_directory_name").on("input", () => {
 		mkdir_button.disabled = $("#new_directory_name").val().length == 0
 	})
