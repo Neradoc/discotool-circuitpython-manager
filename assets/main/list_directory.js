@@ -233,7 +233,7 @@ async function refresh_list() {
 			var delete_button = clone.find(".delete")
 			delete_button.data("path", file_path)
 			delete_button.val(file_path)
-			delete_button.on("click", del)
+			delete_button.on("click", delete_a_file)
 
 			var edit_button = clone.find(".edit")
 			edit_button.data("path", file_path)
@@ -277,12 +277,13 @@ async function refresh_list() {
 */
 
 async function mkdir(e) {
+	var mkdir_button = $("#mkdir")
 	var dir_path = current_path + $("#new_directory_name").val() + "/"
 	var response = await common.board_control.create_dir(dir_path)
 	if (response.ok) {
 		refresh_list()
 		$("#new_directory_name").val("")
-		mkdir_button.disabled = true
+		mkdir_button.prop("disabled", true)
 	}
 }
 
@@ -307,7 +308,7 @@ async function upload(e) {
 * Delete file
 */
 
-async function del(e) {
+async function delete_a_file(e) {
 	var path = $(this).data("path")
 	console.log("Delete", path)
 	var prompt = `Delete ${path}`
@@ -399,8 +400,9 @@ function rename_dialog_ok() {
 		var to_path = $("#rename_dialog .new_name").val()
 		// TODO: sanitize the new path ?
 		// try doing the rename command
-		console.log(`Rename “${from_path}” “${to_path}”`)
-		if(to_path.startsWith(from_path)) {
+		const from_path_dir = (`${from_path}/`).replace(/\/\/+/,"/")
+		console.log(`Rename “${from_path}” “${to_path}” <${from_path_dir}>`)
+		if(to_path.startsWith(from_path_dir)) {
 			console.log("Cannot move a directory into itself.")
 			$("#rename_dialog .error").show().html("Operation failed")
 			return
@@ -507,14 +509,14 @@ async function setup_password_dialog() {
 async function setup_directory() {
 	// settings
 	for(const setting of ["show_system_files", "sort_directories_first"]) {
-		settings[setting] = localStorage.getItem(setting, false)
+		settings[setting] = localStorage.getItem(setting, false) == "1"
 		$(`#file_list_setup_buttons input[name="${setting}"]`).prop(
 			"checked", settings[setting]
 		)
 		const setter = setting
 		$(`#file_list_setup_buttons input[name="${setter}"]`).on("change", (e) => {
 			settings[setter] = $(e.currentTarget).prop("checked")
-			localStorage.setItem(setter, settings[setter])
+			localStorage.setItem(setter, settings[setter] ? "1" : "0")
 			refresh_list()
 		})
 	}
