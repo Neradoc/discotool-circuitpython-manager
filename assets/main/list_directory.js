@@ -180,12 +180,17 @@ async function refresh_list() {
 				icon = _icon("key")
 			} else if (current_path == "/" && HIDDEN.includes(file_info.name)) {
 				// hidden names in root
+				if(file_info.directory) {
+					icon = _icon("folder-no")
+				} else {
+					icon = _icon("file-no")
+				}
 				if(hide_level >= HIDE.DEFAULT_SYSTEM_FILES) continue
 			} else if (file_info.name.startsWith("._")) {
 				icon = _icon("apple")
 				if(hide_level >= HIDE.ALL_SYSTEM_FILES) continue
 			} else if (file_info.name.startsWith(".")) {
-				icon = _icon("no")
+				icon = _icon("file-invisible")
 				if(hide_level >= HIDE.ALL_DOTTED_FILES) continue
 			} else if (current_path == "/" && file_info.name == "lib") {
 				icon = _icon("folder-lib")

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file" width="44" height="44" viewBox="2 2 20 20" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <g transform="translate(5.5,3.5)" opacity="0.5"
+    stroke-width="0" stroke="#000">
+    <path d="M0,0 h9.75 l3.25,3.25 V17 H0 V0" stroke-width="0" fill="#888"/>
+    <path d="
+      M0,0    H13 v3.25 H0 z
+      M0,6.5 H13 v3.25 H0 z
+      M0,13  H13 v3.25 H0 z
+      M3.25,0    V17 h3.25 V0 z
+      M9.75,0    V17 h3.25 V0 z
+      "
+      fill="#FFF"
+      fill-rule="evenodd"
+    />
+  </g>
+  <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" stroke-dasharray="1,2.09"/>
+</svg>
