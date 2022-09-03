@@ -228,8 +228,8 @@ async function detect_boards() {
 	//       finished with this device.
 	//       The section where the serial number is compared and the Board
 	//       instance created should be a critical section.
-	await detect_usb()
 	await Promise.all([
+		detect_usb(),
 		detect_ble(),
 		detect_web(),
 	])
