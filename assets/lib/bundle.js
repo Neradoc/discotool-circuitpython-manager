@@ -189,7 +189,7 @@ class LibraryBundle {
 					module_info.external_dependencies
 				);
 				for(var depmodule of deps) {
-					const dep_info = this.get_module(module)
+					const dep_info = this.get_module(depmodule)
 					if(dep_info === false) { continue; }
 					const dep_ref_name = dep_info.name
 					if(dependencies.includes(dep_ref_name)) { continue; }
