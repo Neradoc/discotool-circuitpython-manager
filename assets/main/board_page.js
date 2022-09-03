@@ -298,6 +298,9 @@ async function init_page() {
 	//
 	LOADING_IMAGE = $("#small_load_image").html()
 	setup_events()
+	// settings
+	show_up_to_date = localStorage.getItem("show_up_to_date") == "1";
+	$("#toggle_updates").prop("checked", !show_up_to_date);
 	//
 	var tab = window.location.hash.substr(1);
 	try {
@@ -412,15 +415,8 @@ function setup_events() {
 		install_all();
 	});
 	$("#toggle_updates").on("click", async (e) => {
-		show_up_to_date = !show_up_to_date;
-		await update_circup_table();
-	});
-	$("#show_updates").on("click", async (e) => {
-		show_up_to_date = true;
-		await update_circup_table();
-	});
-	$("#hide_updates").on("click", async (e) => {
-		show_up_to_date = false;
+		show_up_to_date = !$("#toggle_updates").prop("checked");
+		localStorage.setItem("show_up_to_date", show_up_to_date ? "1" : "0")
 		await update_circup_table();
 	});
 
