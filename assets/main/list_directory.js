@@ -210,7 +210,7 @@ async function refresh_list() {
 			td[0].innerHTML = icon
 			
 			if(file_info.directory) {
-				td[1].innerHTML = "--"
+				td[1].innerHTML = "-"
 			} else {
 				td[1].innerHTML = file_info.file_size
 			}
