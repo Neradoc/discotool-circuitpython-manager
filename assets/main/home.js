@@ -63,7 +63,8 @@ async function detect_usb() {
 			for(const device of devices) {
 				var drive_path = device.mount
 				var drive_name = device.name
-				var url = url_to(BOARD_PAGE, {"dev": `file://${drive_path}`})
+				var board_link = `file://${drive_path}`;
+				var url = url_to(BOARD_PAGE, {"dev": board_link})
 				var url_link = `${BOARD_PAGE}${url.search}`;
 
 				var wf = new USBWorkflow(drive_path)
@@ -95,6 +96,7 @@ async function detect_usb() {
 				name_field.html(name)
 				var link = all_dev_line.find(".link_usb")
 				link.prop("href", url_link);
+				link.data("board_link", board_link);
 				link.find(".name").html(`${drive_name}`)
 				link.prop("title", drive_path)
 				var board_info = all_dev_line.find(".board_info")
@@ -172,6 +174,7 @@ async function detect_web() {
 			name_field.html(name)
 			var link = all_dev_line.find(".link_web")
 			link.prop("href", url_link);
+			link.data("board_link", board_link);
 			link.find(".name").html(`${board_path}`)
 			link.prop("title", device.ip)
 			var board_info = all_dev_line.find(".board_info")
@@ -254,6 +257,17 @@ async function detect_boards() {
 }
 
 async function init_page() {
+	$(document).on("click", ".board_line .board_link", (e) => {
+		const link = $(e.currentTarget)
+		const url = link.data("board_link")
+		console.log(link)
+		console.log(url)
+		window.postMessage({
+			type: 'open-board',
+			url: url,
+		})
+		return false
+	})
 	$("#reload_boards").on("click", detect_boards)
 	await detect_boards()
 }
