@@ -104,6 +104,9 @@ class Workflow {
 	async get_identifier() {
 		return await this.serial_num()
 	}
+	async get_board_path() {
+		return null
+	}
 	icon = "&#128013;"
 	type = "base"
 	supports_credentials = false

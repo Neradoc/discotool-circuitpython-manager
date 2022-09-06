@@ -9,12 +9,16 @@ const Store = require('electron-store');
 const path = require('path')
 
 var store = new Store()
+var all_windows = new Set()
 
 // change the theme manually ?
 // nativeTheme.themeSource = "light"
 COLUMN_MODE = true
 minX = 40
 minY = 40
+
+const board_page = "html/board-template.html"
+const editor_page = "html/editor-template.html"
 
 function browser_window_options(changes={}, other_changes={}) {
 	var data = {
@@ -92,9 +96,9 @@ function createWindow (winBounds) {
 	mainWindow.on("moved", (e) => {
 		store.set("mainWindowBounds", mainWindow.getBounds())
 	})
-}
 
-const board_page = "html/board-template.html"
+	all_windows.add(mainWindow)
+}
 
 function openBoard (url) {
 	for(test_window of all_windows) {
@@ -109,6 +113,26 @@ function openBoard (url) {
 	new_window.board_url = url
 	new_window.loadFile(board_page, {
 		query: { "dev": url }
+	})
+
+	// Open all the windows with preload.cjs ?
+	new_window.webContents.setWindowOpenHandler((details) => {
+		return {
+			action: 'allow',
+			overrideBrowserWindowOptions: browser_window_options()
+		}
+	})
+	// put it in the list
+	all_windows.add(new_window)
+}
+
+function openFile(args) {
+	const new_window = new BrowserWindow(browser_window_options())
+	const dev_url = args.url
+	const file_path = args.file
+
+	new_window.loadFile(editor_page, {
+		query: { "dev": dev_url, "file": file_path }
 	})
 
 	// Open all the windows with preload.cjs ?
@@ -161,4 +185,8 @@ app.on("browser-window-created", function(event, new_window) {
 
 ipcMain.on('open-board', async (event, arg) => {
 	openBoard(arg.url)
+})
+
+ipcMain.on('open-file-editor', async (event, arg) => {
+	openFile(arg)
 })

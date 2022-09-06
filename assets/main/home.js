@@ -260,8 +260,6 @@ async function init_page() {
 	$(document).on("click", ".board_line .board_link", (e) => {
 		const link = $(e.currentTarget)
 		const url = link.data("board_link")
-		console.log(link)
-		console.log(url)
 		window.postMessage({
 			type: 'open-board',
 			url: url,

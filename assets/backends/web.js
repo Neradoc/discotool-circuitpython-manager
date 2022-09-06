@@ -195,6 +195,9 @@ class WebWorkflow extends Workflow {
 	async get_identifier() {
 		return (await this.device_info()).hostname + ".local"
 	}
+	async get_board_url() {
+		return this.workflow_url_base
+	}
 
 	//##############################################################
 

@@ -24,6 +24,8 @@ const HIDE = {
 	ALL_DOTTED_FILES: 3,
 }
 
+var OPEN_IN_BROWSER = false
+
 var current_path = tools.current_path
 var refreshing = false
 var settings = {
@@ -226,7 +228,7 @@ async function refresh_list() {
 				if(is_secret) {
 					path.on("click", open_secret)
 				} else {
-					path.on("click", open_outside_a)
+					path.on("click", open_file_editor)
 				}
 			}
 			td[3].innerHTML = (new Date(file_info.modified)).toLocaleString()
@@ -241,7 +243,7 @@ async function refresh_list() {
 				edit_button.remove()
 			} else {
 				edit_button.attr("href", api_url)
-				edit_button.on("click", open_outside_a)
+				edit_button.on("click", open_file_editor)
 			}
 
 			var rename_button = clone.find(".rename")
@@ -344,6 +346,32 @@ async function delete_a_file(e) {
 }
 
 /*****************************************************************
+* Open file editor
+*/
+
+function open_file_editor(e) {
+	/*
+	if(common.board_control.type == "usb") {
+		return open_outside_a(e)
+	}
+	if(common.board_control.type == "web" && OPEN_IN_BROWSER) {
+		return open_outside_a(e)
+	}
+	*/
+	const link = $(e.currentTarget)
+	var file = link.data("path")
+	common.board_control.get_board_url().then((url) => {
+		window.postMessage({
+			type: 'open-file-editor',
+			url: url,
+			file: file,
+		})
+	})
+	return false
+}
+
+
+/*****************************************************************
 * Open secret file
 */
 
@@ -351,7 +379,7 @@ function open_secret(e) {
 	var path = $(this).data("path")
 	var prompt = `The file: "${path}"\ncan contain readable passwords.\nAre you sure you want to open it ?`
 	if (confirm(prompt)) {
-		open_outside_a(e)
+		open_file_editor(e)
 	}
 	return false
 }

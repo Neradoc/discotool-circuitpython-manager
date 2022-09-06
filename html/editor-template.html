@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--
+SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
+SPDX-License-Identifier: MIT
+-->
+	<title></title>
+	<base href="../" />
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Security-Policy"
+		  content="default-src 'self'; connect-src *">
+	<link rel="shortcut icon" type="image/jpg" href="assets/images/favicon.png"/>
+	<link rel="stylesheet" href="assets/main/common.css">
+	<link rel="stylesheet" href="assets/main/editor.css">
+	<script src="assets/extlib/jquery.min.js"></script>
+	<script src="assets/extlib/jszip.min.js"></script>
+	<script src="assets/main/editor.js" defer="true" type="module"></script>
+</head>
+<body>
+	<header>
+		<h5><span class="board_name">Loading…</span></h5>
+		<h5><span class="file_name">Loading…</span></h5>
+	</header>
+	<content>
+		<p>
+			<button>Save</button> Last saved:
+			<span class="last_saved"></span> minutes ago.
+		</p>
+		<p>
+			<textarea class="editor_content"></textarea>
+		</p>
+	</content>
+</body>
+</html>
