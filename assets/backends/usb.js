@@ -19,13 +19,14 @@ const DEFAULT_DRIVE = "CIRCUITPY";
 class USBWorkflow extends Workflow {
 	constructor(drive = DEFAULT_DRIVE) {
 		super();
-		this.drive = drive;
+		this.drive = drive.replace("file://","");
 		this._device_info = null;
 		this._editable = false;
 		this.drive_info = null;
 		this.drive_name = null;
 	}
 	async start(drive="") {
+		drive = drive.replace("file://","")
 		if(drive) {
 			this.drive = drive
 		}
