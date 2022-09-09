@@ -20,6 +20,7 @@ class USBWorkflow extends Workflow {
 	constructor(drive = DEFAULT_DRIVE) {
 		super();
 		this.drive = drive.replace("file://","");
+		this.root = this.drive
 		this._device_info = null;
 		this._editable = false;
 		this.drive_info = null;
