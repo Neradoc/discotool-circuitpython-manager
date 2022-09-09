@@ -3,3 +3,26 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
+#editor_content textarea {
+	width: calc(100vw - 20px);
+	height: calc(100vh - 100px);
+}
+a {
+	color: inherit;
+}
+h3 {
+	padding: 2px 8px;
+	margin: 0px;
+}
+.save_block .saving_now {
+	display: none;
+}
+.saving_now img {
+	height: 18px;
+}
+.save_block.saving {
+	background: #004000;
+}
+.save_block.saving .saving_now {
+	display: inline;
+}

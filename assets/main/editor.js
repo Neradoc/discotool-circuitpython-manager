@@ -3,11 +3,26 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
+import * as jq from "../extlib/jquery.min.js";
 import { BUNDLE_ACCESS } from "../../config.js";
 import * as common from "./common.js";
 import * as tools from "../lib/tools.js";
 
+var target_file = null
+var board_control = null
+var last_saved = 0
+var saved_timer = null
+const SAVED_DELAY = 10000
+
+function update_saved() {
+	const now = new Date()
+	const delta = (now - last_saved) / 1000 / 60
+	const minutes = Math.floor(delta)
+	$(".last_saved").html(minutes)
+}
+
 async function init_page() {
+
 	/* get the workflow connection/instance
 	- from a common pool setup somewhere ?
 	- from the main process, via preload ?
@@ -18,17 +33,85 @@ async function init_page() {
 		- returns the existing one if it exists
 		- (using unique identifiers http://IP | file://DRIVE ...
 	*/
+	await common.start()
+	board_control = common.board_control
+	var vinfo = await board_control.device_info()
+	$(".board_name").html(vinfo.board_name)
+	$(".board_link").prop("href", `?dev=${board_control.get_board_url()}`)
+	$(".board_link").data("board_link", await board_control.get_board_url())
+
+	$(document).on("click", ".board_link", (e) => {
+		const link = $(e.currentTarget)
+		const url = link.data("board_link")
+		window.postMessage({
+			type: 'open-board',
+			url: url,
+		})
+		return false
+	})
+
 	/* get the file path from the URL parameters
 	- all in one parameter ?
 		- file:///Volumes/CIRCUITPY/code.py
 		- http://192.168.1.1/fs/code.py
 	*/
+
+	var url = new URL(window.location);
+	target_file = url.searchParams.get("file") || "";
+	$(".file_name").html(target_file)
+
+	// get the file content from the workflow
+
+	const result = await board_control.get_file_content(target_file)
+	if(result.ok) {
+		var file_content = result.content
+		$("#editor_content textarea").val(file_content)
+		last_saved = new Date()
+		$(".last_saved").html(0)
+	}
+
+	saved_timer = setInterval(update_saved, SAVED_DELAY)
+
 	// setup the save command/path (probably only needs the same path)
+
+	var saving_now = false;
+	$(".save_button").on("click", async (e) => {
+		if(saving_now) { return }
+		saving_now = true
+		$(".save_button").prop("disabled", true)
+		$(".save_block").addClass("saving")
+		try {
+			var new_content = $("#editor_content textarea").val()
+			var new_content_blob = new Blob([new_content], { type: 'text/plain' })
+			var save_path = target_file
+			var res = await board_control.upload_file(save_path, new_content_blob)
+			if(res.ok) {
+				last_saved = new Date()
+				update_saved()
+			} else {
+				console.log(res)
+			}
+		} finally {
+			await tools.sleep(2)
+			$(".save_block").removeClass("saving")
+			$(".save_button").prop("disabled", false)
+			saving_now = false
+		}
+	})
+
 	/* check the modifiable state
 	- display a lock and disable saving
 	- check and update it periodically (5s ?)
 	*/
-	// get the file content from the workflow
+
+	if(await board_control.is_editable()) {
+		$("body").addClass("editable")
+		$("body").removeClass("locked")
+	} else {
+		$("body").addClass("locked")
+		$("body").removeClass("editable")
+	}
+
 	// setup the editor with the file's content
 }
 

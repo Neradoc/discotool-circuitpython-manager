@@ -19,16 +19,17 @@ SPDX-License-Identifier: MIT
 </head>
 <body>
 	<header>
-		<h5><span class="board_name">Loading…</span></h5>
-		<h5><span class="file_name">Loading…</span></h5>
+		<h3><a href="BOARD" class="board_name board_link">Loading…</a></h3>
+		<h3><span class="file_name">Loading…</span></h3>
 	</header>
 	<content>
-		<p>
-			<button>Save</button> Last saved:
+		<p class="save_block">
+			<button accesskey="s" class="save_button">Save</button> Last saved:
 			<span class="last_saved"></span> minutes ago.
+			<span class="saving_now"><img src="assets/images/loading_black_small.gif" /> Saving.</span>
 		</p>
-		<p>
-			<textarea class="editor_content"></textarea>
+		<p id="editor_content">
+			<textarea></textarea>
 		</p>
 	</content>
 </body>
