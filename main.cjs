@@ -46,7 +46,6 @@ function createWindow (winBounds) {
 	}
 	browserConfig = browser_window_options(settings)
 
-	console.log("winBounds", winBounds)
 	if(winBounds !== undefined) {
 		if(typeof(winBounds.width) == 'number') {
 			browserConfig.width = Math.max(winBounds.width, browserConfig.minWidth)
@@ -98,7 +97,16 @@ function createWindow (winBounds) {
 const board_page = "html/board-template.html"
 
 function openBoard (url) {
+	for(test_window of all_windows) {
+		// if the board already has a window, activate it
+		if(test_window.board_url && test_window.board_url == url) {
+			test_window.focus()
+			return
+		}
+	}
+
 	const new_window = new BrowserWindow(browser_window_options())
+	new_window.board_url = url
 	new_window.loadFile(board_page, {
 		query: { "dev": url }
 	})
@@ -136,7 +144,16 @@ app.whenReady().then(() => {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', function () {
 	// if (process.platform !== 'darwin')
-	app.quit()
+	if(all_windows.size == 0) {
+		app.quit()
+	}
+})
+
+app.on("browser-window-created", function(event, new_window) {
+	//
+	new_window.on("close", (e) => {
+		all_windows.delete(e.sender)
+	})
 })
 
 // In this file you can include the rest of your app's specific main process

@@ -308,9 +308,10 @@ async function init_page() {
 	} catch(e) {
 		$(".tab_link_welcome").click();
 	}
-	await common.start();
+	await common.start()
 	board_control = common.board_control
 	await board_control.start()
+	window.board_url = await board_control.get_board_url()
 	var vinfo = await board_control.device_info()
 	var workflow_type = board_control.type
 	is_editable = await board_control.is_editable()
