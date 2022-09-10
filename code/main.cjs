@@ -19,6 +19,7 @@ minY = 40
 
 const board_page = "html/board-template.html"
 const editor_page = "html/editor-template.html"
+const preload_script = 'preload.cjs'
 
 function browser_window_options(changes={}, other_changes={}) {
 	var data = {
@@ -28,7 +29,7 @@ function browser_window_options(changes={}, other_changes={}) {
 		minHeight: 600,
 		webPreferences: {
 			// Open all the windows with preload.cjs
-			preload: path.join(__dirname, 'preload.cjs'),
+			preload: path.join(__dirname, preload_script),
 			nodeIntegration: true,
 			nodeIntegrationInWorker: true,
 			contextIsolation: false,

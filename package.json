@@ -2,7 +2,7 @@
   "name": "circup-electron-app",
   "version": "1.0.0-alpha.1",
   "description": "A Library manager for Circuitpython and more",
-  "main": "main.cjs",
+  "main": "code/main.cjs",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
