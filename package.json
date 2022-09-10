@@ -39,7 +39,7 @@
     "forge": {
       "packagerConfig": {
         "asar": false,
-        "ignore": "^/_.*"
+        "ignore": "^/(_.*|tools|tests|server)$"
       },
       "makers": [
         {
