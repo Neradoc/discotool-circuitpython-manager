@@ -262,7 +262,7 @@ async function init_page() {
 		const url = link.data("board_link")
 		window.postMessage({
 			type: 'open-board',
-			url: url,
+			device: url,
 		})
 		return false
 	})

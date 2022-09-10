@@ -13,7 +13,7 @@ export var library_bundle = null;
 export var board_control = null
 export async function start() {
 	var url = new URL(window.location);
-	var url_passed = url.searchParams.get("dev") || "";
+	var url_passed = url.searchParams.get("device") || "";
 
 	if (url_passed.startsWith("file://")) {
 		var target_drive = url_passed.replace(/^file:\/\//, "")

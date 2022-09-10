@@ -5,6 +5,7 @@ SPDX-License-Identifier: MIT
 */
 import * as common from "./common.js"
 import * as tools from "../lib/tools.js"
+import * as password_dialog from "./password-dialog.js"
 
 const HIDDEN = [
 	".fseventsd",
@@ -119,7 +120,7 @@ async function refresh_list() {
 			$("#file_list_error_label").html(error_message)
 			//
 			if(response.status == 401) {
-				await password_dialog_open()
+				await password_dialog.open()
 			}
 			return
 		}
@@ -361,11 +362,16 @@ function open_file_editor(e) {
 	const link = $(e.currentTarget)
 	var file = link.data("path")
 	common.board_control.get_board_url().then((url) => {
-		window.postMessage({
+		var IPC_message = {
 			type: 'open-file-editor',
-			url: url,
+			device: url,
 			file: file,
-		})
+		}
+		if(common.board_control.supports_credentials) {
+			IPC_message.password = $("#password").val()
+		}
+		console.log(IPC_message)
+		window.postMessage(IPC_message)
 	})
 	return false
 }
@@ -466,71 +472,6 @@ async function setup_rename_dialog() {
 }
 
 /*****************************************************************
-* Password dialog
-*/
-
-async function password_dialog_close() {
-	$("#password_dialog").removeClass("popup_dialog")
-	$("body").removeClass("popup_dialog")
-	$("#password").data("backup", "")
-}
-async function password_dialog_open() {
-	$("#password_dialog").addClass("popup_dialog")
-	$("body").addClass("popup_dialog")
-	$("#password").data("backup", $("#password").val())
-}
-async function password_dialog_ok() {
-	var info = await common.board_control.device_info()
-	const serial_num = info["serial_num"]
-	const password_key = `insecure_password_${serial_num}`
-	const password = $("#password").val()
-	common.board_control.set_credentials(undefined, password)
-	if($("#password_dialog #remember_password").is(":checked")) {
-		if(serial_num) localStorage[password_key] = password
-	} else {
-		if(serial_num) delete localStorage[password_key]
-	}
-	password_dialog_close()
-	refresh_list()
-}
-async function password_dialog_cancel() {
-	var info = await common.board_control.device_info()
-	const serial_num = info["serial_num"]
-	const password_key = `insecure_password_${serial_num}`
-	$("#password").val($("#password").data("backup"))
-	if(password_key in localStorage) {
-		$("#password_dialog #remember_password").prop("checked", true)
-	} else {
-		$("#password_dialog #remember_password").prop("checked", false)
-	}
-	password_dialog_close()
-	refresh_list()
-}
-async function setup_password_dialog() {
-	var info = await common.board_control.device_info()
-	const serial_num = info["serial_num"]
-	const password_key = `insecure_password_${serial_num}`
-	$("#password_dialog .ok_button").on("click", password_dialog_ok)
-	$("#password_dialog .cancel_button").on("click", password_dialog_cancel)
-	$("#password_dialog #password").on("keypress", (e) => {
-		if(e.which == 13) {
-			$("#password_dialog .ok_button").click()
-			return false
-		}
-		return true
-	})
-	if(serial_num) {
-		if(password_key in localStorage) {
-			const pass_mem = localStorage[password_key]
-			common.board_control.set_credentials(undefined, pass_mem)
-			$("#password").val(common.board_control.get_password())
-			$("#password_dialog #remember_password").prop("checked", true)
-		}
-	}
-	$(".show_password_dialog").on("click", password_dialog_open)
-}
-
-/*****************************************************************
 * Startup
 */
 
@@ -576,7 +517,7 @@ async function setup_directory() {
 
 	// setup dialogs
 	if(common.board_control.supports_credentials) {
-		await setup_password_dialog()
+		await password_dialog.setup({ "button": refresh_list })
 	}
 	await setup_rename_dialog()
 	
@@ -584,7 +525,7 @@ async function setup_directory() {
 	$(document).on("keydown", (e) => {
 		if(e.which == 27 && $("body").is(".popup_dialog")) {
 			rename_dialog_close()
-			password_dialog_close()
+			password_dialog.close()
 			return false
 		}
 		return true;

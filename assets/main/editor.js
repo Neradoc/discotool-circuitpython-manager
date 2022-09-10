@@ -4,11 +4,12 @@ SPDX-License-Identifier: MIT
 */
 
 import * as jq from "../extlib/jquery.min.js";
-import { BUNDLE_ACCESS } from "../../config.js";
 import * as common from "./common.js";
 import * as tools from "../lib/tools.js";
+import * as password_dialog from "./password-dialog.js"
 
 var target_file = null
+var password = ""
 var board_control = null
 var last_saved = 0
 var saved_timer = null
@@ -35,6 +36,17 @@ async function init_page() {
 	*/
 	await common.start()
 	board_control = common.board_control
+
+	// setup the password
+	var window_url = new URL(window.location);
+	if(board_control.supports_credentials) {
+		password = window_url.searchParams.get("password") || "";
+		$("#password").val(password)
+		board_control.set_credentials(null, password)
+		await password_dialog.setup()
+	}
+
+	// setup page information
 	var vinfo = await board_control.device_info()
 	$(".board_name").html(vinfo.board_name)
 	$(".board_link").prop("href", `?dev=${board_control.get_board_url()}`)
@@ -45,7 +57,7 @@ async function init_page() {
 		const url = link.data("board_link")
 		window.postMessage({
 			type: 'open-board',
-			url: url,
+			device: url,
 		})
 		return false
 	})
@@ -56,19 +68,8 @@ async function init_page() {
 		- http://192.168.1.1/fs/code.py
 	*/
 
-	var url = new URL(window.location);
-	target_file = url.searchParams.get("file") || "";
+	target_file = window_url.searchParams.get("file") || "";
 	$(".file_name").html(target_file)
-
-	// get the file content from the workflow
-
-	const result = await board_control.get_file_content(target_file)
-	if(result.ok) {
-		var file_content = result.content
-		$("#editor_content textarea").val(file_content)
-		last_saved = new Date()
-		$(".last_saved").html(0)
-	}
 
 	saved_timer = setInterval(update_saved, SAVED_DELAY)
 
@@ -113,6 +114,28 @@ async function init_page() {
 	}
 
 	// setup the editor with the file's content
+
+	async function setup_editor_content() {
+		const result = await board_control.get_file_content(target_file)
+		if(result.ok) {
+			var file_content = result.content
+			$("#editor_content textarea").val(file_content)
+			last_saved = new Date()
+			$(".last_saved").html(0)
+			return true
+		}
+		return false
+	}
+	function do_setup_editor_content() {
+		setup_editor_content().then((res) => {
+			if(res === false) {
+				password_dialog.open().then(() => {
+					do_setup_editor_content()
+				})
+			}
+		})
+	}
+	do_setup_editor_content()
 }
 
 init_page();

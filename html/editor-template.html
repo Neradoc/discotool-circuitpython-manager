@@ -13,8 +13,9 @@ SPDX-License-Identifier: MIT
 	<link rel="shortcut icon" type="image/jpg" href="assets/images/favicon.png"/>
 	<link rel="stylesheet" href="assets/main/common.css">
 	<link rel="stylesheet" href="assets/main/editor.css">
-	<script src="assets/extlib/jquery.min.js"></script>
-	<script src="assets/extlib/jszip.min.js"></script>
+	<script src="assets/extlib/jquery.min.js" async="true"></script>
+	<script src="assets/extlib/jszip.min.js" async="true"></script>
+	<script src="assets/lib/template.js" defer="true" type="module"></script>
 	<script src="assets/main/editor.js" defer="true" type="module"></script>
 </head>
 <body>
@@ -32,5 +33,6 @@ SPDX-License-Identifier: MIT
 			<textarea></textarea>
 		</p>
 	</content>
+	<div id="password_dialog" class="include" data-src="dialog-password"></div>
 </body>
 </html>

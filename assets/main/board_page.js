@@ -286,16 +286,6 @@ async function bundle_install() {
 }
 
 async function init_page() {
-	for(const item of $(".include")) {
-		// get the include file name
-		const source = $(item).data("src") + ".html"
-		// get the include content
-		const response = await fetch(`html/${source}`)
-		const loaded = await response.text()
-		// put it in
-		$(item).replaceWith(loaded)
-	}
-	//
 	LOADING_IMAGE = $("#small_load_image").html()
 	setup_events()
 	// settings
@@ -405,8 +395,6 @@ function setup_events() {
 	});
 	$(document).on("click", "#file_list_list .analyze", (e) => {
 		var path = $(e.currentTarget).data("path");
-		console.log(e)
-		console.log(path)
 		$(".tab_link_circup").click();
 		run_exclusively(() => auto_install(path));
 		return false;

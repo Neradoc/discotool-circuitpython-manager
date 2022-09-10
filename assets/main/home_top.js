@@ -26,7 +26,7 @@ async function look_at_files(files_dropped) {
 				var link = `file://${file.path}`
 				window.postMessage({
 					type: 'open-board',
-					url: link,
+					device: link,
 				})
 			}
 		}
@@ -97,6 +97,6 @@ $("#web_open_panel .web_go").on("click", (e) => {
 	var link = `http://${target}`
 	window.postMessage({
 		type: 'open-board',
-		url: link,
+		device: link,
 	})
 });

@@ -3,6 +3,8 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
+@import url("password-dialog.css");
+
 #editor_content textarea {
 	width: calc(100vw - 20px);
 	height: calc(100vh - 100px);

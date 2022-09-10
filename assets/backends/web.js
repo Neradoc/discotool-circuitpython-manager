@@ -39,7 +39,7 @@ class WebWorkflow extends Workflow {
 	async start(url_passed=null) {
 		// TODO: setup the actual URL for the workflow OUTSIDE
 		// var url = new URL(window.location);
-		// var url_passed = url.searchParams.get("dev");
+		// var url_passed = url.searchParams.get("device");
 		try {
 			if(url_passed) {
 				var url_test = new URL("/", `http://${url_passed}`);

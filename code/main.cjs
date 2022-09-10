@@ -87,7 +87,7 @@ function createWindow (winBounds) {
 		if(!result.canceled && result.filePaths.length > 0) {
 			const dir_path = result.filePaths[0]
 			const dir_url = `file://${dir_path}`
-			openBoard(dir_url)
+			openBoard({"device": dir_url})
 		}
 	})
 
@@ -101,7 +101,9 @@ function createWindow (winBounds) {
 	all_windows.add(mainWindow)
 }
 
-function openBoard (url) {
+function openBoard (args) {
+	url = args.device
+
 	for(test_window of all_windows) {
 		// if the board already has a window, activate it
 		if(test_window.board_url && test_window.board_url == url) {
@@ -113,7 +115,7 @@ function openBoard (url) {
 	const new_window = new BrowserWindow(browser_window_options())
 	new_window.board_url = url
 	new_window.loadFile(board_page, {
-		query: { "dev": url }
+		query: { "device": url }
 	})
 
 	// Open all the windows with preload.cjs ?
@@ -129,12 +131,11 @@ function openBoard (url) {
 
 function openFile(args) {
 	const new_window = new BrowserWindow(browser_window_options())
-	const dev_url = args.url
-	const file_path = args.file
 
-	new_window.loadFile(editor_page, {
-		query: { "dev": dev_url, "file": file_path }
-	})
+	var query_args = Object.assign({}, args)
+	delete query_args.type
+	// { "device": dev_url, "file": file_path }
+	new_window.loadFile(editor_page, { query: query_args })
 
 	// Open all the windows with preload.cjs ?
 	new_window.webContents.setWindowOpenHandler((details) => {
@@ -185,7 +186,7 @@ app.on("browser-window-created", function(event, new_window) {
 // code. You can also put them in separate files and require them here.
 
 ipcMain.on('open-board', async (event, arg) => {
-	openBoard(arg.url)
+	openBoard(arg)
 })
 
 ipcMain.on('open-file-editor', async (event, arg) => {
