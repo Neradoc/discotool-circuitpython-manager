@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 */
 import * as common from "./common.js"
 import * as tools from "../lib/tools.js"
-import * as password_dialog from "./password-dialog.js"
+import * as password_dialog from "./password_dialog.js"
 
 const HIDDEN = [
 	".fseventsd",
