@@ -351,14 +351,12 @@ async function delete_a_file(e) {
 */
 
 function open_file_editor(e) {
-	/*
 	if(common.board_control.type == "usb") {
 		return open_outside_a(e)
 	}
 	if(common.board_control.type == "web" && OPEN_IN_BROWSER) {
 		return open_outside_a(e)
 	}
-	*/
 	const link = $(e.currentTarget)
 	var file = link.data("path")
 	common.board_control.get_board_url().then((url) => {

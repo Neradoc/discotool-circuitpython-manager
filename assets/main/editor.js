@@ -48,9 +48,12 @@ async function init_page() {
 
 	// setup page information
 	var vinfo = await board_control.device_info()
-	$(".board_name").html(vinfo.board_name)
-	$(".board_link").prop("href", `?dev=${board_control.get_board_url()}`)
-	$(".board_link").data("board_link", await board_control.get_board_url())
+	var board_url = await board_control.get_board_url()
+	var board_name = vinfo.board_name
+
+	$(".board_name").html(board_name)
+	$(".board_link").prop("href", `?dev=${board_url}`)
+	$(".board_link").data("board_link", board_url)
 
 	$(document).on("click", ".board_link", (e) => {
 		const link = $(e.currentTarget)
@@ -70,6 +73,8 @@ async function init_page() {
 
 	target_file = window_url.searchParams.get("file") || "";
 	$(".file_name").html(target_file)
+
+	$("title").html(`${target_file} - ${board_url} - ${board_name}`)
 
 	saved_timer = setInterval(update_saved, SAVED_DELAY)
 
