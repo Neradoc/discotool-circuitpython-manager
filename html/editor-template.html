@@ -20,7 +20,14 @@ SPDX-License-Identifier: MIT
 </head>
 <body>
 	<header>
-		<h3><a href="BOARD" class="board_name board_link">Loading…</a></h3>
+		<h3>
+			<span class="icon">
+				<img class="icon_usb" src="assets/svg/usb-dongle.svg"/>
+				<img class="icon_web" src="assets/svg/wifi-chip.svg"/>
+				<img class="icon_locked" src="assets/svg/lock.svg"/>
+			</span>
+			<a href="BOARD" class="board_name board_link">Loading…</a>
+		</h3>
 		<h3><span class="file_name">Loading…</span></h3>
 	</header>
 	<content>
@@ -28,6 +35,9 @@ SPDX-License-Identifier: MIT
 			<button accesskey="s" class="save_button">Save</button> Last saved:
 			<span class="last_saved"></span> minutes ago.
 			<span class="saving_now"><img src="assets/images/loading_black_small.gif" /> Saving.</span>
+		</p>
+		<p class="no_save_block">
+			The board is locked, the file can not be written.
 		</p>
 		<p id="editor_content">
 			<textarea></textarea>

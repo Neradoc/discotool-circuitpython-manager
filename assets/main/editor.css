@@ -16,6 +16,33 @@ h3 {
 	padding: 2px 8px;
 	margin: 0px;
 }
+
+/* Top title board icon */
+header .icon
+{
+	position: relative;
+	display: inline-block;
+	vertical-align: sub;
+	filter: var(--svg-glow);
+}
+header .icon img {
+	display: none;
+	height: 32px;
+}
+header .icon .icon_locked {
+	position: absolute;
+	height: 18px;
+	top: 0px;
+	left: calc(50% - 24px);
+}
+.board_locked header .icon_locked {
+	display: block;
+}
+.icon_locked {
+	filter: var(--svg-glow);
+}
+
+/* save block */
 .save_block .saving_now {
 	display: none;
 }
@@ -28,3 +55,10 @@ h3 {
 .save_block.saving .saving_now {
 	display: inline;
 }
+
+.no_save_block {
+	display: none;
+	opacity: 50%;
+}
+.board_locked .save_block { display: none; }
+.board_locked .no_save_block { display: block; }

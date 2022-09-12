@@ -54,6 +54,7 @@ async function init_page() {
 	$(".board_name").html(board_name)
 	$(".board_link").prop("href", `?dev=${board_url}`)
 	$(".board_link").data("board_link", board_url)
+	$(`header .icon_${board_control.type}`).show()
 
 	$(document).on("click", ".board_link", (e) => {
 		const link = $(e.currentTarget)
@@ -111,11 +112,12 @@ async function init_page() {
 	*/
 
 	if(await board_control.is_editable()) {
-		$("body").addClass("editable")
-		$("body").removeClass("locked")
+		$("body").addClass("board_editable")
+		$("body").removeClass("board_locked")
 	} else {
-		$("body").addClass("locked")
-		$("body").removeClass("editable")
+		$("body").addClass("board_locked")
+		$("body").removeClass("board_editable")
+		$(".save_button").prop("disabled", true)
 	}
 
 	// setup the editor with the file's content
