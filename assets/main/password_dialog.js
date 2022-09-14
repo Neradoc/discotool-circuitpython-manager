@@ -3,28 +3,28 @@ SPDX-FileCopyrightText: Copyright (c) Scott Shawcroft for Adafruit
 SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
-import * as common from "./common.js"
-import * as tools from "../lib/tools.js"
-
 var callbacks = {}
+var board_control = null
 
 async function close() {
 	$("#password_dialog").removeClass("popup_dialog")
 	$("body").removeClass("popup_dialog")
-	$("#password").data("backup", "")
 	callbacks?.close?.("close")
 }
-async function open() {
+async function open(callback_list) {
+	if(callback_list) {
+		Object.assign(callbacks, callback_list)
+	}
 	$("#password_dialog").addClass("popup_dialog")
 	$("body").addClass("popup_dialog")
-	$("#password").data("backup", $("#password").val())
+	$("#password").val(board_control.get_password())
 }
 async function ok() {
-	var info = await common.board_control.device_info()
+	var info = await board_control.device_info()
 	const serial_num = info["serial_num"]
 	const password_key = `insecure_password_${serial_num}`
 	const password = $("#password").val()
-	common.board_control.set_credentials(undefined, password)
+	board_control.set_credentials(undefined, password)
 	if($("#password_dialog #remember_password").is(":checked")) {
 		if(serial_num) localStorage[password_key] = password
 	} else {
@@ -34,10 +34,10 @@ async function ok() {
 	callbacks?.button?.("ok")
 }
 async function cancel() {
-	var info = await common.board_control.device_info()
+	var info = await board_control.device_info()
 	const serial_num = info["serial_num"]
 	const password_key = `insecure_password_${serial_num}`
-	$("#password").val($("#password").data("backup"))
+	$("#password").val(board_control.get_password())
 	if(password_key in localStorage) {
 		$("#password_dialog #remember_password").prop("checked", true)
 	} else {
@@ -46,11 +46,12 @@ async function cancel() {
 	close()
 	callbacks?.button?.("cancel")
 }
-async function setup(callback_list) {
+async function setup(board_ctrl, callback_list, password=null) {
+	board_control = board_ctrl
 	if(callback_list) {
 		callbacks = callback_list
 	}
-	var info = await common.board_control.device_info()
+	var info = await board_control.device_info()
 	const serial_num = info["serial_num"]
 	const password_key = `insecure_password_${serial_num}`
 	$("#password_dialog .ok_button").on("click", ok)
@@ -62,11 +63,14 @@ async function setup(callback_list) {
 		}
 		return true
 	})
-	if(serial_num) {
+	if(password != null) {
+		board_control.set_credentials(null, password)
+		$("#password").val(password)
+	} else if(serial_num) {
 		if(password_key in localStorage) {
 			const pass_mem = localStorage[password_key]
-			common.board_control.set_credentials(undefined, pass_mem)
-			$("#password").val(common.board_control.get_password())
+			board_control.set_credentials(undefined, pass_mem)
+			$("#password").val(board_control.get_password())
 			$("#password_dialog #remember_password").prop("checked", true)
 		}
 	}

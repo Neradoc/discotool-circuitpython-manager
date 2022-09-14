@@ -515,7 +515,7 @@ async function setup_directory() {
 
 	// setup dialogs
 	if(common.board_control.supports_credentials) {
-		await password_dialog.setup({ "button": refresh_list })
+		await password_dialog.setup(common.board_control, { "button": refresh_list })
 	}
 	await setup_rename_dialog()
 	

@@ -40,10 +40,9 @@ async function init_page() {
 	// setup the password
 	var window_url = new URL(window.location);
 	if(board_control.supports_credentials) {
-		password = window_url.searchParams.get("password") || "";
-		$("#password").val(password)
-		board_control.set_credentials(null, password)
-		await password_dialog.setup()
+		// password was passed from the parent window
+		password = window_url.searchParams.get("password") || null
+		await password_dialog.setup(board_control, undefined, password)
 	}
 
 	// setup page information
@@ -136,8 +135,8 @@ async function init_page() {
 	function do_setup_editor_content() {
 		setup_editor_content().then((res) => {
 			if(res === false) {
-				password_dialog.open().then(() => {
-					do_setup_editor_content()
+				password_dialog.open({
+					"close": do_setup_editor_content,
 				})
 			}
 		})
