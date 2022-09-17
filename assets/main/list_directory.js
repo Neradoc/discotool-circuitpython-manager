@@ -26,16 +26,19 @@ const HIDE = {
 }
 
 var OPEN_IN_BROWSER = false
+var USE_TRIANGLES = false
 
 var current_path = tools.current_path
 var refreshing = false
 var settings = {
 	show_system_files: false,
 	sort_directories_first: false,
+	use_triangles: USE_TRIANGLES,
 }
+var triangles = new Set()
 
-function _icon(name) {
-	return `<img src="assets/svg/${name}.svg" />`
+function _icon(name, cls="") {
+	return `<img src="assets/svg/${name}.svg" class="${cls}" />`
 }
 
 /*****************************************************************
@@ -82,6 +85,203 @@ async function get_error_message(response, message) {
 * Create or refresh the list of files
 */
 
+async function insert_files_list(current_list_path, list_depth="") {
+	var response = await common.board_control.list_dir(current_list_path)
+
+	if (! response.ok) {
+		$('#file_list_error').show()
+		$('#file_list_body tr').remove()
+		const message = `Directory listing failed`
+		var error_message = await get_error_message(response, message)
+		$("#file_list_error_label").html(error_message)
+		//
+		if(response.status == 401) {
+			await password_dialog.open()
+		}
+		return
+	}
+
+	var dir_files_list = response.content
+	var new_children = []
+	var template = $('#file_list_template')
+
+	var link = $("#file_list .go_back_up")
+	if (current_list_path != "/") {
+		const parent = new URL("..", "file://" + current_list_path)
+		link.prop("href", tools.url_here({"path": parent.pathname}))
+		link.show()
+	} else {
+		link.hide()
+	}
+
+	if(settings["sort_directories_first"]) {
+		dir_files_list.sort((a,b) => {
+			if(a.directory != b.directory) {
+				return a.directory ? -1 : 1
+			}
+			return a.name.localeCompare(b.name)
+		})
+	} else {
+		dir_files_list.sort((a,b) => {
+			return a.name.localeCompare(b.name)
+		})
+	}
+
+	const num_files = dir_files_list.length
+	for (const file_pos in dir_files_list) {
+		var file_info = dir_files_list[file_pos]
+		// Clone the new row and insert it into the table
+		var clone = template.clone()
+		clone.prop("id", "")
+		var td = clone.find("td")
+		var file_path = current_list_path + file_info.name
+		// TODO: this is backend-specific
+		// -> make the backend cooperate with this to get the "direct reference"
+		// for web workflow it is currently the direct URL, though it should
+		// not remain so in the future.
+		let api_url = common.board_control.api_url(file_path)
+		if (file_info.directory) {
+			file_path += "/"
+			api_url += "/"
+		}
+		const ext_icons = [
+			[["txt"], _icon("file-text")],
+			[["py"], _icon("file-code-py")],
+			[["js", "json"], _icon("file-code-curl")],
+			[["html", "html"], _icon("file-code-html")],
+			[["mpy"], _icon("adafruit_blinka_angles-right")],
+			[["jpg", "jpeg", "png", "bmp", "gif"], _icon("picture")],
+			[["wav", "mp3", "ogg"], _icon("file-music")],
+		]
+		var hide_level = settings["show_system_files"] ? HIDE.NOTHING : HIDE.ALL_SYSTEM_FILES
+		var is_secret = false;
+		var icon = _icon("file-unknown")
+		if (current_list_path == "/" && SECRETS.includes(file_info.name)) {
+			is_secret = true
+			icon = _icon("key")
+		} else if (current_list_path == "/" && HIDDEN.includes(file_info.name)) {
+			// hidden names in root
+			if(file_info.directory) {
+				icon = _icon("folder-no")
+			} else {
+				icon = _icon("file-no")
+			}
+			if(hide_level >= HIDE.DEFAULT_SYSTEM_FILES) continue
+		} else if (file_info.name.startsWith("._")) {
+			icon = _icon("apple")
+			if(hide_level >= HIDE.ALL_SYSTEM_FILES) continue
+		} else if (file_info.name.startsWith(".")) {
+			icon = _icon("file-invisible")
+			if(hide_level >= HIDE.ALL_DOTTED_FILES) continue
+		} else if (current_list_path == "/" && file_info.name == "lib") {
+			icon = _icon("folder-lib")
+		} else if (current_list_path == "/" && file_info.name == "boot_out.txt") {
+			icon = _icon("file-info") // info-circle
+		} else if (file_info.directory) {
+			icon = _icon("folder")
+		} else {
+			for(const file_dat of ext_icons) {
+				const ext = file_info.name.split(".").pop()
+				if(file_dat[0].includes(ext)) {
+					icon = file_dat[1]
+					break
+				}
+			}
+		}
+		td[0].innerHTML = icon
+
+		if(file_info.directory) {
+			if(settings["use_triangles"]) {
+				var dbutton = $("<a class='triangle'/>")
+				dbutton.data("path", file_path)
+				if(triangles.has(file_path)) {
+					dbutton.html(_icon("triangle-down"))
+				} else {
+					dbutton.html(_icon("triangle-right"))
+				}
+				dbutton.on("click", open_triangle)
+				$(td[1]).append(dbutton)
+			} else {
+				td[1].innerHTML = "-"
+			}
+		} else {
+			td[1].innerHTML = file_info.file_size
+		}
+
+		var path = clone.find("a.path")
+		path.html(file_info.name)
+		path.data("path", file_path)
+		if(file_info.directory) {
+			path.attr("href", tools.url_here({"path": `${file_path}`}))
+			path.addClass("files_list_dir")
+		} else {
+			path.attr("href", api_url)
+			if(is_secret) {
+				path.on("click", open_secret)
+			} else {
+				path.on("click", open_file_editor)
+			}
+		}
+
+		if(settings["use_triangles"] && list_depth) {
+			var prepend = $(td[2]).find(".prepend")
+			prepend.append(list_depth)
+			if(file_pos < num_files - 1) {
+				prepend.append(_icon("dash-cornervertical", "dash"))
+			} else {
+				prepend.append(_icon("dash-corner", "dash"))
+			}
+			var depth_length = list_depth.match(/<img/g)?.length || 0
+			path.css("padding-left", `${(depth_length+1) * 12 + 6}px`)
+		}
+
+		$(td[3]).html((new Date(file_info.modified)).toLocaleString())
+		var delete_button = clone.find(".delete")
+		delete_button.data("path", file_path)
+		delete_button.val(file_path)
+		delete_button.on("click", delete_a_file)
+
+		var edit_button = clone.find(".edit")
+		edit_button.data("path", file_path)
+		if(file_info.directory) {
+			edit_button.remove()
+		} else {
+			edit_button.attr("href", api_url)
+			edit_button.on("click", open_file_editor)
+		}
+
+		var rename_button = clone.find(".rename")
+		rename_button.data("path", file_path)
+		rename_button.attr("href", api_url)
+		rename_button.on("click", rename_dialog_open)
+
+		var analyze_button = clone.find(".analyze")
+		if(file_info.name.endsWith(".py")) {  // || search("requirement") >= 0 ?
+			analyze_button.data("path", file_path)
+			analyze_button.val(api_url)
+		} else {
+			analyze_button.hide()
+		}
+
+		new_children.push(clone)
+
+		if(settings["use_triangles"] && file_info.directory && triangles.has(file_path)) {
+			var sub_list = list_depth
+			if(list_depth == "") {
+				sub_list = _icon("dash-spacer", "dash")
+			} else {
+				if(file_pos < num_files - 1) {
+					sub_list += _icon("dash-vertical", "dash")
+				} else {
+					sub_list += _icon("dash-spacer", "dash")
+				}
+			}
+			var sub_list = await insert_files_list(file_path, sub_list)
+			new_children = new_children.concat(sub_list)
+		}
+	}
+	return new_children
+}
 async function refresh_list() {
 	if (refreshing) {
 		return
@@ -110,161 +310,11 @@ async function refresh_list() {
 		}
 		pwd.html(pwd_link)
 
-		var response = await common.board_control.list_dir(current_path)
-
-		if (! response.ok) {
-			$('#file_list_error').show()
-			$('#file_list_body tr').remove()
-			const message = `Directory listing failed`
-			var error_message = await get_error_message(response, message)
-			$("#file_list_error_label").html(error_message)
-			//
-			if(response.status == 401) {
-				await password_dialog.open()
-			}
-			return
-		}
-
-		var dir_files_list = response.content
-		var new_children = []
-		var template = $('#file_list_template')
-
-		var link = $("#file_list .go_back_up")
-		if (current_path != "/") {
-			const parent = new URL("..", "file://" + current_path)
-			link.prop("href", tools.url_here({"path": parent.pathname}))
-			link.show()
-		} else {
-			link.hide()
-		}
-
-		if(settings["sort_directories_first"]) {
-			dir_files_list.sort((a,b) => {
-				if(a.directory != b.directory) {
-					return a.directory ? -1 : 1
-				}
-				return a.name.localeCompare(b.name)
-			})
-		} else {
-			dir_files_list.sort((a,b) => {
-				return a.name.localeCompare(b.name)
-			})
-		}
-
-		for (const file_info of dir_files_list) {
-			// Clone the new row and insert it into the table
-			var clone = template.clone()
-			clone.prop("id", "")
-			var td = clone.find("td")
-			var file_path = current_path + file_info.name
-			// TODO: this is backend-specific
-			// -> make the backend cooperate with this to get the "direct reference"
-			// for web workflow it is currently the direct URL, though it should
-			// not remain so in the future.
-			let api_url = common.board_control.api_url(file_path)
-			if (file_info.directory) {
-				file_path += "/"
-				api_url += "/"
-			}
-			const ext_icons = [
-				[["txt"], _icon("file-text")],
-				[["py"], _icon("file-code-py")],
-				[["js", "json"], _icon("file-code-curl")],
-				[["html", "html"], _icon("file-code-html")],
-				[["mpy"], _icon("adafruit_blinka_angles-right")],
-				[["jpg", "jpeg", "png", "bmp", "gif"], _icon("picture")],
-				[["wav", "mp3", "ogg"], _icon("file-music")],
-			]
-			var hide_level = settings["show_system_files"] ? HIDE.NOTHING : HIDE.ALL_SYSTEM_FILES
-			var is_secret = false;
-			var icon = _icon("file-unknown")
-			if (current_path == "/" && SECRETS.includes(file_info.name)) {
-				is_secret = true
-				icon = _icon("key")
-			} else if (current_path == "/" && HIDDEN.includes(file_info.name)) {
-				// hidden names in root
-				if(file_info.directory) {
-					icon = _icon("folder-no")
-				} else {
-					icon = _icon("file-no")
-				}
-				if(hide_level >= HIDE.DEFAULT_SYSTEM_FILES) continue
-			} else if (file_info.name.startsWith("._")) {
-				icon = _icon("apple")
-				if(hide_level >= HIDE.ALL_SYSTEM_FILES) continue
-			} else if (file_info.name.startsWith(".")) {
-				icon = _icon("file-invisible")
-				if(hide_level >= HIDE.ALL_DOTTED_FILES) continue
-			} else if (current_path == "/" && file_info.name == "lib") {
-				icon = _icon("folder-lib")
-			} else if (current_path == "/" && file_info.name == "boot_out.txt") {
-				icon = _icon("file-info") // info-circle
-			} else if (file_info.directory) {
-				icon = _icon("folder")
-			} else {
-				for(const file_dat of ext_icons) {
-					const ext = file_info.name.split(".").pop()
-					if(file_dat[0].includes(ext)) {
-						icon = file_dat[1]
-						break
-					}
-				}
-			}
-			td[0].innerHTML = icon
-			
-			if(file_info.directory) {
-				td[1].innerHTML = "-"
-			} else {
-				td[1].innerHTML = file_info.file_size
-			}
-
-			var path = clone.find("a.path")
-			path.html(file_info.name)
-			path.data("path", file_path)
-			if(file_info.directory) {
-				path.attr("href", tools.url_here({"path": `${file_path}`}))
-				path.addClass("files_list_dir")
-			} else {
-				path.attr("href", api_url)
-				if(is_secret) {
-					path.on("click", open_secret)
-				} else {
-					path.on("click", open_file_editor)
-				}
-			}
-			td[3].innerHTML = (new Date(file_info.modified)).toLocaleString()
-			var delete_button = clone.find(".delete")
-			delete_button.data("path", file_path)
-			delete_button.val(file_path)
-			delete_button.on("click", delete_a_file)
-
-			var edit_button = clone.find(".edit")
-			edit_button.data("path", file_path)
-			if(file_info.directory) {
-				edit_button.remove()
-			} else {
-				edit_button.attr("href", api_url)
-				edit_button.on("click", open_file_editor)
-			}
-
-			var rename_button = clone.find(".rename")
-			rename_button.data("path", file_path)
-			rename_button.attr("href", api_url)
-			rename_button.on("click", rename_dialog_open)
-
-			var analyze_button = clone.find(".analyze")
-			if(file_info.name.endsWith(".py")) {  // || search("requirement") >= 0 ?
-				analyze_button.data("path", file_path)
-				analyze_button.val(api_url)
-			} else {
-				analyze_button.hide()
-			}
-
-			new_children.push(clone)
-		}
-		$('#file_list_loading_image').hide()
 		$("#file_list_body tr").remove()
+
+		const new_children = await insert_files_list(current_path)
 		$("#file_list_body").append(new_children)
+
 		$('#file_list_loading_image').hide()
 	} catch(e) {
 		console.log(e)
@@ -374,6 +424,21 @@ function open_file_editor(e) {
 	return false
 }
 
+/*****************************************************************
+* Open a triangle directory
+*/
+
+function open_triangle(e) {
+	var self = $(e.currentTarget)
+	const file_path = self.data("path")
+	if(triangles.has(file_path)) {
+		triangles.delete(file_path)
+	} else {
+		triangles.add(file_path)
+	}
+	refresh_list()
+	return false
+}
 
 /*****************************************************************
 * Open secret file
@@ -487,6 +552,7 @@ async function setup_directory() {
 			refresh_list()
 		})
 	}
+	settings["use_triangles"] = localStorage.getItem("use_triangles", false) == "1"
 
 	// setup thingies
 	let upload_button = $("#upload_button")

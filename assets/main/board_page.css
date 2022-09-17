@@ -162,8 +162,10 @@ tr.odd { background: var(--color-pair1); }
 #file_list td.type { text-align: center; }
 #file_list td.size { text-align: right; }
 #file_list td.path {
+	position: relative;
 	text-align: left;
 	width: 100%;
+	padding: 0px;
 }
 #file_list td.modified {
 	text-align: right;
@@ -174,9 +176,19 @@ tr.odd { background: var(--color-pair1); }
 	white-space: nowrap;
 }
 
+#file_list td.path .prepend {
+	position: absolute;
+	top: 0px;
+}
+#file_list td.path .dash {
+	display: inline-block;
+	position: relative;
+	top: 0px;
+	height: 34px;
+}
 #file_list td a.path {
 	display: block;
-	padding: 2px 4px;
+	padding: 2px 4px 4px;
 }
 #file_list td a.path:hover {
 	background: var(--hover-background);
