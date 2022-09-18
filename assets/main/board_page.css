@@ -2,7 +2,7 @@
 SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
-@import url("password_dialog.css");
+@import url("../sub/password_dialog.css");
 
 div.usb_workflow { display: none; }
 body.workflow_type_usb div.usb_workflow { display: block; }

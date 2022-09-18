@@ -4,9 +4,9 @@ SPDX-License-Identifier: MIT
 */
 
 import * as jq from "../extlib/jquery.min.js";
-import * as common from "./common.js";
+import * as common from "../main/common.js";
 import * as tools from "../lib/tools.js";
-import * as password_dialog from "./password_dialog.js"
+import * as password_dialog from "../sub/password_dialog.js"
 
 var target_file = null
 var password = ""
