@@ -48,29 +48,38 @@ SPDX-License-Identifier: MIT
 	</table>
 	<div id="file_list_loading_image"><img src="assets/images/loading_black.gif" /></div>
 	<commands>
-	<group>
-		<input type="file" id="files_upload" name="files" multiple />
-		<button type="submit" id="upload_button">Upload</button>
-	</group>
-	<group>
-		<img class="mkdir_icon" src="assets/svg/folder-plus.svg" /> <input type="text" placeholder="New Directory" id="new_directory_name" />
-		<button type="submit" id="mkdir">Create Directory</button>
-	</group>
-	<group id="file_list_setup_buttons">
-		<label>
-			<input type="checkbox" name="show_system_files"/>
-			Show System Files
-		</label>
-		<label>
-			<input type="checkbox" name="sort_directories_first"/>
-			Directories First
-		</label>
-	</group>
-	<group class="install_buttons">
-		<button type="submit" class="auto_install">Auto Install...</button>
-		<button type="submit" class="update_all">Update All...</button>
-	</group>
-	</command>
+		<group>
+			<input type="file" id="files_upload" name="files" multiple />
+			<button type="submit" id="upload_button">Upload</button>
+		</group>
+		<group>
+			<img class="mkdir_icon" src="assets/svg/folder-plus.svg" /> <input type="text" placeholder="New Directory" id="new_directory_name" />
+			<button type="submit" id="mkdir">Create Directory</button>
+		</group>
+		<group class="file_list_setup_buttons">
+			<a href="" class="unroll">
+				<img class="icon icon-down" src="assets/svg/triangle-down.svg"
+				/><img class="icon icon-right" src="assets/svg/triangle-right.svg"
+				/>Change File List Settings
+			</a>
+			<label>
+				<input type="checkbox" name="show_system_files"/>
+				Show System Files
+			</label>
+			<label>
+				<input type="checkbox" name="sort_directories_first"/>
+				Directories First
+			</label>
+			<label>
+				<input type="checkbox" name="show_list_triangles"/>
+				Show List Triangles
+			</label>
+		</group>
+		<group class="install_buttons">
+			<button type="submit" class="auto_install">Auto Install...</button>
+			<button type="submit" class="update_all">Update All...</button>
+		</group>
+	</commands>
 </div>
 
 <div id="rename_dialog">

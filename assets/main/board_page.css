@@ -252,6 +252,39 @@ commands .mkdir_icon {
 	height: 24px;
 	float: left;
 }
+commands group .unroll {
+	display: block;
+}
+commands group.file_list_setup_buttons label {
+	display: none;
+}
+commands group.unrolled label {
+	display: block;
+	margin-top: 6px;
+}
+commands group.file_list_setup_buttons {
+	grid-column: 1 / 3;
+}
+commands group.unrolled {
+	grid-column: 1 / 3;
+}
+
+commands group .icon-down {
+	display: none;
+}
+commands group.unrolled .icon-down {
+	display: inline;
+	vertical-align: sub;
+}
+commands group .icon-right {
+	display: inline;
+	vertical-align: sub;
+}
+commands group.unrolled .icon-right {
+	display: none;
+}
+
+
 #file_list_list.loading {
 	opacity: 0.30;
 }

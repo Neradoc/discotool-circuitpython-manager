@@ -33,7 +33,7 @@ var refreshing = false
 var settings = {
 	show_system_files: false,
 	sort_directories_first: false,
-	use_triangles: USE_TRIANGLES,
+	show_list_triangles: USE_TRIANGLES,
 }
 var triangles = new Set()
 
@@ -114,7 +114,7 @@ async function insert_files_list(current_list_path, list_depth="") {
 		link.hide()
 	}
 
-	if(settings["sort_directories_first"]) {
+	if(settings.sort_directories_first) {
 		dir_files_list.sort((a,b) => {
 			if(a.directory != b.directory) {
 				return a.directory ? -1 : 1
@@ -153,7 +153,7 @@ async function insert_files_list(current_list_path, list_depth="") {
 			[["jpg", "jpeg", "png", "bmp", "gif"], _icon("picture")],
 			[["wav", "mp3", "ogg"], _icon("file-music")],
 		]
-		var hide_level = settings["show_system_files"] ? HIDE.NOTHING : HIDE.ALL_SYSTEM_FILES
+		var hide_level = settings.show_system_files ? HIDE.NOTHING : HIDE.ALL_SYSTEM_FILES
 		var is_secret = false;
 		var icon = _icon("file-unknown")
 		if (current_list_path == "/" && SECRETS.includes(file_info.name)) {
@@ -191,7 +191,7 @@ async function insert_files_list(current_list_path, list_depth="") {
 		td[0].innerHTML = icon
 
 		if(file_info.directory) {
-			if(settings["use_triangles"]) {
+			if(settings.show_list_triangles) {
 				var dbutton = $("<a class='triangle'/>")
 				dbutton.data("path", file_path)
 				if(triangles.has(file_path)) {
@@ -223,7 +223,7 @@ async function insert_files_list(current_list_path, list_depth="") {
 			}
 		}
 
-		if(settings["use_triangles"] && list_depth) {
+		if(settings.show_list_triangles && list_depth) {
 			var prepend = $(td[2]).find(".prepend")
 			prepend.append(list_depth)
 			if(file_pos < num_files - 1) {
@@ -265,7 +265,7 @@ async function insert_files_list(current_list_path, list_depth="") {
 
 		new_children.push(clone)
 
-		if(settings["use_triangles"] && file_info.directory && triangles.has(file_path)) {
+		if(settings.show_list_triangles && file_info.directory && triangles.has(file_path)) {
 			var sub_list = list_depth
 			if(list_depth == "") {
 				sub_list = _icon("dash-spacer", "dash")
@@ -310,9 +310,9 @@ async function refresh_list() {
 		}
 		pwd.html(pwd_link)
 
-		$("#file_list_body tr").remove()
-
 		const new_children = await insert_files_list(current_path)
+
+		$("#file_list_body tr").remove()
 		$("#file_list_body").append(new_children)
 
 		$('#file_list_loading_image').hide()
@@ -540,19 +540,24 @@ async function setup_rename_dialog() {
 
 async function setup_directory() {
 	// settings
-	for(const setting of ["show_system_files", "sort_directories_first"]) {
+	const check_settings = [
+		"show_system_files",
+		"sort_directories_first",
+		"show_list_triangles"
+	]
+	for(const setting of check_settings) {
 		settings[setting] = localStorage.getItem(setting, false) == "1"
-		$(`#file_list_setup_buttons input[name="${setting}"]`).prop(
+		$(`.file_list_setup_buttons input[name="${setting}"]`).prop(
 			"checked", settings[setting]
 		)
 		const setter = setting
-		$(`#file_list_setup_buttons input[name="${setter}"]`).on("change", (e) => {
+		$(`.file_list_setup_buttons input[name="${setter}"]`).on("change", (e) => {
 			settings[setter] = $(e.currentTarget).prop("checked")
 			localStorage.setItem(setter, settings[setter] ? "1" : "0")
 			refresh_list()
 		})
 	}
-	settings["use_triangles"] = localStorage.getItem("use_triangles", false) == "1"
+	// settings.show_list_triangles = localStorage.getItem("show_list_triangles", false) == "1"
 
 	// setup thingies
 	let upload_button = $("#upload_button")
@@ -594,6 +599,11 @@ async function setup_directory() {
 		}
 		return true;
 	});
+
+	$(".file_list_setup_buttons .unroll").on("click", (e) => {
+		$(".file_list_setup_buttons").toggleClass("unrolled")
+		return false
+	})
 }
 
 export { setup_directory, refresh_list }
