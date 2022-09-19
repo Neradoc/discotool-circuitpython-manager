@@ -1,9 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-triangle" width="24" height="24" viewBox="2 2 20 20" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+<!--
+SPDX-FileCopyrightText: Copyright (c) 2020-2022 Paweł Kuna, https://tabler-icons.io/
+SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
+SPDX-License-Identifier: MIT
+-->
+<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-triangle" width="24" height="24" viewBox="2 2 20 20" stroke-width="2" stroke="black" fill="none" stroke-linecap="round" stroke-linejoin="round">
 <g
   fill="white"
   transform="scale(0.75) translate(4,4) rotate(90, 12, 12)">
   <path d="M12 5 l8 13 h -16 z"/>
 </g>
 </svg>
-
-

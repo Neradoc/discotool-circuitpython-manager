@@ -1,4 +1,6 @@
 #!/bin/sh
+# SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
+# SPDX-License-Identifier: MIT
 
 function greppit() {
 	git grep --extended-regexp "([a-z._-]+\.svg)" | perl -ne 'm/([a-z._-]+\.svg)/; print("$1\n")'

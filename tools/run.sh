@@ -1,4 +1,7 @@
 #!/bin/sh
+# SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
+# SPDX-License-Identifier: MIT
+
 if [[ "$1" == build ]]
 then
 	npm run make
