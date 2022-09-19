@@ -201,11 +201,11 @@ class WebWorkflow extends Workflow {
 
 	//##############################################################
 
-	set_credentials(user=null, password=null) {
-		if(user != null) {
-			this.user = user;
+	set_credentials(username, password) {
+		if(username != undefined) {
+			this.username = username;
 		}
-		if(password != null) {
+		if(password != undefined) {
 			this.password = password
 		}
 	}
