@@ -19,6 +19,7 @@ minY = 40
 
 const board_page = "html/board-template.html"
 const editor_page = "html/editor-template.html"
+const serial_page = "html/serial-template.html"
 const preload_script = 'preload.cjs'
 
 function browser_window_options(changes={}, other_changes={}) {
@@ -146,6 +147,23 @@ function openFile(args) {
 	})
 }
 
+function openSerial(args) {
+	const new_window = new BrowserWindow(browser_window_options())
+
+	var query_args = Object.assign({}, args)
+	delete query_args.type
+	// { "device": dev_url }
+	new_window.loadFile(serial_page, { query: query_args })
+
+	// Open all the windows with preload.cjs ?
+	new_window.webContents.setWindowOpenHandler((details) => {
+		return {
+			action: 'allow',
+			overrideBrowserWindowOptions: browser_window_options()
+		}
+	})
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -191,4 +209,8 @@ ipcMain.on('open-board', async (event, arg) => {
 
 ipcMain.on('open-file-editor', async (event, arg) => {
 	openFile(arg)
+})
+
+ipcMain.on('open-serial-panel', async (event, arg) => {
+	openSerial(arg)
 })

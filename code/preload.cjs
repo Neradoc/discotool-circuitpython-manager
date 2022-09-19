@@ -11,6 +11,7 @@ window.moduleFss = require("fs") // sync
 window.moduleFs = require("fs/promises")
 window.moduleFsx = require("fs-extra")
 window.moduleMdns = require('multicast-dns')
+window.moduleWS = require("ws")
 window.shell = shell
 
 var win = window.clientInformation.platform == "Win32"

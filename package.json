@@ -33,7 +33,8 @@
     "fs-extra": "^10.1.0",
     "multicast-dns": "^7.2.5",
     "node-powershell": "^5.0.1",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "ws": "^8.8.1"
   },
   "config": {
     "forge": {

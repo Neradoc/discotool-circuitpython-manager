@@ -17,6 +17,8 @@ const CODE_FILES = ["code.txt", "code.py", "main.py", "main.txt"]
 var board_control = null;
 var circup = null
 
+const OPEN_IN_BROWSER = false
+
 const DEBUG = tools.DEBUG;
 const LINE_HIDE_DELAY = 800;
 var LOADING_IMAGE = "";
@@ -50,6 +52,52 @@ async function start_circup() {
 	}
 }
 
+/*****************************************************************
+* Open link in the browser or other
+*/
+
+function open_outside_a(e) {
+	const target = e.currentTarget
+	var path = $(target).data("path")
+	if(path) {
+		var full_path = common.board_control.edit_url(path)
+		tools.open_outside(full_path).then(() => {
+			console.log("GO", full_path)
+		})
+	}
+	return false
+}
+
+/*****************************************************************
+* Open the serial panel
+*/
+
+function open_serial_panel(e) {
+	if(common.board_control.type == "web" && OPEN_IN_BROWSER) {
+		return open_outside_a(e)
+	}
+	const link = $(e.currentTarget)
+	var file = link.data("path")
+	common.board_control.get_board_url().then((url) => {
+		var IPC_message = {
+			type: 'open-serial-panel',
+			device: url,
+			file: file,
+		}
+		if(common.board_control.supports_credentials) {
+			IPC_message.password = $("#password").val()
+		}
+		console.log(IPC_message)
+		window.postMessage(IPC_message)
+	})
+	e.preventDefault()
+	return false
+}
+
+/*****************************************************************
+* Install all button
+*/
+
 async function install_all() {
 	$(".install_buttons").prop("disabled", true);
 	var modules = Array.from(modules_to_update);
@@ -63,6 +111,10 @@ async function install_all() {
 	$(".install_buttons").prop("disabled", !is_editable);
 	await update_circup_table();
 }
+
+/*****************************************************************
+* Etc
+*/
 
 function dont_need_update(module_name) {
 	const index = modules_to_update.indexOf(module_name);
@@ -374,6 +426,9 @@ async function run_exclusively(command) {
 
 function setup_events() {
 	$("#welcome_page a").on("click", tools.open_outside_sync)
+
+	$("a.board_repl").unbind("click")
+	$("a.board_repl").on("click", open_serial_panel)
 
 	$(".auto_install").on("click", async (e) => {
 		$(".tab_link_circup").click();

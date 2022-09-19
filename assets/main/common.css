@@ -30,6 +30,7 @@ SPDX-License-Identifier: MIT
 	--body-color: black;
 	--svg-border: 1px;
 	--svg-glow: none;
+	--error-background: #FFBBBB;
 }
 @media (prefers-color-scheme: dark) {
 	:root {
@@ -45,6 +46,7 @@ SPDX-License-Identifier: MIT
 		--body-color: white;
 		--svg-border: 0.5px;
 		--svg-glow: drop-shadow(var(--svg-border) 0 0 antiquewhite) drop-shadow(calc(-1 * var(--svg-border)) 0 0 antiquewhite) drop-shadow(0 var(--svg-border) 0 antiquewhite) drop-shadow(0 calc(-1 * var(--svg-border)) 0 antiquewhite);
+		--error-background: #440000;
 	}
 }
 
