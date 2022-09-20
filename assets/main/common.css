@@ -31,6 +31,7 @@ SPDX-License-Identifier: MIT
 	--svg-border: 1px;
 	--svg-glow: none;
 	--error-background: #FFBBBB;
+	--font-size: 16px;
 }
 @media (prefers-color-scheme: dark) {
 	:root {
@@ -54,7 +55,7 @@ body {
 	background: var(--body-background);
 	color: var(--body-color);
 	font-family: Verdana;
-	font-size: 16px;
+	font-size: var(--font-size);
 	padding: 0px;
 	margin: 0px;
 	height: 100%;

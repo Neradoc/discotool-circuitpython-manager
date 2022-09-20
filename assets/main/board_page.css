@@ -304,11 +304,12 @@ commands group.unrolled .icon-right {
 }
 #file_list_error_image img {
 	display: block;
-	margin: -10px auto -28px;
+	margin: 0px auto;
 	height: 200px;
 	filter: var(--svg-glow);
 }
 #file_list_error_label {
+	clear: both;
 	padding: 2px 2px 12px;
 }
 

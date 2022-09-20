@@ -61,9 +61,13 @@ header .icon .icon_locked {
 #serial_log {
 	background: var(--input-background);
 	height: calc(100vh - 200px);
-	margin:0;
+	width: 100vw;
+	padding: 8px;
+	margin: 0;
 	font-family: Menlo, Monaco, monospace;
 	white-space: pre-wrap;
+	overflow-x: hidden;
+	overflow-y: scroll;
 }
 body.error #serial_log {
 	background: var(--error-background);
