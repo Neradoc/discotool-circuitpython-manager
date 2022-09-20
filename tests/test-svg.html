@@ -26,6 +26,10 @@ SPDX-License-Identifier: MIT
 	<script type="text/javascript" language="javascript" charset="utf-8">
 		/* votre code ici */
 		const path_dir = "../assets/svg/"
+		function filtering(file) {
+			if(file.name.endsWith(".license")) return true
+			return false
+		}
 
 		$(window).on("dragenter", (event) => {
 			event.stopPropagation();
@@ -50,6 +54,7 @@ SPDX-License-Identifier: MIT
 						// If dropped items aren't files, reject them
 						if (data_transfer.items[i].kind === 'file') {
 							var file = data_transfer.items[i].getAsFile();
+							if(filtering(file)) continue
 							dropped_files_list.push(file)
 						}
 					}
