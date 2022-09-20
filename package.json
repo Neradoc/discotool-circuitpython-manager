@@ -1,14 +1,14 @@
 {
-  "name": "circup-electron-app",
+  "name": "Discotool Manager",
   "version": "1.0.0-alpha.1",
-  "description": "A Library manager for Circuitpython and more",
+  "description": "A Files and Library Manager for Circuitpython USB and Web Workflow",
   "main": "code/main.cjs",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make"
   },
-  "repository": "https://github.com/Neradoc/circuitpython-web-packager",
+  "repository": "https://github.com/Neradoc/discotool-circuitpython-manager",
   "keywords": [
     "Circuitpython",
     "circup"
