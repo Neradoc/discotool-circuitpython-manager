@@ -25,7 +25,7 @@ class WebWorkflowFile extends WorkflowFile {
 	}
 }
 
-const DEFAULT_URL_BASE = "http://circuitpython.local"
+const DEFAULT_URL_BASE = "http://circuitpython.local:80"
 
 class WebWorkflow extends Workflow {
 	constructor(url_base = DEFAULT_URL_BASE) {
@@ -196,7 +196,9 @@ class WebWorkflow extends Workflow {
 		return (await this.device_info()).hostname + ".local"
 	}
 	async get_board_url() {
-		return this.workflow_url_base
+		const u = new URL(this.workflow_url_base)
+		const port = u.port || 80
+		return `${u.protocol}//${u.host}:${port}`
 	}
 
 	//##############################################################
