@@ -5,16 +5,27 @@ SPDX-License-Identifier: MIT
 
 @import url("../sub/password_dialog.css");
 
-#editor_content textarea {
-	width: calc(100vw - 20px);
-	height: calc(100vh - 100px);
-}
 a {
 	color: inherit;
 }
 h3 {
 	padding: 2px 8px;
 	margin: 0px;
+}
+
+/* positions */
+
+content {
+	display: flex;
+	flex-direction: column;
+	padding: 6px;
+	height: calc(100vh - 12px);
+}
+header { flex: 0; }
+.save_block { flex: 0; }
+.no_save_block { flex: 0; }
+#editor_content {
+	flex: 1;
 }
 
 /* Top title board icon */
