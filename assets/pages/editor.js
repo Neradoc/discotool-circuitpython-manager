@@ -13,7 +13,9 @@ var password = ""
 var board_control = null
 var last_saved = 0
 var saved_timer = null
+
 const SAVED_DELAY = 10000
+const TAB_REPLACE = "    "
 
 function update_saved() {
 	const now = new Date()
@@ -48,6 +50,7 @@ async function init_page() {
 	// setup page information
 	var vinfo = await board_control.device_info()
 	var board_url = await board_control.get_board_url()
+	var uuid = await board_control.get_identifier()
 	var board_name = vinfo.board_name
 
 	$(".board_name").html(board_name)
@@ -74,7 +77,7 @@ async function init_page() {
 	target_file = window_url.searchParams.get("file") || "";
 	$(".file_name").html(target_file)
 
-	$("title").html(`${target_file} - ${board_url} - ${board_name}`)
+	$("title").html(`${board_name} - ${uuid} - ${target_file}`)
 
 	saved_timer = setInterval(update_saved, SAVED_DELAY)
 
@@ -87,7 +90,7 @@ async function init_page() {
 		$(".save_button").prop("disabled", true)
 		$(".save_block").addClass("saving")
 		try {
-			var new_content = $("#editor_content textarea").val()
+			var new_content = $("textarea#editor_content").val()
 			var new_content_blob = new Blob([new_content], { type: 'text/plain' })
 			var save_path = target_file
 			var res = await board_control.upload_file(save_path, new_content_blob)
@@ -125,7 +128,7 @@ async function init_page() {
 		const result = await board_control.get_file_content(target_file)
 		if(result.ok) {
 			var file_content = result.content
-			$("#editor_content textarea").val(file_content)
+			$("textarea#editor_content").val(file_content)
 			last_saved = new Date()
 			$(".last_saved").html(0)
 			return true
@@ -142,6 +145,28 @@ async function init_page() {
 		})
 	}
 	do_setup_editor_content()
+
+	var text_block = $("textarea#editor_content")
+	text_block.on("keydown", function(e) {
+		const info = tools.keys_info(e)
+		if(info.key == "TAB" && info.modifiers == "") {
+			var sel = text_block.getSelection()
+			text_block.replaceSelection(sel.text + TAB_REPLACE).focus()
+			e.preventDefault()
+			return false
+		}
+	})
+
+	$(document).on("keydown", function(e) {
+		const info = tools.keys_info(e)
+		if(["C", "M"].includes(info.modifiers)) {
+			if(info.key == "S") {
+				$(".save_button").click()
+				e.preventDefault()
+				return false
+			}
+		}
+	})
 }
 
 init_page();

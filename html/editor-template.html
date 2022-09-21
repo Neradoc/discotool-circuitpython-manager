@@ -13,12 +13,14 @@ SPDX-License-Identifier: MIT
 	<link rel="shortcut icon" type="image/jpg" href="assets/images/favicon.png"/>
 	<link rel="stylesheet" href="assets/main/common.css">
 	<link rel="stylesheet" href="assets/pages/editor.css">
-	<script src="assets/extlib/jquery.min.js" async="true"></script>
 	<script src="assets/extlib/jszip.min.js" async="true"></script>
+	<script src="assets/extlib/jquery.min.js" async="true"></script>
+	<script src="assets/extlib/jquery-selection.js" type="module"></script>
 	<script src="assets/lib/template.js" defer="true" type="module"></script>
 	<script src="assets/pages/editor.js" defer="true" type="module"></script>
 </head>
 <body>
+	<content>
 	<header>
 		<h3>
 			<span class="icon">
@@ -30,18 +32,15 @@ SPDX-License-Identifier: MIT
 		</h3>
 		<h3><span class="file_name">Loading…</span></h3>
 	</header>
-	<content>
-		<p class="save_block">
-			<button accesskey="s" class="save_button">Save</button> Last saved:
-			<span class="last_saved"></span> minutes ago.
-			<span class="saving_now"><img src="assets/images/loading_black_small.gif" /> Saving.</span>
-		</p>
-		<p class="no_save_block">
-			The board is locked, the file can not be written.
-		</p>
-		<p id="editor_content">
-			<textarea></textarea>
-		</p>
+	<p class="save_block">
+		<button accesskey="s" class="save_button">Save</button> Last saved:
+		<span class="last_saved"></span> minutes ago.
+		<span class="saving_now"><img src="assets/images/loading_black_small.gif" /> Saving.</span>
+	</p>
+	<p class="no_save_block">
+		The board is locked, the file can not be written.
+	</p>
+	<textarea id="editor_content"></textarea>
 	</content>
 	<div id="password_dialog" class="include" data-src="dialog-password"></div>
 </body>
