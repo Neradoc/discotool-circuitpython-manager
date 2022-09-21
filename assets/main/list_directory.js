@@ -107,9 +107,11 @@ async function insert_files_list(current_list_path, list_depth="") {
 
 	var link = $("#file_list .go_back_up")
 	if (current_list_path != "/") {
-		const parent = new URL("..", "file://" + current_list_path)
-		link.prop("href", tools.url_here({"path": parent.pathname}))
-		link.show()
+		if(list_depth == "") {
+			const parent = new URL("..", "file://" + current_list_path)
+			link.prop("href", tools.url_here({"path": parent.pathname}))
+			link.show()
+		}
 	} else {
 		link.hide()
 	}
