@@ -17,13 +17,10 @@ h3 {
 	margin: 0px;
 }
 
-content {
-	position: relative;
-}
 #serial_loading_image {
 	display: none;
 	position: absolute;
-	top: calc(50vh - 120px);
+	top: 50vh;
 	left: 0px;
 	text-align: center;
 	width: 100%;
@@ -60,14 +57,20 @@ header .icon .icon_locked {
 /* serial thingies */
 #serial_log {
 	background: var(--input-background);
-	height: calc(100vh - 200px);
-	width: 100vw;
-	padding: 8px;
-	margin: 0;
-	font-family: Menlo, Monaco, monospace;
-	white-space: pre-wrap;
+	width: calc(100vw - 16px);
+	margin: 4px auto;
+	text-align: left;
 	overflow-x: hidden;
 	overflow-y: scroll;
+}
+#serial_log .content {
+	margin: 0px;
+	font-family: Menlo, Monaco, monospace;
+	white-space: pre-wrap;
+}
+#serial_log .bottom {
+	margin: 0px;
+	height: 2px;
 }
 body.error #serial_log {
 	background: var(--error-background);
@@ -84,4 +87,27 @@ body.error #serial_log {
 	resize: none;
 	flex: auto;
 	font-size: 1rem;
+}
+#serial_controls button.pressed,
+#serial_controls button:active {
+	background: black;
+	color: white;
+}
+
+/* positions */
+
+content {
+	display: flex;
+	flex-direction: column;
+	padding: 6px;
+	height: calc(100vh - 12px);
+}
+header {
+	flex: 0;
+}
+#serial_controls {
+	flex: 0 0 0;
+}
+#serial_log {
+	flex: 1;
 }

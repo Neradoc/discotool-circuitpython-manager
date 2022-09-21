@@ -17,14 +17,9 @@ SPDX-License-Identifier: MIT
 	<script src="assets/extlib/jszip.min.js" async="true"></script>
 	<script src="assets/lib/template.js" defer="true" type="module"></script>
 	<script src="assets/pages/serial.js" defer="true" type="module"></script>
-
-	<!-- <link rel="stylesheet" href="http://circuitpython.org/assets/css/webworkflow-8.css"> -->
 </head>
 <body class="loading">
-
-<!-- *************************************************************** -->
-<!-- *************************************************************** -->
-
+	<content>
 	<header>
 		<h3>
 			<span class="icon">
@@ -35,27 +30,21 @@ SPDX-License-Identifier: MIT
 			<a href="BOARD" class="board_name board_link">Loading…</a>
 		</h3>
 	</header>
-	<content>
-<!-- *************************************************************** -->
-		<div id="serial_log"></div>
-		<div id="serial_loading_image"><img src="assets/images/loading_black.gif" /></div>
-		<div id="serial_controls">
-			<fieldset>
-				<legend>Ctrl</legend>
-				<button id="ctrlc">C</button>
-				<button id="ctrld">D</button>
-			</fieldset>
-			<textarea id="input" rows="1" spellcheck="false" wrap="off" autocapitalize="none" autocomplete="off" autocorrect="off"></textarea>
-			<button id="serial_send_button">Send</button>
-		</div>
-<!-- *************************************************************** -->
+	<div id="serial_log">
+		<div class="content"></div>
+		<div class="bottom"></div>
+	</div>
+	<div id="serial_controls">
+		<fieldset>
+			<legend>Ctrl</legend>
+			<button id="ctrlc">C</button>
+			<button id="ctrld">D</button>
+		</fieldset>
+		<textarea id="input" rows="1" spellcheck="false" wrap="off" autocapitalize="none" autocomplete="off" autocorrect="off"></textarea>
+		<button id="serial_send_button">Send</button>
+	</div>
 	</content>
+	<div id="serial_loading_image"><img src="assets/images/loading_black.gif" /></div>
 	<div id="password_dialog" class="include" data-src="dialog-password"></div>
-
-
-<!-- *************************************************************** -->
-<!-- *************************************************************** -->
-
-
 </body>
 </html>

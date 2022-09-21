@@ -31,12 +31,14 @@ async function init_page() {
 	// setup page information
 	var vinfo = await board_control.device_info()
 	var board_url = await board_control.get_board_url()
+	var uuid = await board_control.get_identifier()
 	var board_name = vinfo.board_name
 
 	$(".board_name").html(board_name)
 	$(".board_link").prop("href", `?dev=${board_url}`)
 	$(".board_link").data("board_link", board_url)
 	$(`header .icon_${board_control.type}`).show()
+	$("title").html(`${board_name} - ${uuid} - REPL`)
 
 	$(document).on("click", ".board_link", (e) => {
 		const link = $(e.currentTarget)
@@ -61,17 +63,14 @@ async function init_page() {
 		$("body").removeClass("board_editable")
 	}
 
-
-
-
-
-
 	// The serial part
 
 	var input = $("#input")
 	input.val("")
-	var title = document.querySelector("title")
-	var serial_log = $("#serial_log")[0]
+
+	var serial_log = $("#serial_log")
+	var serial_content = $("#serial_log .content")
+	var bottom_scroll = $("#serial_log .bottom")
 
 	function set_enabled(enabled) {
 		input.prop("disabled", !enabled)
@@ -86,7 +85,6 @@ async function init_page() {
 	var heads = board_control.headers()
 	var base_url = board_control.workflow_url_base.replace(/^https?:\/\//, "")
 	base_url = base_url.replace(/\/$/, "")
-	console.log(base_url)
 	socket = new ws.WebSocket(
 		(
 			"ws://"
@@ -98,10 +96,7 @@ async function init_page() {
 		}
 	)
 	
-	console.log(socket)
-
 	socket.onopen = function() {
-		console.log("open")
 		set_enabled(true)
 		$("body").removeClass("loading")
 		$("body").removeClass("error")
@@ -111,39 +106,44 @@ async function init_page() {
 	var encoder = new TextEncoder()
 	var left_count = 0
 	socket.onmessage = function(e) {
-		console.log("message", e)
+		const scroll_margin = serial_content.height() - (
+			serial_log.scrollTop() + serial_log.height()
+		)
 		if (e.data == "\x1b]0;") {
 			setting_title = true
-			title.textContent = ""
+			// start reading status thing
 		} else if (e.data == "\x1b\\") {
 			setting_title = false
+			// finished reading status thing
 		} else if (setting_title) {
-			title.textContent += e.data
+			// receiving status thing
+			// title.textContent += e.data
 		} else if (e.data == "\b") {
 			left_count += 1
 		} else if (e.data == "\x1b[K") { // Clear line
-			serial_log.textContent = serial_log.textContent.slice(0, -left_count)
+			serial_content[0].textContent = serial_content[0].textContent.slice(0, -left_count)
 			left_count = 0
 		} else {
-			serial_log.textContent += e.data
+			serial_content[0].textContent += e.data
 		}
-		document.querySelector("span").scrollIntoView()
+		if(scroll_margin < 32) {
+			bottom_scroll[0].scrollIntoView()
+		}
 	}
 
 	socket.onclose = function() {
-		console.log("close")
 		set_enabled(false)
 	}
 
 	socket.onerror = function(e) {
-		console.log("error", e)
+		console.log(e)
 		set_enabled(false)
 		$("body").addClass("error")
 	}
 
 	input.on("keydown", function(e) {
-		var TABKEY = 9
-		if(e.keyCode == TABKEY) {
+		const info = tools.keys_info(e)
+		if(info.key == "TAB" && info.modifiers == "") {
 			if(input.val().length == 0) {
 				input.val("\t")
 			} else {
@@ -154,14 +154,30 @@ async function init_page() {
 		}
 	})
 
+	$(document).on("keydown", function(e) {
+		const info = tools.keys_info(e)
+		if(info.modifiers == "C") {
+			if(info.key == "C") {
+				$("#ctrlc").click()
+				e.preventDefault()
+				return false
+			}
+			if(info.key == "D") {
+				$("#ctrld").click()
+				e.preventDefault()
+				return false
+			}
+		}
+	})
+
 	input.on("beforeinput", function(e) {
 		var inputType = e.originalEvent.inputType
 		var data = e.originalEvent.data
-		console.log("BFI", inputType, data)
 		if (inputType == "insertLineBreak") {
 			socket.send("\r")
 			input.val("")
 			input.focus()
+			bottom_scroll[0].scrollIntoView()
 			e.preventDefault()
 			return false
 		} else if (inputType == "insertText" || inputType == "insertFromPaste") {
@@ -169,22 +185,23 @@ async function init_page() {
 		} else if (inputType == "deleteContentBackward") {
 			socket.send("\b")
 		} else {
-			console.log(e)
+			// console.log(e)
 		}
 	})
 
 	$("#ctrlc").on("click", () => {
-		console.log("CTRL-C")
+		$("#ctrlc").addClass("pressed")
 		socket.send("\x03")
+		setTimeout(() => $("#ctrlc").removeClass("pressed"), 250)
 	})
 
 	$("#ctrld").on("click", () => {
-		console.log("CTRL-D")
+		$("#ctrld").addClass("pressed")
 		socket.send("\x04")
+		setTimeout(() => $("#ctrld").removeClass("pressed"), 250)
 	})
 
 	$("#serial_send_button").on("click", () => {
-		console.log("send")
 		socket.send("\r")
 		input.val("")
 		input.focus()
@@ -193,4 +210,3 @@ async function init_page() {
 }
 
 init_page()
-
