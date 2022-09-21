@@ -64,3 +64,16 @@ export function open_outside_sync(link) {
 	open_outside(link)
 	return false
 }
+
+export function keys_info(event) {
+	const info = {
+		key: event.key.toLocaleUpperCase(),
+		modifiers: [
+			event.altKey ? "A" : "",
+			event.ctrlKey ? "C" : "",
+			event.metaKey ? "M" : "",
+			event.shiftKey ? "S" : ""
+		].join(""),
+	}
+	return info
+}
