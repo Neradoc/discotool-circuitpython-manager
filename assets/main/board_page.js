@@ -87,7 +87,6 @@ function open_serial_panel(e) {
 		if(common.board_control.supports_credentials) {
 			IPC_message.password = $("#password").val()
 		}
-		console.log(IPC_message)
 		window.postMessage(IPC_message)
 	})
 	e.preventDefault()
@@ -383,10 +382,10 @@ async function init_page() {
 	// board inits
 	var prom2 = (async () => {
 		// *** title
-		const name = await board_control.get_identifier()
+		const uuid = await board_control.get_identifier()
 		$(`#top_title .icon_${workflow_type}`).show()
 		$(".board_name").html(vinfo.board_name)
-		$("title").html(`${vinfo.board_name} - ${name}`)
+		$("title").html(`${vinfo.board_name} - ${uuid}`)
 		$(".circuitpy_version").html(vinfo.version)
 		$("#version_info_subtitle .subtitle_text").show()
 		// *** file list

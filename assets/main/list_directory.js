@@ -418,7 +418,6 @@ function open_file_editor(e) {
 		if(common.board_control.supports_credentials) {
 			IPC_message.password = $("#password").val()
 		}
-		console.log(IPC_message)
 		window.postMessage(IPC_message)
 	})
 	return false
