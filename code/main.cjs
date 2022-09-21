@@ -13,17 +13,33 @@ var all_windows = new Set()
 
 // change the theme manually ?
 // nativeTheme.themeSource = "light"
-COLUMN_MODE = true
 minX = 40
 minY = 40
+
+COLUMN_MODE = true
+HOME_WIN_CONFIG = {
+	width: 350,
+	height: 800,
+	minWidth: 300,
+	minHeight: 400,
+}
+BOARD_WIN_CONFIG = {
+}
+EDITOR_WIN_CONFIG = {
+}
+SERIAL_WIN_CONFIG = {
+	minWidth: 350,
+	minHeight: 300,
+}
 
 const board_page = "html/board-template.html"
 const editor_page = "html/editor-template.html"
 const serial_page = "html/serial-template.html"
 const preload_script = 'preload.cjs'
 
-function browser_window_options(changes={}, other_changes={}) {
+function browser_window_options(changes={}, prefs_changes={}) {
 	var data = {
+		// these are the defaults for board windows basically
 		width: 820,
 		height: 800,
 		minWidth: 600,
@@ -39,18 +55,24 @@ function browser_window_options(changes={}, other_changes={}) {
 	for(key in changes) {
 		data[key] = changes[key]
 	}
-	for(key in other_changes) {
-		data.webPreferences[key] = other_changes[key]
+	for(key in prefs_changes) {
+		data.webPreferences[key] = prefs_changes[key]
 	}
 	return data
 }
 
-function createWindow (winBounds) {
-	var settings = {}
-	if(COLUMN_MODE) {
-		settings = { width: 350, height: 800, minWidth: 300, minHeight: 400 }
+function window_for_url(board_url) {
+	for(test_window of all_windows) {
+		if(test_window.board_url && test_window.board_url == board_url) {
+			test_window.focus()
+			return test_window
+		}
 	}
-	browserConfig = browser_window_options(settings)
+	return false
+}
+
+function createWindow (winBounds) {
+	var browserConfig = browser_window_options(HOME_WIN_CONFIG)
 
 	if(winBounds !== undefined) {
 		if(typeof(winBounds.width) == 'number') {
@@ -104,16 +126,9 @@ function createWindow (winBounds) {
 
 function openBoard (args) {
 	url = args.device
+	if(window_for_url(url)) { return }
 
-	for(test_window of all_windows) {
-		// if the board already has a window, activate it
-		if(test_window.board_url && test_window.board_url == url) {
-			test_window.focus()
-			return
-		}
-	}
-
-	const new_window = new BrowserWindow(browser_window_options())
+	const new_window = new BrowserWindow(browser_window_options(BOARD_WIN_CONFIG))
 	new_window.board_url = url
 	new_window.loadFile(board_page, {
 		query: { "device": url }
@@ -130,12 +145,16 @@ function openBoard (args) {
 	all_windows.add(new_window)
 }
 
-function openFile(args) {
-	const new_window = new BrowserWindow(browser_window_options())
-
+function openFileEditor(args) {
 	var query_args = Object.assign({}, args)
 	delete query_args.type
 	// { "device": dev_url, "file": file_path }
+
+	const identifier = "Editor:" + JSON.stringify(query_args)
+	if(window_for_url(identifier)) { return }
+
+	const new_window = new BrowserWindow(browser_window_options(EDITOR_WIN_CONFIG))
+	new_window.board_url = identifier
 	new_window.loadFile(editor_page, { query: query_args })
 
 	// Open all the windows with preload.cjs ?
@@ -145,14 +164,20 @@ function openFile(args) {
 			overrideBrowserWindowOptions: browser_window_options()
 		}
 	})
+	// put it in the list
+	all_windows.add(new_window)
 }
 
 function openSerial(args) {
-	const new_window = new BrowserWindow(browser_window_options())
-
 	var query_args = Object.assign({}, args)
 	delete query_args.type
 	// { "device": dev_url }
+
+	const identifier = "Serial:" + JSON.stringify(query_args)
+	if(window_for_url(identifier)) { return }
+
+	const new_window = new BrowserWindow(browser_window_options(SERIAL_WIN_CONFIG))
+	new_window.board_url = identifier
 	new_window.loadFile(serial_page, { query: query_args })
 
 	// Open all the windows with preload.cjs ?
@@ -162,6 +187,8 @@ function openSerial(args) {
 			overrideBrowserWindowOptions: browser_window_options()
 		}
 	})
+	// put it in the list
+	all_windows.add(new_window)
 }
 
 // This method will be called when Electron has finished
@@ -208,7 +235,7 @@ ipcMain.on('open-board', async (event, arg) => {
 })
 
 ipcMain.on('open-file-editor', async (event, arg) => {
-	openFile(arg)
+	openFileEditor(arg)
 })
 
 ipcMain.on('open-serial-panel', async (event, arg) => {
