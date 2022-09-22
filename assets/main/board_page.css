@@ -180,11 +180,16 @@ tr.odd { background: var(--color-pair1); }
 	position: absolute;
 	top: 0px;
 }
+#file_list td.path .dash-spacer,
 #file_list td.path .dash {
 	display: inline-block;
 	position: relative;
 	top: 0px;
 	height: 34px;
+}
+#file_list td.path .dash-spacer {
+	height: auto;
+	width: 8px;
 }
 #file_list td a.path {
 	display: block;

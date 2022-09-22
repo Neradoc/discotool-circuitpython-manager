@@ -234,7 +234,7 @@ async function insert_files_list(current_list_path, list_depth="") {
 				prepend.append(_icon("dash-corner", "dash"))
 			}
 			var depth_length = list_depth.match(/<img/g)?.length || 0
-			path.css("padding-left", `${(depth_length+1) * 12 + 6}px`)
+			path.css("padding-left", `${(depth_length) * 20 + 9}px`)
 		}
 
 		$(td[3]).html((new Date(file_info.modified)).toLocaleString())
@@ -270,7 +270,7 @@ async function insert_files_list(current_list_path, list_depth="") {
 		if(settings.show_list_triangles && file_info.directory && triangles.has(file_path)) {
 			var sub_list = list_depth
 			if(list_depth == "") {
-				sub_list = _icon("dash-spacer", "dash")
+				sub_list = _icon("dash-spacer", "dash-spacer")
 			} else {
 				if(file_pos < num_files - 1) {
 					sub_list += _icon("dash-vertical", "dash")
