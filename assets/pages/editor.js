@@ -161,13 +161,15 @@ async function init_page() {
 					break
 				}
 			}
-			for(var right = end - 1; right < code.length; ++right) {
+			// if the selection is empty, make sure to find the end on this line
+			for(var right = Math.max(start, end - 1); right < code.length; ++right) {
 				if(code[right] == "\n") {
 					break
 				}
 			}
 			left = left + 1
 			var code_in = code.substr(left, right - left)
+			console.log(code_in)
 			var code_out = code_in
 			var sel_pos = start
 			var sel_len = len
@@ -176,10 +178,10 @@ async function init_page() {
 					code_out = TAB_REPLACE
 					left = start
 					right = end
-					sel_pos = left + code_out.length
+					sel_pos = Math.max(left, left + code_out.length)
 				} else if(info.modifiers == "S") {
 					code_out = code_in.replace(TAB_AT_LINE, "")
-					sel_pos = start - (code_in.length - code_out.length)
+					sel_pos = Math.max(left, start - (code_in.length - code_out.length))
 				}
 			} else {
 				if(info.modifiers == "") {
