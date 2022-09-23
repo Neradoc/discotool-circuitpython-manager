@@ -112,6 +112,18 @@ async function init_page() {
 		}
 	})
 
+	/* auto install dependencies */
+	$(".auto_install_button").on("click", (e) => {
+		window.postMessage({
+			type: 'open-board',
+			device: board_url,
+			install: {
+				file: target_file,
+			}
+		})
+		return false
+	})
+
 	/* check the modifiable state
 	- display a lock and disable saving
 	- check and update it periodically (5s ?)

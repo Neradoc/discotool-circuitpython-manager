@@ -238,8 +238,8 @@ ipcMain.on('open-board', async (event, arg) => {
 	new_window = openBoard(arg)
 	if("install" in arg) {
 		new_window.webContents.send("send-to-window", {
-			event: "install-module",
-			modules: arg["install"],
+			event: "install-modules",
+			install: arg["install"],
 		})
 	}
 })

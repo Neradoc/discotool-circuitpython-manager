@@ -297,6 +297,7 @@ async function auto_install(file_name) {
 		$("#circup_page .loading").html(`No such file: <b>${file_name}</b>`)
 		return false;
 	}
+	$(".tab_link_circup").click();
 	// get the list
 	const code_content = code_response.content;
 	$("#circup_page .loading").append(`<br/>Loading modules from <b>${file_name}</b>...`);
@@ -312,6 +313,7 @@ async function update_all() {
 	await pre_update_process();
 	$("#circup_page .loading").append(`<br/>Loading libraries from <b>/lib</b> directory...`);
 	$("#circup_page .title .filename").html("/lib/");
+	$(".tab_link_circup").click();
 	// get the list of libraries from the board
 	var libs_list = await board_control.get_lib_modules();
 	// do the thing
@@ -440,32 +442,21 @@ async function run_exclusively(command) {
 }
 
 function setup_events() {
-	window.addEventListener("install-module", (event) => {
-		var libs_list = event?.detail?.modules
-		console.log("Install", libs_list)
-		if(libs_list != undefined) {
-			install_a_module(libs_list)
-		}
-	})
-
 	$("#welcome_page a").on("click", tools.open_outside_sync)
 
 	$("a.board_repl").unbind("click")
 	$("a.board_repl").on("click", open_serial_panel)
 
 	$(".auto_install").on("click", async (e) => {
-		$(".tab_link_circup").click();
 		await run_exclusively(async () => {
 			for(const code of CODE_FILES) {
 				if(await auto_install(code)) {
 					return
 				}
 			}
-		}
-		);
+		});
 	});
 	$(".update_all").on("click", (e) => {
-		$(".tab_link_circup").click();
 		run_exclusively(() => update_all());
 	});
 	$("#bundle_list #bundle_install").on("click", (e) => {
@@ -473,7 +464,6 @@ function setup_events() {
 	});
 	$(document).on("click", "#file_list_list .analyze", (e) => {
 		var path = $(e.currentTarget).data("path");
-		$(".tab_link_circup").click();
 		run_exclusively(() => auto_install(path));
 		return false;
 	});
@@ -499,6 +489,19 @@ function setup_events() {
 	$("#circup_page .title button").on("click", async (e) => {
 		// await pre_update_process()
 		if(redo_install_button_callback) redo_install_button_callback()
+	})
+
+	window.addEventListener("install-modules", (event) => {
+		var libs_list = event?.detail?.install?.modules
+		if(libs_list !== undefined) {
+			run_exclusively(() => install_a_module(libs_list))
+			return
+		}
+		var target_file = event?.detail?.install?.file
+		if(target_file !== undefined) {
+			run_exclusively(() => auto_install(target_file))
+			return
+		}
 	})
 }
 

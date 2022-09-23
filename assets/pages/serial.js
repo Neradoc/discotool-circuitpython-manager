@@ -245,7 +245,9 @@ async function init_page() {
 		window.postMessage({
 			type: 'open-board',
 			device: url,
-			install: [ module ],
+			install: {
+				modules: [ module ],
+			}
 		})
 		return false
 	})

@@ -73,3 +73,8 @@ header .icon .icon_locked {
 }
 .board_locked .save_block { display: none; }
 .board_locked .no_save_block { display: block; }
+
+/* other buttons */
+.auto_install_button {
+	float: right;
+}
