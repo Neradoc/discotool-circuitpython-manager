@@ -2,7 +2,7 @@
 SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
-
+import { OPEN_IN_BROWSER } from "../../config.js"
 import * as jq from "../extlib/jquery.min.js"
 import * as common from "../main/common.js"
 import * as tools from "../lib/tools.js"
@@ -13,10 +13,6 @@ const ws = window.moduleWS
 var board_control = null
 var socket = null
 var password = ""
-
-String.prototype.escapeHTML = function() {
-	return this.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
 
 async function init_page() {
 
@@ -106,6 +102,32 @@ async function init_page() {
 		$("body").removeClass("error")
 	}
 
+	function set_the_serial_content(the_data) {
+		the_data = the_data.replace(
+			/ImportError: (no module named '(\S+)')/g,
+			`ImportError: <a class="circup_link"
+				data-board_link="${board_url}"
+				data-module="$2"
+				href="?dev=${board_url}&install=$2"
+			>$1</a>`
+		)
+		.replace(
+			/File "([^"]+)", line (\d+),/g,
+			(match, p1, p2, offset, string, groups) => {
+				// don't link to "stdin"
+				if(p1 == "stdin") return match
+				return `<a class="file_link"
+					data-board_link="${board_url}"
+					data-path="${p1}"
+					data-line="${p2}"
+					href="?dev=${board_url}"
+				>File "${p1}", line ${p2}</a>,`
+			}
+		)
+		.replace(/\n$/, "") // somehow there's a return added at the end ?
+		serial_content.html(the_data)
+	}
+
 	var setting_title = false
 	var encoder = new TextEncoder()
 	var left_count = 0
@@ -126,19 +148,12 @@ async function init_page() {
 		} else if (e.data == "\b") {
 			left_count += 1
 		} else if (e.data == "\x1b[K") { // Clear line
-			serial_content[0].textContent = serial_content[0].textContent.slice(0, -left_count)
+			var the_data = serial_content.text().slice(0, -left_count)
 			left_count = 0
+			set_the_serial_content(the_data)
 		} else {
-			serial_content.append(e.data.escapeHTML())
-			var the_data = serial_content.html().replace(
-				/ImportError: (no module named '(\S+)')/,
-				`ImportError: <a class="circup_link"
-					data-board_link="${board_url}"
-					data-module="$2"
-					href="?dev=${board_url}&install=$2"
-				>$1</a>`
-			)
-			serial_content.html(the_data)
+			var the_data = (serial_content.text() + e.data.escapeHTML())
+			set_the_serial_content(the_data)
 		}
 		if(scroll_margin < 32) {
 			bottom_scroll[0].scrollIntoView()
@@ -232,6 +247,15 @@ async function init_page() {
 			device: url,
 			install: [ module ],
 		})
+		return false
+	})
+
+	$(document).on("click", ".file_link", (e) => {
+		try {
+			common.open_file_editor_a(e)
+		} catch(error) {
+			console.log(error)
+		}
 		return false
 	})
 

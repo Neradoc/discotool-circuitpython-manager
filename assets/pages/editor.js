@@ -76,6 +76,9 @@ async function init_page() {
 	*/
 
 	target_file = window_url.searchParams.get("file") || "";
+	if(target_file[0] != "/") {
+		target_file = "/" + target_file
+	}
 	$(".file_name").html(target_file)
 
 	$("title").html(`${board_name} - ${uuid} - ${target_file}`)
@@ -134,14 +137,17 @@ async function init_page() {
 			$(".last_saved").html(0)
 			return true
 		}
-		return false
+		return result.status
 	}
 	function do_setup_editor_content() {
 		setup_editor_content().then((res) => {
-			if(res === false) {
+			if(res === 409) {
 				password_dialog.open({
 					"close": do_setup_editor_content,
 				})
+			}
+			if(res === 404) {
+				// TODO
 			}
 		})
 	}

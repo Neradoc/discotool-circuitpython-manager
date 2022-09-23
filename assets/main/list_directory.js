@@ -3,6 +3,7 @@ SPDX-FileCopyrightText: Copyright (c) Scott Shawcroft for Adafruit
 SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
+import { OPEN_IN_BROWSER } from "../../config.js"
 import * as common from "../main/common.js"
 import * as tools from "../lib/tools.js"
 import * as password_dialog from "../sub/password_dialog.js"
@@ -25,7 +26,6 @@ const HIDE = {
 	ALL_DOTTED_FILES: 3,
 }
 
-var OPEN_IN_BROWSER = false
 var USE_TRIANGLES = false
 
 var current_path = tools.current_path
@@ -39,22 +39,6 @@ var triangles = new Set()
 
 function _icon(name, cls="") {
 	return `<img src="assets/svg/${name}.svg" class="${cls}" />`
-}
-
-/*****************************************************************
-* Open link in the browser or other
-*/
-
-function open_outside_a(e) {
-	const target = e.currentTarget
-	var path = $(target).data("path")
-	if(path) {
-		var full_path = common.board_control.edit_url(path)
-		tools.open_outside(full_path).then(() => {
-			console.log("GO", full_path)
-		})
-	}
-	return false
 }
 
 /*****************************************************************
@@ -221,7 +205,7 @@ async function insert_files_list(current_list_path, list_depth="") {
 			if(is_secret) {
 				path.on("click", open_secret)
 			} else {
-				path.on("click", open_file_editor)
+				path.on("click", common.open_file_editor_a)
 			}
 		}
 
@@ -249,7 +233,7 @@ async function insert_files_list(current_list_path, list_depth="") {
 			edit_button.remove()
 		} else {
 			edit_button.attr("href", api_url)
-			edit_button.on("click", open_file_editor)
+			edit_button.on("click", common.open_file_editor_a)
 		}
 
 		var rename_button = clone.find(".rename")
@@ -399,33 +383,6 @@ async function delete_a_file(e) {
 }
 
 /*****************************************************************
-* Open file editor
-*/
-
-function open_file_editor(e) {
-	if(common.board_control.type == "usb") {
-		return open_outside_a(e)
-	}
-	if(common.board_control.type == "web" && OPEN_IN_BROWSER) {
-		return open_outside_a(e)
-	}
-	const link = $(e.currentTarget)
-	var file = link.data("path")
-	common.board_control.get_board_url().then((url) => {
-		var IPC_message = {
-			type: 'open-file-editor',
-			device: url,
-			file: file,
-		}
-		if(common.board_control.supports_credentials) {
-			IPC_message.password = $("#password").val()
-		}
-		window.postMessage(IPC_message)
-	})
-	return false
-}
-
-/*****************************************************************
 * Open a triangle directory
 */
 
@@ -449,7 +406,7 @@ function open_secret(e) {
 	var path = $(this).data("path")
 	var prompt = `The file: "${path}"\ncan contain readable passwords.\nAre you sure you want to open it ?`
 	if (confirm(prompt)) {
-		open_file_editor(e)
+		common.open_file_editor_a(e)
 	}
 	return false
 }

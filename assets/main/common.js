@@ -3,9 +3,10 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
-import {WORKFLOW_USERNAME, WORKFLOW_PASSWORD} from "../../config.js";
+import {WORKFLOW_USERNAME, WORKFLOW_PASSWORD, OPEN_IN_BROWSER} from "../../config.js";
 import { WebWorkflow } from "../backends/web.js";
 import { USBWorkflow } from "../backends/usb.js";
+import * as tools from "../lib/tools.js"
 
 export const is_electron = window && window.process && window.process.type == "renderer"
 
@@ -28,3 +29,41 @@ export async function start() {
 export function set_library_bundle(bundle) {
 	library_bundle = bundle
 }
+
+/* open helpers */
+
+function open_outside_a(e) {
+	const target = e.currentTarget
+	var path = $(target).data("path")
+	if(path) {
+		var full_path = board_control.edit_url(path)
+		tools.open_outside(full_path).then(() => {
+			console.log("GO", full_path)
+		})
+	}
+	return false
+}
+
+export function open_file_editor_a(e) {
+	if(board_control.type == "usb") {
+		return open_outside_a(e)
+	}
+	if(board_control.type == "web" && OPEN_IN_BROWSER) {
+		return open_outside_a(e)
+	}
+	const link = $(e.currentTarget)
+	var file = link.data("path")
+	board_control.get_board_url().then((url) => {
+		var IPC_message = {
+			type: 'open-file-editor',
+			device: url,
+			file: file,
+		}
+		if(board_control.supports_credentials) {
+			IPC_message.password = $("#password").val()
+		}
+		window.postMessage(IPC_message)
+	})
+	return false
+}
+

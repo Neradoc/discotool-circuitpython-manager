@@ -14,6 +14,10 @@ export const DEBUG = (
 )
 export const current_path = url_params.get("path") || "/";
 
+String.prototype.escapeHTML = function() {
+	return this.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
 export function url_here(parameters = {}, hash = null) {
 	var url = new URL(window.location);
 	for(var key in parameters) {
