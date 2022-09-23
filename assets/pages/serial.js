@@ -115,7 +115,7 @@ async function init_page() {
 			/File "([^"]+)", line (\d+),/g,
 			(match, p1, p2, offset, string, groups) => {
 				// don't link to "stdin"
-				if(p1 == "stdin") return match
+				if(p1 == "<stdin>") return match
 				return `<a class="file_link"
 					data-board_link="${board_url}"
 					data-path="${p1}"
