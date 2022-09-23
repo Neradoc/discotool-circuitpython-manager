@@ -187,7 +187,6 @@ async function init_page() {
 			}
 			left = left + 1
 			var code_in = code.substr(left, right - left)
-			console.log(code_in)
 			var code_out = code_in
 			var sel_pos = start
 			var sel_len = len
@@ -230,6 +229,67 @@ async function init_page() {
 				e.preventDefault()
 				return false
 			}
+			if(info.key == "'") {
+			var sel = text_block.getSelection()
+			var code = text_block.val()
+			var start = sel.start
+			var end = sel.end
+			var len = sel.length
+			for(var left = start - 1; left >= 0; --left) {
+				if(code[left] == "\n") {
+					break
+				}
+			}
+			// if the selection is empty, make sure to find the end on this line
+			for(var right = Math.max(start, end - 1); right < code.length; ++right) {
+				if(code[right] == "\n") {
+					break
+				}
+			}
+			left = left + 1
+			var code_in = code.substr(left, right - left)
+			var code_out = code_in
+			var sel_pos = start
+			var sel_len = len
+			if(sel.length == 0) {
+				if(code_in.match(/^\s*#/)) {
+					code_out = code_in.split("\n")
+						.map((x) => x.replace(/^(\s*)#\s*/, "$1"))
+						.join("\n")
+					sel_pos = Math.max(left, Math.min(start - 2, right - 2))
+				} else {
+					code_out = code_in.split("\n")
+						.map((x) => x.replace(/^(\s*)/, "$1# "))
+						.join("\n")
+					sel_pos = start + 2
+				}
+			} else {
+				var n_com_y = 0
+				var n_com_n = 0
+				for(var line of code_in.split("\n")) {
+					if(line.match(/^\s*#/)) {
+						n_com_y += 1
+					} else {
+						n_com_n += 1
+					}
+				}
+				if(n_com_n > 0) {
+					code_out = code_in.split("\n")
+						.map((x) => x.replace(/^(\s*)/, "$1# "))
+						.join("\n")
+				} else {
+					code_out = code_in.split("\n")
+						.map((x) => x.replace(/^(\s*)#\s*/, "$1"))
+						.join("\n")
+				}
+				sel_pos = left
+				sel_len = code_out.length
+			}
+			text_block.setSelection(left, right)
+			text_block.replaceSelection(code_out).focus()
+			text_block.setSelection(sel_pos, sel_pos +  sel_len)
+			e.preventDefault()
+			return false			}
 		}
 	})
 }
