@@ -71,7 +71,7 @@ class WebWorkflow extends Workflow {
 		return this.version_info;
 	}
 	async is_editable() {
-		const status = await fetch(new URL("/fs/", this.workflow_url_base),
+		const status = await fetch(this.api_url("/"),
 			{
 				method: "OPTIONS",
 				credentials: "include",
@@ -85,7 +85,7 @@ class WebWorkflow extends Workflow {
 	}
 	async get_file_content(file_path, range=null) {
 		var heads = this.headers();
-		var url = new URL("/fs"+file_path, this.workflow_url_base);
+		var url = this.api_url(file_path)
 		var response = await fetch(
 			url,
 			{
@@ -105,7 +105,7 @@ class WebWorkflow extends Workflow {
 			dir_path += "/";
 		}
 		var heads = this.headers({"Accept": "application/json"});
-		var url = new URL("/fs"+dir_path, this.workflow_url_base);
+		var url = this.api_url(dir_path)
 		// console.log("URL", url)
 		var response = await fetch(
 			url,
@@ -127,7 +127,7 @@ class WebWorkflow extends Workflow {
 			'Content-Type': 'application/octet-stream',
 			'X-Timestamp': Date.now() * 1000, // file.lastModified,
 		});
-		const file_url = new URL("/fs" + upload_path, this.workflow_url_base);
+		const file_url = this.api_url(upload_path)
 		const response = await fetch(file_url,
 			{
 				method: "PUT",
@@ -145,7 +145,7 @@ class WebWorkflow extends Workflow {
 	async create_dir(dir_path) {
 		var heads = this.headers({'X-Timestamp': Date.now()});
 		const response = await fetch(
-			new URL("/fs" + dir_path, this.workflow_url_base),
+			this.api_url(dir_path),
 			{
 				method: "PUT",
 				headers: heads,
@@ -182,7 +182,9 @@ class WebWorkflow extends Workflow {
 		return new WebResponse(response, "");
 	}
 	api_url(file_path) {
-		return new URL("/fs" + file_path, this.workflow_url_base);
+		var sub_path = `/fs/${file_path}`.replace("//", "/")
+		var url = new URL(sub_path, this.workflow_url_base)
+		return url
 	}
 	edit_url(file_path) {
 		var url = new URL("/edit/", this.workflow_url_base);
