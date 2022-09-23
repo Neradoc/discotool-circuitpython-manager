@@ -122,11 +122,13 @@ function createWindow (winBounds) {
 	})
 
 	all_windows.add(mainWindow)
+	return mainWindow
 }
 
 function openBoard (args) {
 	url = args.device
-	if(window_for_url(url)) { return }
+	var win = window_for_url(url)
+	if(win) { return win }
 
 	const new_window = new BrowserWindow(browser_window_options(BOARD_WIN_CONFIG))
 	new_window.board_url = url
@@ -143,6 +145,7 @@ function openBoard (args) {
 	})
 	// put it in the list
 	all_windows.add(new_window)
+	return new_window
 }
 
 function openFileEditor(args) {
@@ -151,7 +154,8 @@ function openFileEditor(args) {
 	// { "device": dev_url, "file": file_path }
 
 	const identifier = "Editor:" + JSON.stringify(query_args)
-	if(window_for_url(identifier)) { return }
+	var win = window_for_url(identifier)
+	if(win) { return win }
 
 	const new_window = new BrowserWindow(browser_window_options(EDITOR_WIN_CONFIG))
 	new_window.board_url = identifier
@@ -166,6 +170,7 @@ function openFileEditor(args) {
 	})
 	// put it in the list
 	all_windows.add(new_window)
+	return new_window
 }
 
 function openSerial(args) {
@@ -174,7 +179,8 @@ function openSerial(args) {
 	// { "device": dev_url }
 
 	const identifier = "Serial:" + JSON.stringify(query_args)
-	if(window_for_url(identifier)) { return }
+	var win = window_for_url(identifier)
+	if(win) { return win }
 
 	const new_window = new BrowserWindow(browser_window_options(SERIAL_WIN_CONFIG))
 	new_window.board_url = identifier
@@ -189,6 +195,7 @@ function openSerial(args) {
 	})
 	// put it in the list
 	all_windows.add(new_window)
+	return new_window
 }
 
 // This method will be called when Electron has finished
@@ -227,11 +234,14 @@ app.on("browser-window-created", function(event, new_window) {
 	})
 })
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
-
 ipcMain.on('open-board', async (event, arg) => {
-	openBoard(arg)
+	new_window = openBoard(arg)
+	if("install" in arg) {
+		new_window.webContents.send("send-to-window", {
+			event: "install-module",
+			modules: arg["install"],
+		})
+	}
 })
 
 ipcMain.on('open-file-editor', async (event, arg) => {

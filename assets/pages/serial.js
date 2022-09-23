@@ -14,6 +14,10 @@ var board_control = null
 var socket = null
 var password = ""
 
+String.prototype.escapeHTML = function() {
+	return this.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
 async function init_page() {
 
 	// get the workflow connection/instance
@@ -106,6 +110,7 @@ async function init_page() {
 	var encoder = new TextEncoder()
 	var left_count = 0
 	socket.onmessage = function(e) {
+		const scroll_top = serial_log.scrollTop()
 		const scroll_margin = serial_content.height() - (
 			serial_log.scrollTop() + serial_log.height()
 		)
@@ -124,10 +129,21 @@ async function init_page() {
 			serial_content[0].textContent = serial_content[0].textContent.slice(0, -left_count)
 			left_count = 0
 		} else {
-			serial_content[0].textContent += e.data
+			serial_content.append(e.data.escapeHTML())
+			var the_data = serial_content.html().replace(
+				/ImportError: (no module named '(\S+)')/,
+				`ImportError: <a class="circup_link"
+					data-board_link="${board_url}"
+					data-module="$2"
+					href="?dev=${board_url}&install=$2"
+				>$1</a>`
+			)
+			serial_content.html(the_data)
 		}
 		if(scroll_margin < 32) {
 			bottom_scroll[0].scrollIntoView()
+		} else {
+			serial_log.scrollTop(scroll_top)
 		}
 	}
 
@@ -205,6 +221,18 @@ async function init_page() {
 		socket.send("\r")
 		input.val("")
 		input.focus()
+	})
+
+	$(document).on("click", ".circup_link", (e) => {
+		const link = $(e.currentTarget)
+		const url = link.data("board_link")
+		const module = link.data("module")
+		window.postMessage({
+			type: 'open-board',
+			device: url,
+			install: [ module ],
+		})
+		return false
 	})
 
 }

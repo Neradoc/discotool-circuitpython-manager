@@ -336,6 +336,21 @@ async function bundle_install() {
 	}
 }
 
+async function install_a_module(libs_list) {
+	// should we do the thing ?
+	if(libs_list.length > 0) {
+		$(".tab_link_circup").click();
+		// start
+		await pre_update_process();
+		const modules_names = libs_list.join(", ")
+		$("#circup_page .loading").append(`<br/>Loading dependencies for module <b>${modules_names}</b>.`);
+		$("#circup_page .title .filename").html(modules_names);
+		redo_install_button_callback = bundle_install
+		// do the thing
+		await run_update_process(libs_list);
+	}
+}
+
 async function init_page() {
 	LOADING_IMAGE = $("#small_load_image").html()
 	setup_events()
@@ -410,6 +425,7 @@ async function init_page() {
 	//
 	await prom1;
 	await prom2;
+	window.dispatchEvent(new Event('finished-starting'))
 }
 
 const running_buttons = ".auto_install, .update_all";
@@ -424,6 +440,14 @@ async function run_exclusively(command) {
 }
 
 function setup_events() {
+	window.addEventListener("install-module", (event) => {
+		var libs_list = event?.detail?.modules
+		console.log("Install", libs_list)
+		if(libs_list != undefined) {
+			install_a_module(libs_list)
+		}
+	})
+
 	$("#welcome_page a").on("click", tools.open_outside_sync)
 
 	$("a.board_repl").unbind("click")

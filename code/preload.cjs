@@ -14,6 +14,9 @@ window.moduleMdns = require('multicast-dns')
 window.moduleWS = require("ws")
 window.shell = shell
 
+window.delayed_events = []
+window.finished_loading = false
+
 var win = window.clientInformation.platform == "Win32"
 if(win) {
 	const { PowerShell } = require('node-powershell')
@@ -29,7 +32,27 @@ window.addEventListener('DOMContentLoaded', () => {
 	for (const type of ['chrome', 'node', 'electron']) {
 		replaceText(`${type}-version`, process.versions[type])
 	}
+	
+	window.addEventListener('finished-starting', evt => {
+		window.finished_loading = true
+		if(window.delayed_events) {
+			for(event of window.delayed_events) {
+				window.dispatchEvent(event)
+			}
+		}
+		window.delayed_events = []
+	})
 })
+
+ipcRenderer.on('send-to-window', function (evt, args) {
+	const event_name = args.event
+	const event = new CustomEvent(event_name, { detail: args });
+	if(window.finished_loading) {
+		window.dispatchEvent(event)
+	} else {
+		window.delayed_events.push(event)
+	}
+});
 
 process.once('loaded', () => {
 	window.addEventListener('message', evt => {
