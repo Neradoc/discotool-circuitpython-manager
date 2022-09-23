@@ -16,6 +16,7 @@ var saved_timer = null
 
 const SAVED_DELAY = 10000
 const TAB_REPLACE = "    "
+const TAB_AT_LINE = /^(\t| {1,4})/
 
 function update_saved() {
 	const now = new Date()
@@ -149,9 +150,53 @@ async function init_page() {
 	var text_block = $("textarea#editor_content")
 	text_block.on("keydown", function(e) {
 		const info = tools.keys_info(e)
-		if(info.key == "TAB" && info.modifiers == "") {
+		if(info.key == "TAB" && ["", "S"].includes(info.modifiers)) {
 			var sel = text_block.getSelection()
-			text_block.replaceSelection(sel.text + TAB_REPLACE).focus()
+			var code = text_block.val()
+			var start = sel.start
+			var end = sel.end
+			var len = sel.length
+			for(var left = start - 1; left >= 0; --left) {
+				if(code[left] == "\n") {
+					break
+				}
+			}
+			for(var right = end - 1; right < code.length; ++right) {
+				if(code[right] == "\n") {
+					break
+				}
+			}
+			left = left + 1
+			var code_in = code.substr(left, right - left)
+			var code_out = code_in
+			var sel_pos = start
+			var sel_len = len
+			if(sel.length == 0) {
+				if(info.modifiers == "") {
+					code_out = TAB_REPLACE
+					left = start
+					right = end
+					sel_pos = left + code_out.length
+				} else if(info.modifiers == "S") {
+					code_out = code_in.replace(TAB_AT_LINE, "")
+					sel_pos = start - (code_in.length - code_out.length)
+				}
+			} else {
+				if(info.modifiers == "") {
+					code_out = code_in.split("\n")
+						.map((x) => TAB_REPLACE + x)
+						.join("\n")
+				} else if(info.modifiers == "S") {
+					code_out = code_in.split("\n")
+						.map((x) => x.replace(TAB_AT_LINE, ""))
+						.join("\n")
+				}
+				sel_pos = left
+				sel_len = code_out.length
+			}
+			text_block.setSelection(left, right)
+			text_block.replaceSelection(code_out).focus()
+			text_block.setSelection(sel_pos, sel_pos +  sel_len)
 			e.preventDefault()
 			return false
 		}
