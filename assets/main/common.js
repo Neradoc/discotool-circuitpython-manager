@@ -44,7 +44,7 @@ function open_outside_a(e) {
 	return false
 }
 
-export function open_file_editor_a(e) {
+export function open_file_editor_a(e, more=[]) {
 	if(board_control.type == "usb") {
 		return open_outside_a(e)
 	}
@@ -52,12 +52,17 @@ export function open_file_editor_a(e) {
 		return open_outside_a(e)
 	}
 	const link = $(e.currentTarget)
-	var file = link.data("path")
+	var file = ("/" + link.data("path")).replace(/\/\/+/, "/")
 	board_control.get_board_url().then((url) => {
 		var IPC_message = {
 			type: 'open-file-editor',
 			device: url,
 			file: file,
+		}
+		if(more) {
+			for(var key in more) {
+				IPC_message[key] = more[key]
+			}
 		}
 		if(board_control.supports_credentials) {
 			IPC_message.password = $("#password").val()
