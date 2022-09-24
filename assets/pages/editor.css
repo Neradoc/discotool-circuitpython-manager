@@ -28,11 +28,23 @@ header { flex: 0; }
 	display: flex;
 	flex-direction: row;
 	overflow: hidden;
+	border-top: 2px solid var(--disabled-border);
+	background: var(--base-background);
 }
 
 /* code mirror */
+
+.cm-content {
+	background-image: url("../images/stripes.png");
+	background-size: 38.5px auto;
+	background-position: 6px;
+}
+
 .cm-cursor {
 	border-color: var(--caret-color) !important;
+}
+.cm-content .cm-line:nth-child(even) {
+	background-color: var(--color-editor-zebra) !important;
 }
 
 @media (prefers-color-scheme: dark) {

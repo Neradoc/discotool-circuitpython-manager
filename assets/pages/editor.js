@@ -121,26 +121,50 @@ async function init_page() {
 		CM.language.defaultHighlightStyle
 	)
 
-	console.log(syntaxHighLight)
-
 	const fixedHeightEditor = CM.view.EditorView.theme({
 		"&": { flex: "1" },
 		".cm-scroller": { overflow: "auto" },
-		
 	}, {
 		dark: true,
 	})
-	
-	console.log(fixedHeightEditor)
+
+	// better insert tab, using TAB_REPLACE
+	function insertTab({ state, dispatch }) {
+		if (state.selection.ranges.some(r => !r.empty)) {
+			return CM.commands.indentMore({ state, dispatch })
+		}
+		dispatch(state.update(state.replaceSelection(TAB_REPLACE), {
+			scrollIntoView: true,
+			userEvent: "input"
+		}))
+		return true
+	}
 
 	let startState = CM.state.EditorState.create({
 		doc: "",
 		extensions: [
-			CM.view.keymap.of(
-				...CM.commands.defaultKeymap,
-				...CM.commands.historyKeymap,
-			),
+			CM.language.indentUnit.of(TAB_REPLACE),
+			CM.view.keymap.of(CM.commands.defaultKeymap),
+			CM.view.keymap.of(CM.commands.historyKeymap),
+			CM.view.keymap.of(CM.search.searchKeymap),
+			// CM.view.keymap.of([CM.commands.indentWithTab]),
+			CM.view.keymap.of([
+				{
+					key: "Tab",
+					run: insertTab, // CM.commands.insertTab,
+					shift: CM.commands.indentLess,
+				},
+				{
+					key: "Mod-t",
+					run: CM.commands.toggleComment,
+				},
+				{
+					key: "Mod-4", // '
+					run: CM.commands.toggleComment,
+				}
+			]),
 			CM.python(),
+			CM.search.search({ top: true }),
 			CM.view.lineNumbers(),
 			CM.view.EditorView.lineWrapping,
 			CM.commands.history(),
@@ -152,7 +176,7 @@ async function init_page() {
 
 	let view = new CM.view.EditorView({
 		state: startState,
-		parent: $(".cm-editor")[0]
+		parent: $(".cm-editor")[0],
 	})
 
 	var transaction = view.state.update({
@@ -190,10 +214,6 @@ async function init_page() {
 			saving_now = false
 		}
 	})
-
-	// TODO setup tab/shift tab
-	// TODO setup keyboard shortcuts
-	// TODO save, comment/uncomment
 
 	// setup the editor with the file's content
 
@@ -241,156 +261,6 @@ async function init_page() {
 			}
 		}
 	})
-
-
-
-
-// 	var line_numbers = $("#line_numbers")
-// 	var number_of_lines_past = 0
-// 	function setup_lines() {
-// 		const number_of_lines = text_block.val().split(/\n/).length * 2
-// 		if(number_of_lines > number_of_lines_past) {
-// 			line_numbers.html('<span></span>'.repeat(number_of_lines))
-// 			number_of_lines_past = number_of_lines
-// 		}
-// 	}
-// 
-// 	text_block.on("scroll", (e) => {
-// 		var scrollolo = text_block.scrollTop()
-// 		line_numbers.css("top", `-${scrollolo}px`)
-// 	})
-// 
-// 	text_block.on("keyup", (e) => {
-// 		setup_lines()
-// 	})
-//
-// 	text_block.on("keydown", function(e) {
-// 		const info = tools.keys_info(e)
-// 		if(info.key == "TAB" && ["", "S"].includes(info.modifiers)) {
-// 			var sel = text_block.getSelection()
-// 			var code = text_block.val()
-// 			var start = sel.start
-// 			var end = sel.end
-// 			var len = sel.length
-// 			for(var left = start - 1; left >= 0; --left) {
-// 				if(code[left] == "\n") {
-// 					break
-// 				}
-// 			}
-// 			// if the selection is empty, make sure to find the end on this line
-// 			for(var right = Math.max(start, end - 1); right < code.length; ++right) {
-// 				if(code[right] == "\n") {
-// 					break
-// 				}
-// 			}
-// 			left = left + 1
-// 			var code_in = code.substr(left, right - left)
-// 			var code_out = code_in
-// 			var sel_pos = start
-// 			var sel_len = len
-// 			if(sel.length == 0) {
-// 				if(info.modifiers == "") {
-// 					code_out = TAB_REPLACE
-// 					left = start
-// 					right = end
-// 					sel_pos = Math.max(left, left + code_out.length)
-// 				} else if(info.modifiers == "S") {
-// 					code_out = code_in.replace(TAB_AT_LINE, "")
-// 					sel_pos = Math.max(left, start - (code_in.length - code_out.length))
-// 				}
-// 			} else {
-// 				if(info.modifiers == "") {
-// 					code_out = code_in.split("\n")
-// 						.map((x) => TAB_REPLACE + x)
-// 						.join("\n")
-// 				} else if(info.modifiers == "S") {
-// 					code_out = code_in.split("\n")
-// 						.map((x) => x.replace(TAB_AT_LINE, ""))
-// 						.join("\n")
-// 				}
-// 				sel_pos = left
-// 				sel_len = code_out.length
-// 			}
-// 			text_block.setSelection(left, right)
-// 			text_block.replaceSelection(code_out).focus()
-// 			text_block.setSelection(sel_pos, sel_pos +  sel_len)
-// 			e.preventDefault()
-// 			return false
-// 		}
-// 	})
-// 
-// 	$(document).on("keydown", function(e) {
-// 		const info = tools.keys_info(e)
-// 		if(["C", "M"].includes(info.modifiers)) {
-// 			if(info.key == "S") {
-// 				$(".save_button").click()
-// 				e.preventDefault()
-// 				return false
-// 			}
-// 			if(info.key == "'") {
-// 				var sel = text_block.getSelection()
-// 				var code = text_block.val()
-// 				var start = sel.start
-// 				var end = sel.end
-// 				var len = sel.length
-// 				for(var left = start - 1; left >= 0; --left) {
-// 					if(code[left] == "\n") {
-// 						break
-// 					}
-// 				}
-// 				// if the selection is empty, make sure to find the end on this line
-// 				for(var right = Math.max(start, end - 1); right < code.length; ++right) {
-// 					if(code[right] == "\n") {
-// 						break
-// 					}
-// 				}
-// 				left = left + 1
-// 				var code_in = code.substr(left, right - left)
-// 				var code_out = code_in
-// 				var sel_pos = start
-// 				var sel_len = len
-// 				if(sel.length == 0) {
-// 					if(code_in.match(/^\s*#/)) {
-// 						code_out = code_in.split("\n")
-// 							.map((x) => x.replace(/^(\s*)#\s*/, "$1"))
-// 							.join("\n")
-// 						sel_pos = Math.max(left, Math.min(start - 2, right - 2))
-// 					} else {
-// 						code_out = code_in.split("\n")
-// 							.map((x) => x.replace(/^(\s*)/, "$1# "))
-// 							.join("\n")
-// 						sel_pos = start + 2
-// 					}
-// 				} else {
-// 					var n_com_y = 0
-// 					var n_com_n = 0
-// 					for(var line of code_in.split("\n")) {
-// 						if(line.match(/^\s*#/)) {
-// 							n_com_y += 1
-// 						} else {
-// 							n_com_n += 1
-// 						}
-// 					}
-// 					if(n_com_n > 0) {
-// 						code_out = code_in.split("\n")
-// 							.map((x) => x.replace(/^(\s*)/, "$1# "))
-// 							.join("\n")
-// 					} else {
-// 						code_out = code_in.split("\n")
-// 							.map((x) => x.replace(/^(\s*)#\s*/, "$1"))
-// 							.join("\n")
-// 					}
-// 					sel_pos = left
-// 					sel_len = code_out.length
-// 				}
-// 				text_block.setSelection(left, right)
-// 				text_block.replaceSelection(code_out).focus()
-// 				text_block.setSelection(sel_pos, sel_pos +  sel_len)
-// 				e.preventDefault()
-// 				return false
-// 			}
-// 		}
-// 	})
 
 	do_setup_editor_content()
 }

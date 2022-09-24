@@ -5,21 +5,21 @@ SPDX-License-Identifier: MIT
 
 /* Variables and dark mode */
 :root {
+	--base-background: white;
+	--base-color: black;
 	--color-pair0: #EEF;
 	--color-pair1: #EEE;
 	--text-color: black;
-	--disabled-color: #888;
 	--hover-background: #48B;
 	--hover-color: black;
 	--link-color: #004;
 	--border-basic: #888;
 	--input-background: #EBEBEB;
 	--input-text: black;
+	--disabled-color: #888;
 	--disabled-text: #888;
 	--disabled-border: #CCC;
-	--enabled-border: #888;
-	--disabled-border: #444;
-	--enabled-border: #CCC;
+	--enabled-border: #444;
 	--select-background-pair0: #030;
 	--select-background-pair1: #040;
 	--select-text-pair0: white;
@@ -33,15 +33,20 @@ SPDX-License-Identifier: MIT
 	--error-background: #FFBBBB;
 	--font-size: 16px;
 	--caret-color: black;
+	--color-editor-zebra: rgba(200, 200, 200, 0.2);
 }
 @media (prefers-color-scheme: dark) {
 	:root {
+		--base-background: black;
+		--base-color: white;
 		--color-pair0: #181818;
 		--color-pair1: #202020;
 		--text-color: white;
 		--input-background: #181F1F;
 		--input-text: white;
 		--disabled-color: #777;
+		--disabled-border: #444;
+		--enabled-border: #CCC;
 		--link-color: #BBF;
 		--contrast-color: #CCC;
 		--body-background: #15141a;
@@ -50,6 +55,7 @@ SPDX-License-Identifier: MIT
 		--svg-glow: drop-shadow(var(--svg-border) 0 0 antiquewhite) drop-shadow(calc(-1 * var(--svg-border)) 0 0 antiquewhite) drop-shadow(0 var(--svg-border) 0 antiquewhite) drop-shadow(0 calc(-1 * var(--svg-border)) 0 antiquewhite);
 		--error-background: #440000;
 		--caret-color: white;
+		--color-editor-zebra: rgba(50, 50, 50, 0.2);
 	}
 }
 
