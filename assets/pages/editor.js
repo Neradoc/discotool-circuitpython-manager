@@ -239,7 +239,7 @@ async function init_page() {
 	}
 
 	function do_setup_editor_content() {
-		setup_editor_content().then((res) => {
+		return setup_editor_content().then((res) => {
 			if(res === 409) {
 				password_dialog.open({
 					"close": do_setup_editor_content,
@@ -262,7 +262,27 @@ async function init_page() {
 		}
 	})
 
-	do_setup_editor_content()
+	window.addEventListener("opened-editor", (event) => {
+		var line_num = event?.detail?.line
+		console.log(event, line_num)
+		console.log(view)
+		if(line_num !== undefined) {
+			// hightlight line line_num
+			const line = view.state.doc.line(line_num)
+			view.dispatch({
+				selection: {
+					anchor: line.from,
+					head: line.to,
+				},
+				scrollIntoView: true,
+			})
+			view.focus()
+		}
+	})
+
+	do_setup_editor_content().then(() => {
+		window.dispatchEvent(new Event('finished-starting'))
+	})
 }
 
 init_page();

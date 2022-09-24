@@ -112,7 +112,7 @@ async function init_page() {
 			>$1</a>`
 		)
 		.replace(
-			/File "([^"]+)", line (\d+),/g,
+			/File "([^"]+)", line (\d+)/g,
 			(match, p1, p2, offset, string, groups) => {
 				// don't link to "stdin"
 				if(p1 == "<stdin>") return match
@@ -121,7 +121,7 @@ async function init_page() {
 					data-path="${p1}"
 					data-line="${p2}"
 					href="?dev=${board_url}"
-				>File "${p1}", line ${p2}</a>,`
+				>File "${p1}", line ${p2}</a>`
 			}
 		)
 		.replace(/\n$/, "") // somehow there's a return added at the end ?
@@ -254,7 +254,8 @@ async function init_page() {
 
 	$(document).on("click", ".file_link", (e) => {
 		try {
-			common.open_file_editor_a(e)
+			var line = $(e.currentTarget).data("line")
+			common.open_file_editor_a(e, { line: line })
 		} catch(error) {
 			console.log(error)
 		}
