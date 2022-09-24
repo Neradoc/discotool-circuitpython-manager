@@ -24,6 +24,26 @@ if(win) {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+// 	const {EditorState, Transaction} = require("@codemirror/state")
+// 	const {EditorView, keymap, lineNumbers, drawSelection} = require("@codemirror/view")
+// 	const {defaultKeymap} = require("@codemirror/commands")
+// 	const {python} = require("@codemirror/lang-python")
+
+	const state = require("@codemirror/state")
+	const view = require("@codemirror/view")
+	const commands = require("@codemirror/commands")
+	const language = require("@codemirror/language")
+	const {python} = require("@codemirror/lang-python")
+
+
+	window.codemirror = {
+		state: state,
+		view: view,
+		commands: commands,
+		language: language,
+		"python": python,
+	}
+
 	const replaceText = (selector, text) => {
 		const element = document.getElementById(selector)
 		if (element) element.innerText = text

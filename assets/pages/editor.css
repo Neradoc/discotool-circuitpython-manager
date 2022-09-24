@@ -30,30 +30,26 @@ header { flex: 0; }
 	overflow: hidden;
 }
 
-#line_numbers { flex: 0; }
-#editor_content { flex: 1; }
-
-#line_numbers,
-#editor_content {
-	font-size: 16px;
-	font-family: Menlo, Monaco, monospace;
+/* code mirror */
+.cm-cursor {
+	border-color: var(--caret-color) !important;
 }
 
-#line_numbers {
-	position: relative;
-	width: 20px;
-	padding: 3px 4px 0px 2px;
-	text-align: right;
-}
-
-#line_numbers span {
-	counter-increment: linenumber;
-}
-
-#line_numbers span::before {
-	content: counter(linenumber);
-	display: block;
-	color: #506882;
+@media (prefers-color-scheme: dark) {
+	.ͼ5 { color: #7a757a; }
+	.ͼb { color: #FF8AD8; }
+	.ͼc { color: #76D6FF; }
+	.ͼd { color: #73FA79; }
+	.ͼe { color: #FF9300; }
+	.ͼf { color: #FF9300; }
+	.ͼg { color: #7A81FF; }
+	.ͼh { color: #0096FF; }
+	.ͼi { color: #00F900; }
+	.ͼj { color: #73FDFF; }
+	.ͼk { color: #76D6FF; }
+	.ͼl { color: #7A81FF; }
+	.ͼm { color: #FFFB00; }
+	.ͼn { color: #FF2600; }
 }
 
 /* Top title board icon */
@@ -88,10 +84,10 @@ header .icon .icon_locked {
 .saving_now img {
 	height: 18px;
 }
-.save_block.saving {
+.buttons_1.saving {
 	background: #004000;
 }
-.save_block.saving .saving_now {
+.buttons_1.saving .saving_now {
 	display: inline;
 }
 

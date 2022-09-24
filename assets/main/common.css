@@ -32,6 +32,7 @@ SPDX-License-Identifier: MIT
 	--svg-glow: none;
 	--error-background: #FFBBBB;
 	--font-size: 16px;
+	--caret-color: black;
 }
 @media (prefers-color-scheme: dark) {
 	:root {
@@ -48,6 +49,7 @@ SPDX-License-Identifier: MIT
 		--svg-border: 0.5px;
 		--svg-glow: drop-shadow(var(--svg-border) 0 0 antiquewhite) drop-shadow(calc(-1 * var(--svg-border)) 0 0 antiquewhite) drop-shadow(0 var(--svg-border) 0 antiquewhite) drop-shadow(0 calc(-1 * var(--svg-border)) 0 antiquewhite);
 		--error-background: #440000;
+		--caret-color: white;
 	}
 }
 

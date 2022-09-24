@@ -27,6 +27,12 @@
   },
   "type": "module",
   "dependencies": {
+    "@codemirror/commands": "github:codemirror/commands",
+    "@codemirror/lang-python": "github:codemirror/lang-python",
+    "@codemirror/language": "^6.2.1",
+    "@codemirror/state": "github:codemirror/state",
+    "@codemirror/view": "github:codemirror/view",
+    "codemirror": "^6.0.1",
     "drivelist": "^11.0.0",
     "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^8.1.0",

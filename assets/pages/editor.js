@@ -87,33 +87,6 @@ async function init_page() {
 
 	saved_timer = setInterval(update_saved, SAVED_DELAY)
 
-	// setup the save command/path (probably only needs the same path)
-
-	var saving_now = false;
-	$(".save_button").on("click", async (e) => {
-		if(saving_now) { return }
-		saving_now = true
-		$(".save_button").prop("disabled", true)
-		$(".save_block").addClass("saving")
-		try {
-			var new_content = text_block.val()
-			var new_content_blob = new Blob([new_content], { type: 'text/plain' })
-			var save_path = target_file
-			var res = await board_control.upload_file(save_path, new_content_blob)
-			if(res.ok) {
-				last_saved = new Date()
-				update_saved()
-			} else {
-				console.log(res)
-			}
-		} finally {
-			await tools.sleep(2)
-			$(".save_block").removeClass("saving")
-			$(".save_button").prop("disabled", false)
-			saving_now = false
-		}
-	})
-
 	/* auto install dependencies */
 	$(".auto_install_button").on("click", (e) => {
 		window.postMessage({
@@ -140,39 +113,111 @@ async function init_page() {
 		$(".save_button").prop("disabled", true)
 	}
 
-	// setup the editor with the file's content
+	// setup code mirror
 
-	var line_numbers = $("#line_numbers")
-	var number_of_lines_past = 0
-	function setup_lines() {
-		const number_of_lines = text_block.val().split(/\n/).length * 2
-		if(number_of_lines > number_of_lines_past) {
-			line_numbers.html('<span></span>'.repeat(number_of_lines))
-			number_of_lines_past = number_of_lines
+	const CM = window.codemirror
+
+	var syntaxHighLight = CM.language.syntaxHighlighting(
+		CM.language.defaultHighlightStyle
+	)
+
+	console.log(syntaxHighLight)
+
+	const fixedHeightEditor = CM.view.EditorView.theme({
+		"&": { flex: "1" },
+		".cm-scroller": { overflow: "auto" },
+		
+	}, {
+		dark: true,
+	})
+	
+	console.log(fixedHeightEditor)
+
+	let startState = CM.state.EditorState.create({
+		doc: "",
+		extensions: [
+			CM.view.keymap.of(
+				...CM.commands.defaultKeymap,
+				...CM.commands.historyKeymap,
+			),
+			CM.python(),
+			CM.view.lineNumbers(),
+			CM.view.EditorView.lineWrapping,
+			CM.commands.history(),
+			CM.view.drawSelection(),
+			syntaxHighLight,
+			fixedHeightEditor,
+		]
+	})
+
+	let view = new CM.view.EditorView({
+		state: startState,
+		parent: $(".cm-editor")[0]
+	})
+
+	var transaction = view.state.update({
+		changes: {
+			from: 0,
+			to: view.state.doc.length,
+			insert: "This is a view",
 		}
-	}
-
-	text_block.on("scroll", (e) => {
-		var scrollolo = text_block.scrollTop()
-		line_numbers.css("top", `-${scrollolo}px`)
 	})
 
-	text_block.on("keyup", (e) => {
-		setup_lines()
+	// setup the save command/path (probably only needs the same path)
+
+	var saving_now = false;
+	$(".save_button").on("click", async (e) => {
+		if(saving_now) { return }
+		saving_now = true
+		$(".save_button").prop("disabled", true)
+		$(".buttons_1").addClass("saving")
+		try {
+			// var new_content = text_block.val()
+			var new_content = await view.state.doc.toString()
+			var new_content_blob = new Blob([new_content], { type: 'text/plain' })
+			var save_path = target_file
+			var res = await board_control.upload_file(save_path, new_content_blob)
+			if(res.ok) {
+				last_saved = new Date()
+				update_saved()
+			} else {
+				console.log(res)
+			}
+		} finally {
+			await tools.sleep(2)
+			$(".buttons_1").removeClass("saving")
+			$(".save_button").prop("disabled", false)
+			saving_now = false
+		}
 	})
+
+	// TODO setup tab/shift tab
+	// TODO setup keyboard shortcuts
+	// TODO save, comment/uncomment
+
+	// setup the editor with the file's content
 
 	async function setup_editor_content() {
 		const result = await board_control.get_file_content(target_file)
 		if(result.ok) {
 			var file_content = result.content
-			text_block.val(file_content)
-			setup_lines()
+			// text_block.val(file_content)
+			view.dispatch(view.state.update({
+				changes: {
+					from: 0,
+					to: view.state.doc.length,
+					insert: file_content,
+				}
+			}))
+			//
+			// setup_lines()
 			last_saved = new Date()
 			$(".last_saved").html(0)
 			return true
 		}
 		return result.status
 	}
+
 	function do_setup_editor_content() {
 		setup_editor_content().then((res) => {
 			if(res === 409) {
@@ -185,62 +230,6 @@ async function init_page() {
 			}
 		})
 	}
-	do_setup_editor_content()
-
-	text_block.on("keydown", function(e) {
-		const info = tools.keys_info(e)
-		if(info.key == "TAB" && ["", "S"].includes(info.modifiers)) {
-			var sel = text_block.getSelection()
-			var code = text_block.val()
-			var start = sel.start
-			var end = sel.end
-			var len = sel.length
-			for(var left = start - 1; left >= 0; --left) {
-				if(code[left] == "\n") {
-					break
-				}
-			}
-			// if the selection is empty, make sure to find the end on this line
-			for(var right = Math.max(start, end - 1); right < code.length; ++right) {
-				if(code[right] == "\n") {
-					break
-				}
-			}
-			left = left + 1
-			var code_in = code.substr(left, right - left)
-			var code_out = code_in
-			var sel_pos = start
-			var sel_len = len
-			if(sel.length == 0) {
-				if(info.modifiers == "") {
-					code_out = TAB_REPLACE
-					left = start
-					right = end
-					sel_pos = Math.max(left, left + code_out.length)
-				} else if(info.modifiers == "S") {
-					code_out = code_in.replace(TAB_AT_LINE, "")
-					sel_pos = Math.max(left, start - (code_in.length - code_out.length))
-				}
-			} else {
-				if(info.modifiers == "") {
-					code_out = code_in.split("\n")
-						.map((x) => TAB_REPLACE + x)
-						.join("\n")
-				} else if(info.modifiers == "S") {
-					code_out = code_in.split("\n")
-						.map((x) => x.replace(TAB_AT_LINE, ""))
-						.join("\n")
-				}
-				sel_pos = left
-				sel_len = code_out.length
-			}
-			text_block.setSelection(left, right)
-			text_block.replaceSelection(code_out).focus()
-			text_block.setSelection(sel_pos, sel_pos +  sel_len)
-			e.preventDefault()
-			return false
-		}
-	})
 
 	$(document).on("keydown", function(e) {
 		const info = tools.keys_info(e)
@@ -250,70 +239,160 @@ async function init_page() {
 				e.preventDefault()
 				return false
 			}
-			if(info.key == "'") {
-				var sel = text_block.getSelection()
-				var code = text_block.val()
-				var start = sel.start
-				var end = sel.end
-				var len = sel.length
-				for(var left = start - 1; left >= 0; --left) {
-					if(code[left] == "\n") {
-						break
-					}
-				}
-				// if the selection is empty, make sure to find the end on this line
-				for(var right = Math.max(start, end - 1); right < code.length; ++right) {
-					if(code[right] == "\n") {
-						break
-					}
-				}
-				left = left + 1
-				var code_in = code.substr(left, right - left)
-				var code_out = code_in
-				var sel_pos = start
-				var sel_len = len
-				if(sel.length == 0) {
-					if(code_in.match(/^\s*#/)) {
-						code_out = code_in.split("\n")
-							.map((x) => x.replace(/^(\s*)#\s*/, "$1"))
-							.join("\n")
-						sel_pos = Math.max(left, Math.min(start - 2, right - 2))
-					} else {
-						code_out = code_in.split("\n")
-							.map((x) => x.replace(/^(\s*)/, "$1# "))
-							.join("\n")
-						sel_pos = start + 2
-					}
-				} else {
-					var n_com_y = 0
-					var n_com_n = 0
-					for(var line of code_in.split("\n")) {
-						if(line.match(/^\s*#/)) {
-							n_com_y += 1
-						} else {
-							n_com_n += 1
-						}
-					}
-					if(n_com_n > 0) {
-						code_out = code_in.split("\n")
-							.map((x) => x.replace(/^(\s*)/, "$1# "))
-							.join("\n")
-					} else {
-						code_out = code_in.split("\n")
-							.map((x) => x.replace(/^(\s*)#\s*/, "$1"))
-							.join("\n")
-					}
-					sel_pos = left
-					sel_len = code_out.length
-				}
-				text_block.setSelection(left, right)
-				text_block.replaceSelection(code_out).focus()
-				text_block.setSelection(sel_pos, sel_pos +  sel_len)
-				e.preventDefault()
-				return false
-			}
 		}
 	})
+
+
+
+
+// 	var line_numbers = $("#line_numbers")
+// 	var number_of_lines_past = 0
+// 	function setup_lines() {
+// 		const number_of_lines = text_block.val().split(/\n/).length * 2
+// 		if(number_of_lines > number_of_lines_past) {
+// 			line_numbers.html('<span></span>'.repeat(number_of_lines))
+// 			number_of_lines_past = number_of_lines
+// 		}
+// 	}
+// 
+// 	text_block.on("scroll", (e) => {
+// 		var scrollolo = text_block.scrollTop()
+// 		line_numbers.css("top", `-${scrollolo}px`)
+// 	})
+// 
+// 	text_block.on("keyup", (e) => {
+// 		setup_lines()
+// 	})
+//
+// 	text_block.on("keydown", function(e) {
+// 		const info = tools.keys_info(e)
+// 		if(info.key == "TAB" && ["", "S"].includes(info.modifiers)) {
+// 			var sel = text_block.getSelection()
+// 			var code = text_block.val()
+// 			var start = sel.start
+// 			var end = sel.end
+// 			var len = sel.length
+// 			for(var left = start - 1; left >= 0; --left) {
+// 				if(code[left] == "\n") {
+// 					break
+// 				}
+// 			}
+// 			// if the selection is empty, make sure to find the end on this line
+// 			for(var right = Math.max(start, end - 1); right < code.length; ++right) {
+// 				if(code[right] == "\n") {
+// 					break
+// 				}
+// 			}
+// 			left = left + 1
+// 			var code_in = code.substr(left, right - left)
+// 			var code_out = code_in
+// 			var sel_pos = start
+// 			var sel_len = len
+// 			if(sel.length == 0) {
+// 				if(info.modifiers == "") {
+// 					code_out = TAB_REPLACE
+// 					left = start
+// 					right = end
+// 					sel_pos = Math.max(left, left + code_out.length)
+// 				} else if(info.modifiers == "S") {
+// 					code_out = code_in.replace(TAB_AT_LINE, "")
+// 					sel_pos = Math.max(left, start - (code_in.length - code_out.length))
+// 				}
+// 			} else {
+// 				if(info.modifiers == "") {
+// 					code_out = code_in.split("\n")
+// 						.map((x) => TAB_REPLACE + x)
+// 						.join("\n")
+// 				} else if(info.modifiers == "S") {
+// 					code_out = code_in.split("\n")
+// 						.map((x) => x.replace(TAB_AT_LINE, ""))
+// 						.join("\n")
+// 				}
+// 				sel_pos = left
+// 				sel_len = code_out.length
+// 			}
+// 			text_block.setSelection(left, right)
+// 			text_block.replaceSelection(code_out).focus()
+// 			text_block.setSelection(sel_pos, sel_pos +  sel_len)
+// 			e.preventDefault()
+// 			return false
+// 		}
+// 	})
+// 
+// 	$(document).on("keydown", function(e) {
+// 		const info = tools.keys_info(e)
+// 		if(["C", "M"].includes(info.modifiers)) {
+// 			if(info.key == "S") {
+// 				$(".save_button").click()
+// 				e.preventDefault()
+// 				return false
+// 			}
+// 			if(info.key == "'") {
+// 				var sel = text_block.getSelection()
+// 				var code = text_block.val()
+// 				var start = sel.start
+// 				var end = sel.end
+// 				var len = sel.length
+// 				for(var left = start - 1; left >= 0; --left) {
+// 					if(code[left] == "\n") {
+// 						break
+// 					}
+// 				}
+// 				// if the selection is empty, make sure to find the end on this line
+// 				for(var right = Math.max(start, end - 1); right < code.length; ++right) {
+// 					if(code[right] == "\n") {
+// 						break
+// 					}
+// 				}
+// 				left = left + 1
+// 				var code_in = code.substr(left, right - left)
+// 				var code_out = code_in
+// 				var sel_pos = start
+// 				var sel_len = len
+// 				if(sel.length == 0) {
+// 					if(code_in.match(/^\s*#/)) {
+// 						code_out = code_in.split("\n")
+// 							.map((x) => x.replace(/^(\s*)#\s*/, "$1"))
+// 							.join("\n")
+// 						sel_pos = Math.max(left, Math.min(start - 2, right - 2))
+// 					} else {
+// 						code_out = code_in.split("\n")
+// 							.map((x) => x.replace(/^(\s*)/, "$1# "))
+// 							.join("\n")
+// 						sel_pos = start + 2
+// 					}
+// 				} else {
+// 					var n_com_y = 0
+// 					var n_com_n = 0
+// 					for(var line of code_in.split("\n")) {
+// 						if(line.match(/^\s*#/)) {
+// 							n_com_y += 1
+// 						} else {
+// 							n_com_n += 1
+// 						}
+// 					}
+// 					if(n_com_n > 0) {
+// 						code_out = code_in.split("\n")
+// 							.map((x) => x.replace(/^(\s*)/, "$1# "))
+// 							.join("\n")
+// 					} else {
+// 						code_out = code_in.split("\n")
+// 							.map((x) => x.replace(/^(\s*)#\s*/, "$1"))
+// 							.join("\n")
+// 					}
+// 					sel_pos = left
+// 					sel_len = code_out.length
+// 				}
+// 				text_block.setSelection(left, right)
+// 				text_block.replaceSelection(code_out).focus()
+// 				text_block.setSelection(sel_pos, sel_pos +  sel_len)
+// 				e.preventDefault()
+// 				return false
+// 			}
+// 		}
+// 	})
+
+	do_setup_editor_content()
 }
 
 init_page();
