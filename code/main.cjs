@@ -153,7 +153,9 @@ function openFileEditor(args) {
 	delete query_args.type
 	// { "device": dev_url, "file": file_path }
 
-	const identifier = "Editor:" + JSON.stringify(query_args)
+	const identifier = "Editor:" + JSON.stringify([
+		query_args.device, query_args.file,
+	])
 	var win = window_for_url(identifier)
 	if(win) { return win }
 
@@ -238,14 +240,18 @@ ipcMain.on('open-board', async (event, arg) => {
 	new_window = openBoard(arg)
 	if("install" in arg) {
 		new_window.webContents.send("send-to-window", {
+			...arg,
 			event: "install-modules",
-			install: arg["install"],
 		})
 	}
 })
 
 ipcMain.on('open-file-editor', async (event, arg) => {
-	openFileEditor(arg)
+	new_window = openFileEditor(arg)
+	new_window.webContents.send("send-to-window", {
+		...arg,
+		event: "opened-editor",
+	})
 })
 
 ipcMain.on('open-serial-panel', async (event, arg) => {
