@@ -69,6 +69,8 @@ async function init_page() {
 		return false
 	})
 
+	var text_block = $("textarea#editor_content")
+
 	/* get the file path from the URL parameters
 	- all in one parameter ?
 		- file:///Volumes/CIRCUITPY/code.py
@@ -94,7 +96,7 @@ async function init_page() {
 		$(".save_button").prop("disabled", true)
 		$(".save_block").addClass("saving")
 		try {
-			var new_content = $("textarea#editor_content").val()
+			var new_content = text_block.val()
 			var new_content_blob = new Blob([new_content], { type: 'text/plain' })
 			var save_path = target_file
 			var res = await board_control.upload_file(save_path, new_content_blob)
@@ -140,11 +142,31 @@ async function init_page() {
 
 	// setup the editor with the file's content
 
+	var line_numbers = $("#line_numbers")
+	var number_of_lines_past = 0
+	function setup_lines() {
+		const number_of_lines = text_block.val().split(/\n/).length * 2
+		if(number_of_lines > number_of_lines_past) {
+			line_numbers.html('<span></span>'.repeat(number_of_lines))
+			number_of_lines_past = number_of_lines
+		}
+	}
+
+	text_block.on("scroll", (e) => {
+		var scrollolo = text_block.scrollTop()
+		line_numbers.css("top", `-${scrollolo}px`)
+	})
+
+	text_block.on("keyup", (e) => {
+		setup_lines()
+	})
+
 	async function setup_editor_content() {
 		const result = await board_control.get_file_content(target_file)
 		if(result.ok) {
 			var file_content = result.content
-			$("textarea#editor_content").val(file_content)
+			text_block.val(file_content)
+			setup_lines()
 			last_saved = new Date()
 			$(".last_saved").html(0)
 			return true
@@ -165,7 +187,6 @@ async function init_page() {
 	}
 	do_setup_editor_content()
 
-	var text_block = $("textarea#editor_content")
 	text_block.on("keydown", function(e) {
 		const info = tools.keys_info(e)
 		if(info.key == "TAB" && ["", "S"].includes(info.modifiers)) {

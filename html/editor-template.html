@@ -32,16 +32,23 @@ SPDX-License-Identifier: MIT
 		</h3>
 		<h3><span class="file_name">Loading…</span></h3>
 	</header>
-	<p class="save_block">
-		<button accesskey="s" class="save_button">Save</button> Last saved:
-		<span class="last_saved"></span> minutes ago.
-		<span class="saving_now"><img src="assets/images/loading_black_small.gif" /> Saving.</span>
-		<button class="auto_install_button">Install Dependencies</button>
-	</p>
-	<p class="no_save_block">
-		The board is locked, the file can not be written.
-	</p>
-	<textarea id="editor_content"></textarea>
+	<div class="buttons_1">
+		<span class="save_block">
+			<button accesskey="s" class="save_button">Save</button> Last saved:
+			<span class="last_saved"></span> minutes ago.
+			<span class="saving_now"><img src="assets/images/loading_black_small.gif" /> Saving.</span>
+		</span>
+		<span class="no_save_block">
+			The board is locked, the file cannot be written.
+		</span>
+		<button class="auto_install_button">Lookup Dependencies</button>
+	</div>
+	<div id="editor_block">
+		<div id="line_numbers">
+			<span></span>
+		</div>
+		<textarea id="editor_content"></textarea>
+	</div>
 	</content>
 	<div id="password_dialog" class="include" data-src="dialog-password"></div>
 </body>
