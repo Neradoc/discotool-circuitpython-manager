@@ -147,10 +147,14 @@ async function detect_web() {
 			var url_link = `${BOARD_PAGE}${url.search}`;
 
 			var wf = new WebWorkflow(board_link)
-			await wf.start()
+			var did_start = await wf.start()
+			if(!did_start) {
+				console.log("SKIP")
+				continue
+			}
 			const info = await wf.device_info()
-			const serial = await info["serial_num"] || board_path
-			const name = await info["board_name"] || board_name
+			const serial = info["serial_num"] || board_path
+			const name = info["board_name"] || board_name
 			const line_id = `dev_line_${serial}`
 			var board = null;
 			if(!(serial in boards)) {

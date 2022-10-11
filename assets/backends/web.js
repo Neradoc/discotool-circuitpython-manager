@@ -70,22 +70,28 @@ class WebWorkflow extends Workflow {
 				this.version_info.serial_num = this.version_info["UID"]
 			}
 		} catch(e) {
-			console.log("No device info")
+			console.log("Device inaccessible")
+			return {}
 		}
 		return this.version_info
 	}
 	async is_editable() {
-		const status = await fetch(this.api_url("/"),
-			{
-				method: "OPTIONS",
-				credentials: "include",
-			}
-		);
-		var editable = status.headers
-			.get("Access-Control-Allow-Methods")
-			.toLowerCase()
-			.includes("delete");
-		return editable;
+		try {
+			const status = await fetch(this.api_url("/"),
+				{
+					method: "OPTIONS",
+					credentials: "include",
+				}
+			);
+			var editable = status.headers
+				.get("Access-Control-Allow-Methods")
+				.toLowerCase()
+				.includes("delete");
+			return editable;
+		} catch(e) {
+			console.log("Device inaccessible")
+			return false
+		}
 	}
 	async get_file_content(file_path, range=null) {
 		var heads = this.headers();
