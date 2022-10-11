@@ -61,14 +61,18 @@ class WebWorkflow extends Workflow {
 		if(this.version_info !== null) {
 			return this.version_info;
 		}
-		var response = await fetch(
-			new URL("/cp/version.json", this.workflow_url_base),
-		);
-		this.version_info = await response.json();
-		if( "UID" in this.version_info ) {
-			this.version_info.serial_num = this.version_info["UID"]
+		try {
+			var response = await fetch(
+				new URL("/cp/version.json", this.workflow_url_base),
+			);
+			this.version_info = await response.json();
+			if( "UID" in this.version_info ) {
+				this.version_info.serial_num = this.version_info["UID"]
+			}
+		} catch(e) {
+			console.log("No device info")
 		}
-		return this.version_info;
+		return this.version_info
 	}
 	async is_editable() {
 		const status = await fetch(this.api_url("/"),
@@ -200,7 +204,7 @@ class WebWorkflow extends Workflow {
 	async get_board_url() {
 		const u = new URL(this.workflow_url_base)
 		const port = u.port || 80
-		return `${u.protocol}//${u.host}:${port}`
+		return `${u.protocol}//${u.hostname}:${port}`
 	}
 
 	//##############################################################
