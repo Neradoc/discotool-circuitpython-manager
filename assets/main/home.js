@@ -142,9 +142,10 @@ async function detect_web() {
 			// port: 80
 			var board_path = device.hostname.replace(/\.local$/, "")
 			var board_name = device.instance_name
-			var board_link = `http://${device.ip}:${device.port}`;
+			var board_link = `http://${device.ip}:${device.port}`
+			var board_port = (device.port != 80 ? ` [${device.port}]` : "")
 			var url = url_to(BOARD_PAGE, {"dev": board_link})
-			var url_link = `${BOARD_PAGE}${url.search}`;
+			var url_link = `${BOARD_PAGE}${url.search}`
 
 			var wf = new WebWorkflow(board_link)
 			var did_start = await wf.start()
@@ -179,7 +180,7 @@ async function detect_web() {
 			var link = all_dev_line.find(".link_web")
 			link.prop("href", url_link);
 			link.data("board_link", board_link);
-			link.find(".name").html(`${board_path}`)
+			link.find(".name").html(`${board_path}${board_port}`)
 			link.prop("title", device.ip)
 			var board_info = all_dev_line.find(".board_info")
 			board_info.html(link.href)
