@@ -12,6 +12,7 @@ window.moduleFs = require("fs/promises")
 window.moduleFsx = require("fs-extra")
 window.moduleMdns = require('multicast-dns')
 window.moduleWS = require("ws")
+window.moduleOS = require("os")
 window.shell = shell
 
 window.delayed_events = []

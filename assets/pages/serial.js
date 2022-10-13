@@ -14,6 +14,34 @@ var board_control = null
 var socket = null
 var password = ""
 
+var input_history = []
+var input_line = ""
+
+function push_history(item) {
+	item = item.trim()
+	if(item == "") return
+	var history_panel = $("#history_panel")
+	var pos = -1
+	while( (pos = input_history.indexOf(item)) >= 0) {
+		input_history.splice(pos,pos)
+	}
+	input_history.push(item)
+	history_panel.children().remove()
+	for(var index in input_history) {
+		var command = input_history[index]
+		var option = $('<div class="history_line">')
+		option.data("command", index)
+		option.html(command.substr(0,64).escapeHTML())
+		history_panel.append(option)
+	}
+	if(input_history.length == 0) {
+		$("#history_button").prop("disabled", true)
+		$("#history_panel").hide()
+	} else {
+		$("#history_button").prop("disabled", false)
+	}
+}
+
 async function init_page() {
 
 	// get the workflow connection/instance
@@ -74,10 +102,8 @@ async function init_page() {
 
 	function set_enabled(enabled) {
 		input.prop("disabled", !enabled)
-		var buttons = document.querySelectorAll("button")
-		for (var button of buttons) {
-			button.disabled = !enabled
-		}
+		$("button").prop("disabled", !enabled)
+		$("#history_button").prop("disabled", input_history.length == 0)
 	}
 
 	set_enabled(false)
@@ -100,6 +126,7 @@ async function init_page() {
 		set_enabled(true)
 		$("body").removeClass("loading")
 		$("body").removeClass("error")
+		input.focus()
 	}
 
 	function set_the_serial_content(the_data) {
@@ -174,6 +201,7 @@ async function init_page() {
 
 	input.on("keydown", function(e) {
 		const info = tools.keys_info(e)
+		$("#history_panel").hide()
 		if(info.key == "TAB" && info.modifiers == "") {
 			if(input.val().length == 0) {
 				input.val("\t")
@@ -185,9 +213,17 @@ async function init_page() {
 		}
 	})
 
+	var mod_is_ctrl = ! window.moduleOS.platform().includes("darwin")
+	var command_modifiers = (mod_is_ctrl ? "CS" : "C")
+
+	function control_keys(letter) {
+		return String.fromCharCode(letter.charCodeAt(0) - "A".charCodeAt(0) + 1)
+	}
+
 	$(document).on("keydown", function(e) {
 		const info = tools.keys_info(e)
-		if(info.modifiers == "C") {
+		
+		if(info.modifiers == command_modifiers) {
 			if(info.key == "C") {
 				$("#ctrlc").click()
 				e.preventDefault()
@@ -198,6 +234,14 @@ async function init_page() {
 				e.preventDefault()
 				return false
 			}
+			if("A B E F".includes(info.key)) {
+				socket.send(control_keys(info.key))
+				e.preventDefault()
+				return false
+			}
+		} else if(info.modifiers == "") {
+			input.focus()
+			return true
 		}
 	})
 
@@ -205,6 +249,8 @@ async function init_page() {
 		var inputType = e.originalEvent.inputType
 		var data = e.originalEvent.data
 		if (inputType == "insertLineBreak") {
+			push_history(input_line)
+			input_line = ""
 			socket.send("\r")
 			input.val("")
 			input.focus()
@@ -212,8 +258,10 @@ async function init_page() {
 			e.preventDefault()
 			return false
 		} else if (inputType == "insertText" || inputType == "insertFromPaste") {
+			input_line += data
 			socket.send(data)
 		} else if (inputType == "deleteContentBackward") {
+			input_line = input_line.substr(0,-1)
 			socket.send("\b")
 		} else {
 			// console.log(e)
@@ -222,13 +270,13 @@ async function init_page() {
 
 	$("#ctrlc").on("click", () => {
 		$("#ctrlc").addClass("pressed")
-		socket.send("\x03")
+		socket.send(control_keys("C"))
 		setTimeout(() => $("#ctrlc").removeClass("pressed"), 250)
 	})
 
 	$("#ctrld").on("click", () => {
 		$("#ctrld").addClass("pressed")
-		socket.send("\x04")
+		socket.send(control_keys("D"))
 		setTimeout(() => $("#ctrld").removeClass("pressed"), 250)
 	})
 
@@ -262,6 +310,21 @@ async function init_page() {
 		return false
 	})
 
+	$("#history_button").on("click", (e) => {
+		$("#history_panel").toggle()
+	})
+
+	$(document).on("click", "#history_panel .history_line", (e) => {
+		$("#history_panel").hide()
+		var line = $(e.currentTarget)
+		var index = line.data("command")
+		var command = input_history[index]
+		input.val(command)
+		socket.send(command)
+	})
+
+	input.focus()
+	window.dispatchEvent(new Event('finished-starting'))
 }
 
 init_page()

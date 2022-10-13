@@ -72,12 +72,12 @@ export function open_outside_sync(link) {
 export function keys_info(event) {
 	const info = {
 		key: event.key.toLocaleUpperCase(),
-		modifiers: [
-			event.altKey ? "A" : "",
-			event.ctrlKey ? "C" : "",
-			event.metaKey ? "M" : "",
-			event.shiftKey ? "S" : ""
-		].join(""),
+		modifiers: (
+			(event.altKey ? "A" : "")
+			+ (event.ctrlKey ? "C" : "")
+			+ (event.metaKey ? "M" : "")
+			+ (event.shiftKey ? "S" : "")
+		),
 	}
 	return info
 }

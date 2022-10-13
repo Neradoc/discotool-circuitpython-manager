@@ -94,6 +94,31 @@ body.error #serial_log {
 	color: white;
 }
 
+/* history */
+
+#history_button {
+	font: inherit;
+}
+
+#history_panel {
+	position: absolute;
+	max-width: 240px;
+	right: 16px;
+	bottom: 60px;
+	background: black;
+}
+
+#history_panel .history_line {
+	padding: 4px 8px;
+	border: 1px dashed #888;
+	cursor: pointer;
+}
+
+#history_panel .history_line:hover {
+	background: white;
+	color: black;
+}
+
 /* positions */
 
 content {
@@ -106,7 +131,7 @@ header {
 	flex: 0;
 }
 #serial_controls {
-	flex: 0 0 0;
+	flex: 0 0 0 0;
 }
 #serial_log {
 	flex: 1;
