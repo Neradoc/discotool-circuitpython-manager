@@ -393,17 +393,23 @@ async function download_all_event(event) {
 		if(!result.ok) { break }
 		var files_list = result.content
 		for(var file_ref of files_list) {
-			// console.log(file_ref)
 			var file_path = `${dir_path}/${file_ref.name}`.replace(/\/+/, "/")
 			if(SKIP.includes(file_path)) continue
+			var file_size = file_ref.file_size
+			if(file_size < 1000) {
+				file_size = `${file_size} B`
+			} else if(file_size < 1000000) {
+				file_size = `${(file_size/1000).toFixed(1)} kB`
+			} else {
+				file_size = `${(file_size/1000000).toFixed(1)} MB`
+			}
 			if(file_ref.directory) {
 				dir_paths.unshift(file_path)
 				var target_path = save_path + file_path
 				await window.moduleFs.mkdir(target_path)
 			} else {
+				await files_progress_dialog.log(`Downloading: ${file_path} (${file_size})`)
 				var response = await board_control.get_file_content(file_path)
-				// console.log(file)
-				await files_progress_dialog.log(`Downloading file ${file_path}`)
 				if(response.ok) {
 					var target_path = save_path + file_path
 					const data = response.content
