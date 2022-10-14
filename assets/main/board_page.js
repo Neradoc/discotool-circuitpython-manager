@@ -10,6 +10,7 @@ import { setup_directory, refresh_list } from "../main/list_directory.js";
 import { LibraryBundle } from "../lib/bundle.js";
 import { Circup } from "../lib/circup.js";
 import * as bundler from "../main/bundler_select.js";
+import * as files_progress_dialog from "../sub/files_progress_dialog.js"
 
 // import { $ } from "../extlib/jquery.min.js";
 const CODE_FILES = ["code.txt", "code.py", "main.py", "main.txt"]
@@ -353,6 +354,73 @@ async function install_a_module(libs_list) {
 	}
 }
 
+/*****************************************************************
+* download a backup of all the files
+*/
+
+const SKIP = common.DEFAULT_SYSTEM_FILES.map((x) => `/${x}`).concat(["/lib"])
+
+async function download_all() {
+	// make the dir name
+	const vinfo = await board_control.device_info()
+	const uuid = vinfo.serial_num || await board_control.get_identifier()
+	const date_str = (new Date()).toISOString().replace(/:/g,"-")
+	var save_name = `${date_str}-${vinfo.board_name}-${uuid}`
+	var save_path = "/Users/spyro/Backups/CPBackups-discotool-manager/" + save_name
+	// file save dialog
+	window.postMessage({
+		"type": 'open-directory-dialog',
+		"return_event": 'opened-directory-dialog',
+		"sender": window.location.toString(),
+	})
+}
+
+async function download_all_event(event) {
+	console.log("download_all_event", event)
+	if(event?.detail?.sender != window.location.toString()) return
+	var save_path = event?.detail?.dir_path
+	// progress window
+	files_progress_dialog.open("Download All")
+	files_progress_dialog.description(`Board files downloaded to <b>${save_path}</b>`)
+	await window.moduleFs.mkdir(save_path, {recursive: true})
+	// download all the files, skipping system files and lib
+	var dir_path = "/"
+	var dir_paths = ["/"]
+	var drill = true
+	while(drill) {
+		var result = await board_control.list_dir(dir_path)
+		if(!result.ok) { break }
+		var files_list = result.content
+		for(var file_ref of files_list) {
+			// console.log(file_ref)
+			var file_path = `${dir_path}/${file_ref.name}`.replace(/\/+/, "/")
+			if(SKIP.includes(file_path)) continue
+			if(file_ref.directory) {
+				dir_paths.unshift(file_path)
+				var target_path = save_path + file_path
+				await window.moduleFs.mkdir(target_path)
+			} else {
+				var response = await board_control.get_file_content(file_path)
+				// console.log(file)
+				files_progress_dialog.log(`Downloading file ${file_path}`)
+				var target_path = save_path + file_path
+				if(response.ok) {
+					const data = response.content
+					await window.moduleFs.writeFile(target_path, data)
+				}
+			}
+		}
+		dir_path = dir_paths.shift()
+		if(dir_paths.length == 0) drill = false
+	}
+	await files_progress_dialog.log("Download finished.")
+	await files_progress_dialog.enable_buttons()
+}
+
+/*****************************************************************
+* Init and setup
+*/
+
 async function init_page() {
 	LOADING_IMAGE = $("#small_load_image").html()
 	setup_events()
@@ -380,6 +448,8 @@ async function init_page() {
 	} else {
 		$("body").addClass("board_locked")
 	}
+	// prepare dialog that requires board_control
+	files_progress_dialog.setup(board_control)
 	// load some data into the page
 	const serial_num = await board_control.serial_num()
 	$("#circup_page .title .circuitpy_version").html(await board_control.cp_version());
@@ -430,7 +500,7 @@ async function init_page() {
 	window.dispatchEvent(new Event('finished-starting'))
 }
 
-const running_buttons = ".auto_install, .update_all";
+const running_buttons = ".auto_install, .update_all, .download_all";
 async function run_exclusively(command) {
 	if(!install_running) {
 		$(running_buttons).prop("disabled", true);
@@ -462,6 +532,11 @@ function setup_events() {
 	$("#bundle_list #bundle_install").on("click", (e) => {
 		run_exclusively(() => bundle_install());
 	});
+
+	$(".download_all").on("click", (e) => {
+		run_exclusively(() => download_all());
+	})
+
 	$(document).on("click", "#file_list_list .analyze", (e) => {
 		var path = $(e.currentTarget).data("path");
 		run_exclusively(() => auto_install(path));
@@ -502,6 +577,10 @@ function setup_events() {
 			run_exclusively(() => auto_install(target_file))
 			return
 		}
+	})
+
+	window.addEventListener("opened-directory-dialog", (event) => {
+		download_all_event(event)
 	})
 }
 

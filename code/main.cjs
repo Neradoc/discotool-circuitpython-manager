@@ -103,7 +103,7 @@ function createWindow (winBounds) {
 	})
 
 	// listen for the "open directory" dialog and do something with it
-	ipcMain.on('select-dirs', async (event, arg) => {
+	ipcMain.on('open-board-directory', async (event, arg) => {
 		const result = await dialog.showOpenDialog(mainWindow, {
 			properties: ['openDirectory']
 		})
@@ -111,6 +111,31 @@ function createWindow (winBounds) {
 			const dir_path = result.filePaths[0]
 			const dir_url = `file://${dir_path}`
 			openBoard({"device": dir_url})
+		}
+	})
+
+	ipcMain.on('open-directory-dialog', async (event, arg) => {
+		var dialog_args = {
+			buttonLabel: 'Save',
+			properties: ['openDirectory', "createDirectory"],
+		}
+		if(arg.save_path) {
+			dialog_args.defaultPath = arg.save_path
+		}
+		const result = await dialog.showOpenDialog(dialog_args)
+		console.log(result)
+		if(!result.canceled && result.filePaths.length > 0) {
+			const dir_path = result.filePaths[0]
+			console.log(all_windows)
+			for(a_window of all_windows) {
+				console.log(a_window)
+				console.log(arg)
+				a_window.webContents.send("send-to-window", {
+					...arg,
+					"dir_path": dir_path,
+					"event": arg.return_event,
+				})
+			}
 		}
 	})
 

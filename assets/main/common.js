@@ -8,6 +8,14 @@ import { WebWorkflow } from "../backends/web.js";
 import { USBWorkflow } from "../backends/usb.js";
 import * as tools from "../lib/tools.js"
 
+export const DEFAULT_SYSTEM_FILES = [
+	".fseventsd",
+	".metadata_never_index",
+	".Trashes",
+	".TemporaryItems",
+	"System Volume Information",
+]
+
 export const is_electron = window && window.process && window.process.type == "renderer"
 
 export var library_bundle = null;

@@ -134,7 +134,7 @@ async function detect_web() {
 		// $(".web_workflow").show()
 		const devices = await WebWorkflow.find_devices()
 		// candidates
-		var noboard = true
+		var num_boards = 0
 		for(const device of devices) {
 			// hostname: "cpy-9673a4"
 			// instance_name: "Adafruit Feather ESP32-S2 TFT"
@@ -195,9 +195,9 @@ async function detect_web() {
 			board.created = true
 			all_dev_line.show()
 			$("#web_boards_list_empty").hide()
-			noboard = false
+			num_boards += 1
 		}
-		if(noboard) {
+		if(num_boards == 0) {
 			$("#web_boards_list_empty").show()
 		}
 		$("#web_boards_loading").hide()

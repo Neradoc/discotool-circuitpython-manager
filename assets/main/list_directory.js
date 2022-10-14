@@ -8,22 +8,15 @@ import * as common from "../main/common.js"
 import * as tools from "../lib/tools.js"
 import * as password_dialog from "../sub/password_dialog.js"
 
-const HIDDEN = [
-	".fseventsd",
-	".metadata_never_index",
-	".Trashes",
-	".TemporaryItems",
-	"System Volume Information",
-]
 const SECRETS = [
 	".env",
 	"secrets.py",
 ]
 const HIDE = {
-	NOTHING: 0,
-	DEFAULT_SYSTEM_FILES: 1,
-	ALL_SYSTEM_FILES: 2,
-	ALL_DOTTED_FILES: 3,
+	"NOTHING": 0,
+	"DEFAULT_SYSTEM_FILES": 1,
+	"ALL_SYSTEM_FILES": 2,
+	"ALL_DOTTED_FILES": 3,
 }
 
 var USE_TRIANGLES = false
@@ -145,7 +138,7 @@ async function insert_files_list(current_list_path, list_depth="") {
 		if (current_list_path == "/" && SECRETS.includes(file_info.name)) {
 			is_secret = true
 			icon = _icon("key")
-		} else if (current_list_path == "/" && HIDDEN.includes(file_info.name)) {
+		} else if (current_list_path == "/" && common.DEFAULT_SYSTEM_FILES.includes(file_info.name)) {
 			// hidden names in root
 			if(file_info.directory) {
 				icon = _icon("folder-no")

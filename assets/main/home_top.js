@@ -45,7 +45,7 @@ $(document).on("change", "#select_files_input", (event) => {
 
 $(document).on("click", "#file_select_button", (e) => {
 	window.postMessage({
-		type: 'select-dirs'
+		type: 'open-board-directory'
 	})
 });
 
