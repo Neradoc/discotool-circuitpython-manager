@@ -361,12 +361,6 @@ async function install_a_module(libs_list) {
 const SKIP = common.DEFAULT_SYSTEM_FILES.map((x) => `/${x}`).concat(["/lib"])
 
 async function download_all() {
-	// make the dir name
-	const vinfo = await board_control.device_info()
-	const uuid = vinfo.serial_num || await board_control.get_identifier()
-	const date_str = (new Date()).toISOString().replace(/:/g,"-")
-	var save_name = `${date_str}-${vinfo.board_name}-${uuid}`
-	var save_path = "/Users/spyro/Backups/CPBackups-discotool-manager/" + save_name
 	// file save dialog
 	window.postMessage({
 		"type": 'open-directory-dialog',
@@ -376,12 +370,19 @@ async function download_all() {
 }
 
 async function download_all_event(event) {
-	console.log("download_all_event", event)
 	if(event?.detail?.sender != window.location.toString()) return
-	var save_path = event?.detail?.dir_path
+	var dir_path = event?.detail?.dir_path
+	// make the dir name
+	const vinfo = await board_control.device_info()
+	const uuid = vinfo.serial_num || await board_control.get_identifier()
+	const date_str = (new Date()).toISOString().replace(/:/g,"-")
+	var save_name = `${date_str}-${vinfo.board_name}-${uuid}`
+	var save_path = `${dir_path}/${save_name}`
 	// progress window
-	files_progress_dialog.open("Download All")
-	files_progress_dialog.description(`Board files downloaded to <b>${save_path}</b>`)
+	files_progress_dialog.open({}, {
+		title: "Download All",
+		description: `Board files downloaded to <b>${save_path}</b>`,
+	})
 	await window.moduleFs.mkdir(save_path, {recursive: true})
 	// download all the files, skipping system files and lib
 	var dir_path = "/"
@@ -402,9 +403,9 @@ async function download_all_event(event) {
 			} else {
 				var response = await board_control.get_file_content(file_path)
 				// console.log(file)
-				files_progress_dialog.log(`Downloading file ${file_path}`)
-				var target_path = save_path + file_path
+				await files_progress_dialog.log(`Downloading file ${file_path}`)
 				if(response.ok) {
+					var target_path = save_path + file_path
 					const data = response.content
 					await window.moduleFs.writeFile(target_path, data)
 				}

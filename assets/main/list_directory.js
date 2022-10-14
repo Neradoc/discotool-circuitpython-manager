@@ -544,8 +544,12 @@ async function setup_directory() {
 	// setup closing dialogs with escape
 	$(document).on("keydown", (e) => {
 		if(e.which == 27 && $("body").is(".popup_dialog")) {
-			rename_dialog_close()
-			password_dialog.close()
+			if($("#password_dialog").is(".popup_dialog")) {
+				password_dialog.close()
+			}
+			if($("#rename_dialog").is(".popup_dialog")) {
+				rename_dialog_close()
+			}
 			return false
 		}
 		return true;

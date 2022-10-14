@@ -15,12 +15,16 @@ async function close() {
 	$("body").removeClass("popup_dialog")
 	callbacks?.close?.("close")
 }
-async function open(title=null, callback_list=null, options={}) {
+async function open(callback_list=null, options={}) {
+	$("#files_progress_dialog .list").empty()
 	if(callback_list) {
 		Object.assign(callbacks, callback_list)
 	}
-	if(title != null) {
-		$("#files_progress_dialog .title").html(title)
+	if(options.title != undefined) {
+		$("#files_progress_dialog .title").html(options.title)
+	}
+	if(options.description != undefined) {
+		$("#files_progress_dialog .description").html(options.description)
 	}
 	if(options.has_ok === false) {
 		$("#files_progress_dialog .ok_button").hide()
@@ -43,17 +47,6 @@ async function cancel() {
 	close()
 	callbacks?.button?.("cancel")
 }
-async function setup(board_ctrl, callback_list) {
-	board_control = board_ctrl
-	if(callback_list) {
-		callbacks = callback_list
-	}
-	var info = await board_control.device_info()
-	$("#files_progress_dialog .ok_button").on("click", ok)
-	$("#files_progress_dialog .cancel_button").on("click", cancel)
-	$("#files_progress_dialog .ok_button").prop("disabled", true)
-	$("#files_progress_dialog .cancel_button").prop("disabled", true)
-}
 async function enable_buttons(status=true) {
 	$("#files_progress_dialog .ok_button").prop("disabled", !status)
 	$("#files_progress_dialog .cancel_button").prop("disabled", !status)
@@ -62,8 +55,7 @@ async function log(text) {
 	var line = $("<div/>")
 	line.html(text)
 	$("#files_progress_dialog .list").append(line)
-	// TODO: scroll
-	
+	$("#files_progress_dialog .list div:last")[0].scrollIntoView()
 }
 async function title(text) {
 	if(text != undefined) {
@@ -74,6 +66,29 @@ async function description(text) {
 	if(text != undefined) {
 		$("#files_progress_dialog .description").html(text)
 	}
+}
+async function setup(board_ctrl, callback_list) {
+	board_control = board_ctrl
+	if(callback_list) {
+		callbacks = callback_list
+	}
+	var info = await board_control.device_info()
+	$("#files_progress_dialog .ok_button").on("click", ok)
+	$("#files_progress_dialog .cancel_button").on("click", cancel)
+	$("#files_progress_dialog .ok_button").prop("disabled", true)
+	$("#files_progress_dialog .cancel_button").prop("disabled", true)
+
+	$(document).on("keydown", (e) => {
+		if(e.which == 27 && $("body").is(".popup_dialog")) {
+			if($("#files_progress_dialog").is(".popup_dialog")) {
+				if($("#files_progress_dialog .cancel_button").prop("disabled") == false) {
+					close()
+				}
+			}
+			return false
+		}
+		return true;
+	});
 }
 
 export { setup, open, close, ok, cancel, enable_buttons, log, title, description }

@@ -123,13 +123,9 @@ function createWindow (winBounds) {
 			dialog_args.defaultPath = arg.save_path
 		}
 		const result = await dialog.showOpenDialog(dialog_args)
-		console.log(result)
 		if(!result.canceled && result.filePaths.length > 0) {
 			const dir_path = result.filePaths[0]
-			console.log(all_windows)
 			for(a_window of all_windows) {
-				console.log(a_window)
-				console.log(arg)
 				a_window.webContents.send("send-to-window", {
 					...arg,
 					"dir_path": dir_path,
