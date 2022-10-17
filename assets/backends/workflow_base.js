@@ -113,4 +113,19 @@ class Workflow {
 	static available = false
 }
 
-export { Workflow, WorkflowResponse, WorkflowFile };
+class WorkflowWithCredentials extends Workflow {
+	set_credentials(username, password) {
+		if(username != undefined) {
+			this.username = username;
+		}
+		if(password != undefined) {
+			this.password = password
+		}
+	}
+	get_password() {
+		return this.password;
+	}
+	supports_credentials = true
+}
+
+export { Workflow, WorkflowResponse, WorkflowFile, WorkflowWithCredentials };

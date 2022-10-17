@@ -2,7 +2,7 @@
 SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
-import { Workflow, WorkflowResponse, WorkflowFile } from "./workflow_base.js"
+import { Workflow, WorkflowResponse, WorkflowFile, WorkflowWithCredentials } from "./workflow_base.js"
 import { WORKFLOW_USERNAME, WORKFLOW_PASSWORD } from "../../config.js"
 import * as tools from "../lib/tools.js"
 import * as mdns from "../lib/mdns.js"
@@ -27,7 +27,7 @@ class WebWorkflowFile extends WorkflowFile {
 
 const DEFAULT_URL_BASE = "http://circuitpython.local:80"
 
-class WebWorkflow extends Workflow {
+class WebWorkflow extends WorkflowWithCredentials {
 	constructor(url_base = DEFAULT_URL_BASE) {
 		super()
 		this.workflow_url_base = url_base
@@ -226,7 +226,9 @@ class WebWorkflow extends Workflow {
 	get_password() {
 		return this.password;
 	}
-	
+
+	//##############################################################
+
 	headers(others=null) {
 		var encoded = btoa(this.username + ":" + this.password)
 		var head = new Headers({
@@ -270,7 +272,6 @@ class WebWorkflow extends Workflow {
 	}
 	icon = "&#127760;"
 	type = "web"
-	supports_credentials = true
 	static available = true
 }
 
