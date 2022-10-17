@@ -446,7 +446,6 @@ function rename_dialog_ok() {
 	try {
 		var from_path = $("#rename_dialog").data("path")
 		var to_path = $("#rename_dialog .new_name").val()
-		// TODO: sanitize the new path ?
 		// try doing the rename command
 		const from_path_dir = (`${from_path}/`).replace(/\/\/+/,"/")
 		console.log(`Rename “${from_path}” “${to_path}” <${from_path_dir}>`)

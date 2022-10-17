@@ -69,7 +69,7 @@ async function setup(board_ctrl, callback_list, password=undefined) {
 		return true
 	})
 	if(password) {
-		board_control.set_credentials(null, password)
+		board_control.set_credentials(undefined, password)
 		current_password = password
 		$("#password").val(password)
 	} else if(serial_num) {
