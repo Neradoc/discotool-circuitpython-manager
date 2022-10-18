@@ -7,6 +7,7 @@ import { OPEN_IN_BROWSER } from "../../config.js"
 import * as common from "../main/common.js"
 import * as tools from "../lib/tools.js"
 import * as password_dialog from "../sub/password_dialog.js"
+import * as files_progress_dialog from "../sub/files_progress_dialog.js"
 
 const SECRETS = [
 	".env",
@@ -18,6 +19,10 @@ const HIDE = {
 	"ALL_SYSTEM_FILES": 2,
 	"ALL_DOTTED_FILES": 3,
 }
+const IGNORE_UPLOAD = [
+	".DS_Store",
+	/^\._.*/,
+]
 
 var USE_TRIANGLES = false
 
@@ -323,18 +328,76 @@ async function mkdir(e) {
 * Upload file
 */
 
-async function upload(e) {
-	console.log("Upload")
-	const files_upload = document.getElementById("files_upload")
-	for (const file of files_upload.files) {
-		var response = await common.board_control.upload_file(current_path + file.name, file)
-		if (response.ok) {
-			refresh_list()
-			files_upload.value = ""
-			upload_button.disabled = true
+async function upload_files_action(e) {
+	window.postMessage({
+		"type": 'open-multiples-dialog',
+		"return_event": 'upload-files-from-dialog',
+		"sender": window.location.toString(),
+	})
+}
+
+async function upload_files_to(source_files, target_path) {
+	const fs = window.moduleFss
+	const path = window.modulePath
+
+	for(var file_path of source_files) {
+		var stat = fs.statSync(file_path)
+		var file_size = stat.size
+		if(file_size < 1000) {
+			file_size = `${file_size} B`
+		} else if(file_size < 1000000) {
+			file_size = `${(file_size/1000).toFixed(1)} kB`
+		} else {
+			file_size = `${(file_size/1000000).toFixed(1)} MB`
+		}
+		var file_name = path.basename(file_path)
+		var sub_target = path.join(target_path, file_name)
+
+		var do_skip = false
+		for(var pattern of IGNORE_UPLOAD) {
+			if(file_name.match(pattern)) {
+				do_skip = true
+				break
+			}
+		}
+		if(do_skip) continue
+
+		if(stat.isDirectory()) {
+			await files_progress_dialog.log(`<c class="right">Creating:</c><c> ${sub_target}/</c>`)
+			var response = await common.board_control.create_dir(sub_target)
+			var subdir = fs.opendirSync(file_path)
+			for await (const dirent of subdir) {
+				var sub_file = path.join(file_path, dirent.name)
+				await upload_files_to([sub_file], sub_target)
+			}
+		} else {
+			await files_progress_dialog.log(`<c class="right">Uploading:</c><c> ${sub_target} (${file_size})</c>`)
+			var file_data = fs.readFileSync(file_path)
+			var response = await common.board_control.upload_file(sub_target, file_data)
 		}
 	}
 }
+
+async function upload_files_from_dialog(event) {
+	if(event?.detail?.sender != window.location.toString()) return
+	const fs = window.moduleFss
+	const path = window.modulePath
+
+	files_progress_dialog.open({}, {
+		title: "Uploading Files",
+		description: `Files uploaded to the board.`,
+	})
+	try {
+		var source_files = event?.detail?.source_files
+		await upload_files_to(source_files, current_path)
+	} catch(e) {
+		console.log(e)
+	}
+	await files_progress_dialog.log("Upload finished.")
+	await files_progress_dialog.enable_buttons()
+	refresh_list()
+}
+
 
 /*****************************************************************
 * Delete file
@@ -509,22 +572,16 @@ async function setup_directory() {
 	}
 	// settings.show_list_triangles = localStorage.getItem("show_list_triangles", false) == "1"
 
-	// setup thingies
-	let upload_button = $("#upload_button")
+	// upload from electron
+	let upload_files_button = $("#upload_files_button")
+	upload_files_button.on("click", upload_files_action)
+
+	// make directory
 	let mkdir_button = document.getElementById("mkdir")
-	let files_upload = document.getElementById("files_upload")
-
-	upload_button.on("click", upload)
-	upload_button.prop("disabled", files_upload.files.length == 0)
-
-	files_upload.onchange = () => {
-		upload_button.prop("disabled", files_upload.files.length == 0)
-	}
-
 	mkdir_button.onclick = mkdir
 	mkdir_button.disabled = $("#new_directory_name").val().length == 0
 
-	/// setup other buttons and things
+	// setup other buttons and things
 	$("#new_directory_name").on("input", () => {
 		mkdir_button.disabled = $("#new_directory_name").val().length == 0
 	})
@@ -557,6 +614,10 @@ async function setup_directory() {
 	$(".file_list_setup_buttons .unroll").on("click", (e) => {
 		$(".file_list_setup_buttons").toggleClass("unrolled")
 		return false
+	})
+
+	window.addEventListener("upload-files-from-dialog", (event) => {
+		upload_files_from_dialog(event)
 	})
 }
 

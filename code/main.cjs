@@ -114,6 +114,24 @@ function createWindow (winBounds) {
 		}
 	})
 
+	ipcMain.on('open-multiples-dialog', async (event, arg) => {
+		var dialog_args = {
+			buttonLabel: 'Upload',
+			properties: ["openDirectory", "multiSelections", "openFile", "showHiddenFiles"],
+		}
+		const result = await dialog.showOpenDialog(dialog_args)
+		if(!result.canceled && result.filePaths.length > 0) {
+			const source_files = result.filePaths
+			for(a_window of all_windows) {
+				a_window.webContents.send("send-to-window", {
+					...arg,
+					"source_files": source_files,
+					"event": arg.return_event,
+				})
+			}
+		}
+	})
+
 	ipcMain.on('open-directory-dialog', async (event, arg) => {
 		var dialog_args = {
 			buttonLabel: 'Save',

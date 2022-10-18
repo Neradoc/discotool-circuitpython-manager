@@ -44,6 +44,8 @@ SPDX-License-Identifier: MIT
 }
 #files_progress_dialog .buttons {
 	flex-grow: 0;
+	text-align: center;
+	position: relative;
 }
 
 #files_progress_dialog .cancel_button {
@@ -53,4 +55,21 @@ SPDX-License-Identifier: MIT
 #files_progress_dialog .ok_button {
 	display: block;
 	float: right;
+}
+#files_progress_dialog .progress {
+	display: none;
+	position: absolute;
+	width: 32px;
+	bottom: 0px;
+	left: calc(50% - 16px);
+}
+#files_progress_dialog .list div {
+	display: table-row;
+}
+c {
+	display: table-cell;
+	padding: 1px 4px;
+}
+c.right {
+	text-align: right
 }

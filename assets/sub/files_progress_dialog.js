@@ -38,6 +38,7 @@ async function open(callback_list=null, options={}) {
 	}
 	$("#files_progress_dialog").addClass("popup_dialog")
 	$("body").addClass("popup_dialog")
+	$("#files_progress_dialog .progress").show()
 }
 async function ok() {
 	close()
@@ -50,6 +51,7 @@ async function cancel() {
 async function enable_buttons(status=true) {
 	$("#files_progress_dialog .ok_button").prop("disabled", !status)
 	$("#files_progress_dialog .cancel_button").prop("disabled", !status)
+	$("#files_progress_dialog .progress").hide()
 }
 async function log(text) {
 	var line = $("<div/>")

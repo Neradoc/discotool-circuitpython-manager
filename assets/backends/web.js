@@ -154,6 +154,9 @@ class WebWorkflow extends WorkflowWithCredentials {
 	}
 	async create_dir(dir_path) {
 		var heads = this.headers({'X-Timestamp': Date.now()});
+		if(!dir_path.match(/\/$/)) {
+			dir_path += "/"
+		}
 		const response = await fetch(
 			this.api_url(dir_path),
 			{

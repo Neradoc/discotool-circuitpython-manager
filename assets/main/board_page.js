@@ -364,7 +364,7 @@ async function download_all() {
 	// file save dialog
 	window.postMessage({
 		"type": 'open-directory-dialog',
-		"return_event": 'opened-directory-dialog',
+		"return_event": 'save-from-directory-dialog',
 		"sender": window.location.toString(),
 	})
 }
@@ -586,7 +586,7 @@ function setup_events() {
 		}
 	})
 
-	window.addEventListener("opened-directory-dialog", (event) => {
+	window.addEventListener("save-from-directory-dialog", (event) => {
 		download_all_event(event)
 	})
 }
