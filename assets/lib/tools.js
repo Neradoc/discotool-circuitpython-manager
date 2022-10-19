@@ -49,14 +49,19 @@ export async function sleep(duration) {
 
 export async function open_outside(link) {
 	// showItemInFolder
+	console.log("Opening link:", link)
 	if(window.shell) {
 		if(typeof(link) == "string") { // direct url string
+			console.log("From string")
 			await shell.openExternal(link)
 		} else if(typeof(link.href) == "string") { // URL instance most likely
+			console.log("From href")
 			await shell.openExternal(link.href)
 		} else if(link.prop !== undefined) { // jQuery object, expecting a link
+			console.log("From jquery prop")
 			await shell.openExternal(link.prop("href"))
 		} else if(link.target !== undefined) { // onClick event with a target
+			console.log("From event.target")
 			await shell.openExternal(link.target.href)
 		}
 		return false

@@ -131,14 +131,18 @@ async function init_page() {
 
 	function set_the_serial_content(the_data) {
 		the_data = the_data.replace(
+			/(\s+)(https?:\/\/\S+)(\s+)/g,
+			`$1<a class="outside_link"
+				href="$2"
+			>$2</a>$3`
+		).replace(
 			/ImportError: (no module named '(\S+)')/g,
 			`ImportError: <a class="circup_link"
 				data-board_link="${board_url}"
 				data-module="$2"
 				href="?dev=${board_url}&install=$2"
 			>$1</a>`
-		)
-		.replace(
+		).replace(
 			/File "([^"]+)", line (\d+)/g,
 			(match, p1, p2, offset, string, groups) => {
 				// don't link to "stdin"
@@ -150,8 +154,7 @@ async function init_page() {
 					href="?dev=${board_url}"
 				>File "${p1}", line ${p2}</a>`
 			}
-		)
-		.replace(/\n$/, "") // somehow there's a return added at the end ?
+		).replace(/\n$/, "") // somehow there's a return added at the end ?
 		serial_content.html(the_data)
 	}
 
@@ -304,6 +307,16 @@ async function init_page() {
 		try {
 			var line = $(e.currentTarget).data("line")
 			common.open_file_editor_a(e, { line: line })
+		} catch(error) {
+			console.log(error)
+		}
+		return false
+	})
+
+	$(document).on("click", ".outside_link", (e) => {
+		e.preventDefault()
+		try {
+			tools.open_outside(e)
 		} catch(error) {
 			console.log(error)
 		}

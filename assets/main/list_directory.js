@@ -3,7 +3,6 @@ SPDX-FileCopyrightText: Copyright (c) Scott Shawcroft for Adafruit
 SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
-import { OPEN_IN_BROWSER } from "../../config.js"
 import * as common from "../main/common.js"
 import * as tools from "../lib/tools.js"
 import * as password_dialog from "../sub/password_dialog.js"

@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
-import { BUNDLE_ACCESS } from "../../config.js";
+import { BUNDLE_ACCESS, OPEN_IN_BROWSER } from "../../config.js";
 import * as common from "../main/common.js";
 import * as tools from "../lib/tools.js";
 import { setup_directory, refresh_list } from "../main/list_directory.js";
@@ -17,8 +17,6 @@ const CODE_FILES = ["code.txt", "code.py", "main.py", "main.txt"]
 
 var board_control = null;
 var circup = null
-
-const OPEN_IN_BROWSER = false
 
 const DEBUG = tools.DEBUG;
 const LINE_HIDE_DELAY = 800;
