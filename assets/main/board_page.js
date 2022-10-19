@@ -382,6 +382,7 @@ async function download_all_event(event) {
 	files_progress_dialog.open({}, {
 		title: "Download All",
 		description: `Board files downloaded to <b>${save_path}</b>`,
+		has_cancel: false,
 	})
 	await window.moduleFs.mkdir(save_path, {recursive: true})
 	// download all the files, skipping system files and lib

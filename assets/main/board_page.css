@@ -242,10 +242,6 @@ commands {
 	display: grid;
 	grid-template-columns: 50% 50%;
 }
-commands input,
-commands input[type="file"] {
-	font-size: 12px;
-}
 commands group {
 	display: block;
 	float: left;
@@ -254,10 +250,26 @@ commands group {
 	border-radius: 8px;
 	background: var(--color-pair1);
 }
-commands .mkdir_icon {
-	height: 24px;
-	float: left;
+commands .mkdir_icon,
+commands .mkfile_icon
+{
+	width: 24px;
 }
+commands group button {
+	white-space: pre;
+}
+commands group.mknew {
+	display: flex;
+	flex: 1 0 1;
+}
+commands #new_file_name,
+commands #new_directory_name {
+	font-size: inherit;
+	flex-grow: 1;
+	margin: 0px 2px;
+	width: 50%;
+}
+
 commands group .unroll {
 	display: block;
 }
@@ -289,7 +301,6 @@ commands group .icon-right {
 commands group.unrolled .icon-right {
 	display: none;
 }
-
 
 #file_list_list.loading {
 	opacity: 0.30;

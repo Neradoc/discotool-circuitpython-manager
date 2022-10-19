@@ -315,12 +315,27 @@ async function refresh_list() {
 
 async function mkdir(e) {
 	var mkdir_button = $("#mkdir")
-	var dir_path = current_path + $("#new_directory_name").val() + "/"
+	var dir_path = current_path + $("#new_directory_name").val()
 	var response = await common.board_control.create_dir(dir_path)
 	if (response.ok) {
 		refresh_list()
 		$("#new_directory_name").val("")
 		mkdir_button.prop("disabled", true)
+	}
+}
+
+/*****************************************************************
+* Create empty file
+*/
+
+async function mkfile(e) {
+	var mkfile_button = $("#mkfile")
+	var file_path = current_path + $("#new_file_name").val()
+	var response = await common.board_control.upload_file(file_path, [])
+	if (response.ok) {
+		refresh_list()
+		$("#new_file_name").val("")
+		mkfile_button.prop("disabled", true)
 	}
 }
 
@@ -386,6 +401,7 @@ async function upload_files_from_dialog(event) {
 	files_progress_dialog.open({}, {
 		title: "Uploading Files",
 		description: `Files uploaded to the board.`,
+		has_cancel: false,
 	})
 	try {
 		var source_files = event?.detail?.source_files
@@ -577,15 +593,22 @@ async function setup_directory() {
 	upload_files_button.on("click", upload_files_action)
 
 	// make directory
-	let mkdir_button = document.getElementById("mkdir")
-	mkdir_button.onclick = mkdir
-	mkdir_button.disabled = $("#new_directory_name").val().length == 0
-
-	// setup other buttons and things
+	let mkdir_button = $("#mkdir")
+	mkdir_button.on("click", mkdir)
+	mkdir_button.prop("disabled", $("#new_directory_name").val().length == 0)
 	$("#new_directory_name").on("input", () => {
-		mkdir_button.disabled = $("#new_directory_name").val().length == 0
+		mkdir_button.prop("disabled", $("#new_directory_name").val().length == 0)
 	})
 
+	// make directory
+	let mkfile_button = $("#mkfile")
+	mkfile_button.on("click", mkfile)
+	mkfile_button.prop("disabled", $("#new_file_name").val().length == 0)
+	$("#new_file_name").on("input", () => {
+		mkfile_button.prop("disabled", $("#new_file_name").val().length == 0)
+	})
+
+	// setup other buttons and things
 	$(document).on("click", ".refresh_list", (e) => {
 		refresh_list()
 	})
