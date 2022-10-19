@@ -90,8 +90,8 @@ async function setup(board_ctrl, callback_list) {
 			}
 			return false
 		}
-		return true;
-	});
+		return true
+	})
 }
 
 export { setup, open, close, ok, cancel, enable_buttons, log, title, description }

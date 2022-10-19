@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
-import {WORKFLOW_USERNAME, WORKFLOW_PASSWORD, DEBUG_DEFAULT} from "../../config.js";
+import {WORKFLOW_USERNAME, WORKFLOW_PASSWORD, DEBUG_DEFAULT} from "../../config.js"
 
 export var hash = window.location.hash.substr(1)
 export var url_params = new URLSearchParams(document.location.search)
@@ -12,32 +12,32 @@ export const DEBUG = (
 		url_params.get("debug") ? true : false
 	)
 )
-export const current_path = url_params.get("path") || "/";
+export const current_path = url_params.get("path") || "/"
 
 String.prototype.escapeHTML = function() {
-	return this.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+	return this.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
 }
 
 export function url_here(parameters = {}, hash = null) {
-	var url = new URL(window.location);
+	var url = new URL(window.location)
 	for(var key in parameters) {
-		url.searchParams.set(key, parameters[key]);
+		url.searchParams.set(key, parameters[key])
 	}
 	if(hash != null) {
-		url.hash = `#${hash}`;
+		url.hash = `#${hash}`
 	}
-	return url;
+	return url
 }
 
 export function url_to(path, parameters, hash=null) {
-	var url = new URL(path, window.location);
+	var url = new URL(path, window.location)
 	for(var key in parameters) {
-		url.searchParams.set(key, parameters[key]);
+		url.searchParams.set(key, parameters[key])
 	}
 	if(hash != null) {
-		url.hash = `#${hash}`;
+		url.hash = `#${hash}`
 	}
-	return url;
+	return url
 }
 
 export async function sleep_ms(duration) {

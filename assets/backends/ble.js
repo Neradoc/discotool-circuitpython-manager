@@ -16,4 +16,4 @@ class BLEWorkflow extends Workflow {
 	static available = false
 }
 
-export { BLEWorkflow };
+export { BLEWorkflow }

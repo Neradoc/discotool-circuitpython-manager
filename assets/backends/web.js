@@ -22,7 +22,7 @@ class WebWorkflowFile extends WorkflowFile {
 			result.directory,
 			result.file_size,
 			result.modified_ns / 1000000,
-		);
+		)
 	}
 }
 
@@ -39,34 +39,34 @@ class WebWorkflow extends WorkflowWithCredentials {
 	}
 	async start(url_passed=null) {
 		// TODO: setup the actual URL for the workflow OUTSIDE
-		// var url = new URL(window.location);
-		// var url_passed = url.searchParams.get("device");
+		// var url = new URL(window.location)
+		// var url_passed = url.searchParams.get("device")
 		try {
 			if(url_passed) {
-				var url_test = new URL("/", `http://${url_passed}`);
+				var url_test = new URL("/", `http://${url_passed}`)
 			} else {
-				var url_test = new URL("/", this.workflow_url_base);
+				var url_test = new URL("/", this.workflow_url_base)
 			}
 			var response = await fetch(url_test)
 			this.workflow_url_base = response.url
-			// console.log(`Board URL: ${this.workflow_url_base}`);
+			// console.log(`Board URL: ${this.workflow_url_base}`)
 			return true
 		} catch(e) {
 			console.log("While trying", url_test)
 			console.log("No Web Workflow Found")
 			console.log(e)
 		}
-		return false;
+		return false
 	}
 	async device_info() {
 		if(this.version_info !== null) {
-			return this.version_info;
+			return this.version_info
 		}
 		try {
 			var response = await fetch(
 				new URL("/cp/version.json", this.workflow_url_base),
-			);
-			this.version_info = await response.json();
+			)
+			this.version_info = await response.json()
 			if( "UID" in this.version_info ) {
 				this.version_info.serial_num = this.version_info["UID"]
 			}
@@ -83,19 +83,19 @@ class WebWorkflow extends WorkflowWithCredentials {
 					method: "OPTIONS",
 					credentials: "include",
 				}
-			);
+			)
 			var editable = status.headers
 				.get("Access-Control-Allow-Methods")
 				.toLowerCase()
-				.includes("delete");
-			return editable;
+				.includes("delete")
+			return editable
 		} catch(e) {
 			console.log("Device inaccessible")
 			return false
 		}
 	}
 	async get_file_content(file_path, range=null) {
-		var heads = this.headers();
+		var heads = this.headers()
 		var url = this.api_url(file_path)
 		var response = await fetch(
 			url,
@@ -103,19 +103,19 @@ class WebWorkflow extends WorkflowWithCredentials {
 				headers: heads,
 				credentials: "include",
 			}
-		);
+		)
 		try {
-			var file_content = await response.text();
-			return new WebResponse(response, file_content);
+			var file_content = await response.text()
+			return new WebResponse(response, file_content)
 		} catch {
-			return new WebResponse(response, null, false);
+			return new WebResponse(response, null, false)
 		}
 	}
 	async list_dir(dir_path) {
 		if (!dir_path.endsWith("/")) {
-			dir_path += "/";
+			dir_path += "/"
 		}
-		var heads = this.headers({"Accept": "application/json"});
+		var heads = this.headers({"Accept": "application/json"})
 		var url = this.api_url(dir_path)
 		// console.log("URL", url)
 		var response = await fetch(
@@ -124,20 +124,20 @@ class WebWorkflow extends WorkflowWithCredentials {
 				headers: heads,
 				credentials: "include",
 			}
-		);
+		)
 		try {
-			var data = await response.json();
+			var data = await response.json()
 			var file_list = data.map((d) => new WebWorkflowFile(d))
-			return new WebResponse(response, file_list);
+			return new WebResponse(response, file_list)
 		} catch {
-			return new WebResponse(response, [], false);
+			return new WebResponse(response, [], false)
 		}
 	}
 	async upload_file(upload_path, file_data) {
 		var heads = this.headers({
 			'Content-Type': 'application/octet-stream',
 			'X-Timestamp': Date.now() * 1000, // file.lastModified,
-		});
+		})
 		const file_url = this.api_url(upload_path)
 		const response = await fetch(file_url,
 			{
@@ -146,15 +146,15 @@ class WebWorkflow extends WorkflowWithCredentials {
 				credentials: "include",
 				body: file_data,
 			}
-		);
+		)
 		if(response.status == 409) {
-			console.log("Error: Cannot write to the drive");
-			return new WorkflowResponse(false, null, 409, "Error: Cannot write to the drive");
+			console.log("Error: Cannot write to the drive")
+			return new WorkflowResponse(false, null, 409, "Error: Cannot write to the drive")
 		}
-		return new WorkflowResponse(true, null);
+		return new WorkflowResponse(true, null)
 	}
 	async create_dir(dir_path) {
-		var heads = this.headers({'X-Timestamp': Date.now()});
+		var heads = this.headers({'X-Timestamp': Date.now()})
 		if(!dir_path.match(/\/$/)) {
 			dir_path += "/"
 		}
@@ -165,12 +165,12 @@ class WebWorkflow extends WorkflowWithCredentials {
 				headers: heads,
 				credentials: "include",
 			}
-		);
+		)
 		if(response.status == 409) {
-			console.log("Error: Cannot write to the drive");
-			return new WorkflowResponse(false, null, 409, "Error: Cannot write to the drive");
+			console.log("Error: Cannot write to the drive")
+			return new WorkflowResponse(false, null, 409, "Error: Cannot write to the drive")
 		}
-		return new WorkflowResponse(true, null);
+		return new WorkflowResponse(true, null)
 	}
 	async delete_file(file_path) {
 		const target_url = this.api_url(file_path)
@@ -180,7 +180,7 @@ class WebWorkflow extends WorkflowWithCredentials {
 				headers: this.headers(),
 			}
 		)
-		return new WebResponse(response, "");
+		return new WebResponse(response, "")
 	}
 	async rename_file(from_path, to_path) {
 		const target_url = this.api_url(from_path)
@@ -193,7 +193,7 @@ class WebWorkflow extends WorkflowWithCredentials {
 				}),
 			}
 		)
-		return new WebResponse(response, "");
+		return new WebResponse(response, "")
 	}
 	api_url(file_path) {
 		var sub_path = `/fs/${file_path}`.replace("//", "/")
@@ -201,12 +201,12 @@ class WebWorkflow extends WorkflowWithCredentials {
 		return url
 	}
 	edit_url(file_path) {
-		var url = new URL("/edit/", this.workflow_url_base);
+		var url = new URL("/edit/", this.workflow_url_base)
 		url.hash = `#${file_path}`
 		return url
 	}
 	repl_url() {
-		return new URL("/cp/serial/", this.workflow_url_base);
+		return new URL("/cp/serial/", this.workflow_url_base)
 	}
 	async get_identifier() {
 		return (await this.device_info()).hostname + ".local"
@@ -221,14 +221,14 @@ class WebWorkflow extends WorkflowWithCredentials {
 
 	set_credentials(username, password) {
 		if(username != undefined) {
-			this.username = username;
+			this.username = username
 		}
 		if(password != undefined) {
 			this.password = password
 		}
 	}
 	get_password() {
-		return this.password;
+		return this.password
 	}
 
 	//##############################################################
@@ -237,13 +237,13 @@ class WebWorkflow extends WorkflowWithCredentials {
 		var encoded = btoa(this.username + ":" + this.password)
 		var head = new Headers({
 			"Authorization": 'Basic ' + encoded,
-		});
+		})
 		if (others) {
 			for (var key in others) {
-				head.append(key, others[key]);
+				head.append(key, others[key])
 			}
 		}
-		return head;
+		return head
 	}
 
 	static async find_devices() {
@@ -257,8 +257,8 @@ class WebWorkflow extends WorkflowWithCredentials {
 			await webby.start()
 			const response = await fetch(
 				new URL("/cp/devices.json", webby.workflow_url_base)
-			);
-			var data = await response.json();
+			)
+			var data = await response.json()
 			var devices = data.devices
 			// add myself
 			const web_info = await webby.device_info()
@@ -279,4 +279,4 @@ class WebWorkflow extends WorkflowWithCredentials {
 	static available = true
 }
 
-export { WebWorkflow };
+export { WebWorkflow }

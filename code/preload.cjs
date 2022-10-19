@@ -57,13 +57,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
 ipcRenderer.on('send-to-window', function (evt, args) {
 	const event_name = args.event
-	const event = new CustomEvent(event_name, { detail: args });
+	const event = new CustomEvent(event_name, { detail: args })
 	if(window.finished_loading) {
 		window.dispatchEvent(event)
 	} else {
 		window.delayed_events.push(event)
 	}
-});
+})
 
 process.once('loaded', () => {
 	window.addEventListener('message', evt => {

@@ -3,12 +3,12 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
-import * as jq from "../extlib/jquery.min.js";
+import * as jq from "../extlib/jquery.min.js"
 import { sleep, url_to } from "../lib/tools.js"
-import * as top from "../main/home_top.js";
-import { WebWorkflow } from "../backends/web.js";
-import { USBWorkflow } from "../backends/usb.js";
-import { BLEWorkflow } from "../backends/ble.js";
+import * as top from "../main/home_top.js"
+import { WebWorkflow } from "../backends/web.js"
+import { USBWorkflow } from "../backends/usb.js"
+import { BLEWorkflow } from "../backends/ble.js"
 
 const BOARD_PAGE = "html/board-template.html"
 var update_timer = null
@@ -16,14 +16,14 @@ var update_timer_running = false
 
 class Board {
 	constructor() {
-		this.serial = "";
-		this.name = "";
-		this.created = false;
-		this.usb_name = "";
-		this.usb_path = "";
-		this.web_name = "";
-		this.web_url = "";
-		this.action = new Promise(() => {});
+		this.serial = ""
+		this.name = ""
+		this.created = false
+		this.usb_name = ""
+		this.usb_path = ""
+		this.web_name = ""
+		this.web_url = ""
+		this.action = new Promise(() => {})
 	}
 	next(callback) {
 		this.action = this.action.then(callback)
@@ -31,11 +31,11 @@ class Board {
 	}
 }
 
-var boards = {};
+var boards = {}
 const template_all = $("#template_board_all")
 
 async function insert_line(all_dev_line, name) {
-	var added = false;
+	var added = false
 	for(const line of $(".board_line")) {
 		const bname = $(line).find(".board_name").html()
 		if(bname.localeCompare(name) >= 0) {
@@ -63,9 +63,9 @@ async function detect_usb() {
 			for(const device of devices) {
 				var drive_path = device.mount
 				var drive_name = device.name
-				var board_link = `file://${drive_path}`;
+				var board_link = `file://${drive_path}`
 				var url = url_to(BOARD_PAGE, {"dev": board_link})
-				var url_link = `${BOARD_PAGE}${url.search}`;
+				var url_link = `${BOARD_PAGE}${url.search}`
 
 				var wf = new USBWorkflow(drive_path)
 				await wf.start()
@@ -74,7 +74,7 @@ async function detect_usb() {
 				const name = info["board_name"] || drive_name
 				serial = serial.replaceAll(/[^a-z0-9_]+/ig, "_W")
 				const line_id = `dev_line_${serial}`
-				var board = null;
+				var board = null
 				if(!(serial in boards)) {
 					board = new Board()
 					boards[serial] = board
@@ -95,8 +95,8 @@ async function detect_usb() {
 				var name_field = all_dev_line.find(".board_name")
 				name_field.html(name)
 				var link = all_dev_line.find(".link_usb")
-				link.prop("href", url_link);
-				link.data("board_link", board_link);
+				link.prop("href", url_link)
+				link.data("board_link", board_link)
 				link.find(".name").html(`${drive_name}`)
 				link.prop("title", drive_path)
 				var board_info = all_dev_line.find(".board_info")
@@ -157,7 +157,7 @@ async function detect_web() {
 			const serial = info["serial_num"] || board_path
 			const name = info["board_name"] || board_name
 			const line_id = `dev_line_${serial}`
-			var board = null;
+			var board = null
 			if(!(serial in boards)) {
 				board = new Board()
 				boards[serial] = board
@@ -178,8 +178,8 @@ async function detect_web() {
 			var name_field = all_dev_line.find(".board_name")
 			name_field.html(name)
 			var link = all_dev_line.find(".link_web")
-			link.prop("href", url_link);
-			link.data("board_link", board_link);
+			link.prop("href", url_link)
+			link.data("board_link", board_link)
 			link.find(".name").html(`${board_path}${board_port}`)
 			link.prop("title", device.ip)
 			var board_info = all_dev_line.find(".board_info")

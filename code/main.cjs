@@ -4,7 +4,7 @@ SPDX-License-Identifier: MIT
 */
 
 const { app, BrowserWindow, dialog, ipcMain, nativeTheme } = require('electron')
-const Store = require('electron-store');
+const Store = require('electron-store')
 const path = require('path')
 
 var store = new Store()

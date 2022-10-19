@@ -3,9 +3,9 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
-import * as jq from "../extlib/jquery.min.js";
-import * as common from "../main/common.js";
-import * as tools from "../lib/tools.js";
+import * as jq from "../extlib/jquery.min.js"
+import * as common from "../main/common.js"
+import * as tools from "../lib/tools.js"
 import * as password_dialog from "../sub/password_dialog.js"
 
 var target_file = null
@@ -41,7 +41,7 @@ async function init_page() {
 	board_control = common.board_control
 
 	// setup the password
-	var window_url = new URL(window.location);
+	var window_url = new URL(window.location)
 	if(board_control.supports_credentials) {
 		// password was passed from the parent window
 		password = window_url.searchParams.get("password") || null
@@ -77,7 +77,7 @@ async function init_page() {
 		- http://192.168.1.1/fs/code.py
 	*/
 
-	target_file = window_url.searchParams.get("file") || "";
+	target_file = window_url.searchParams.get("file") || ""
 	if(target_file[0] != "/") {
 		target_file = "/" + target_file
 	}
@@ -189,7 +189,7 @@ async function init_page() {
 
 	// setup the save command/path (probably only needs the same path)
 
-	var saving_now = false;
+	var saving_now = false
 	$(".save_button").on("click", async (e) => {
 		if(saving_now) { return }
 		saving_now = true
@@ -285,4 +285,4 @@ async function init_page() {
 	})
 }
 
-init_page();
+init_page()

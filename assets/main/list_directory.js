@@ -138,7 +138,7 @@ async function insert_files_list(current_list_path, list_depth="") {
 			[["wav", "mp3", "ogg"], _icon("file-music")],
 		]
 		var hide_level = settings.show_system_files ? HIDE.NOTHING : HIDE.ALL_SYSTEM_FILES
-		var is_secret = false;
+		var is_secret = false
 		var icon = _icon("file-unknown")
 		if (current_list_path == "/" && SECRETS.includes(file_info.name)) {
 			is_secret = true
@@ -631,8 +631,8 @@ async function setup_directory() {
 			}
 			return false
 		}
-		return true;
-	});
+		return true
+	})
 
 	$(".file_list_setup_buttons .unroll").on("click", (e) => {
 		$(".file_list_setup_buttons").toggleClass("unrolled")
