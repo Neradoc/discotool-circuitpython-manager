@@ -3,7 +3,6 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
-// Modules to control application life and create native browser window
 const { app, BrowserWindow, dialog, ipcMain, nativeTheme } = require('electron')
 const Store = require('electron-store');
 const path = require('path')

@@ -2,6 +2,7 @@
 SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
+
 async function runPS(cmd) {
 	var result = await PowerShell.invoke(cmd)
 	return result.raw

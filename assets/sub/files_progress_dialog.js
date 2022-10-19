@@ -3,6 +3,7 @@ SPDX-FileCopyrightText: Copyright (c) Scott Shawcroft for Adafruit
 SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
+
 var callbacks = {}
 var board_control = null
 var current_password = null

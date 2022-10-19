@@ -2,6 +2,7 @@
 SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
+
 function replace_includes() {
 	const includes = window.document.getElementsByClassName("include")
 	var all_promises = []

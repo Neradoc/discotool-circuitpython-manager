@@ -2,6 +2,7 @@
 SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
+
 import { Workflow, WorkflowResponse, WorkflowFile } from "./workflow_base.js";
 const path = window.modulePath;
 const fsx = window.moduleFsx;

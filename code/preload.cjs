@@ -4,7 +4,6 @@ SPDX-License-Identifier: MIT
 */
 
 const { shell, ipcRenderer } = require('electron')
-
 window.modulePath = require("path")
 window.moduleDrivelist = require("drivelist")
 window.moduleFss = require("fs") // sync

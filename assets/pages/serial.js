@@ -2,6 +2,7 @@
 SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
+
 import { OPEN_IN_BROWSER } from "../../config.js"
 import * as jq from "../extlib/jquery.min.js"
 import * as common from "../main/common.js"
