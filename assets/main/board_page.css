@@ -78,6 +78,7 @@ content {
 	border-bottom: 2px solid var(--border-basic);
 }
 #tablist .tab_link {
+	cursor: pointer;
 	padding: 4px 16px;
 	font-size: 120%;
 	border-width: 2px 2px 0px;
@@ -234,6 +235,10 @@ tr.odd { background: var(--color-pair1); }
 .board_locked #file_list .icon_locked { display: inline; }
 .board_locked #file_list td .delete { display: none; }
 .board_locked #file_list td .rename { display: none; }
+
+#file_list .triangle {
+	cursor: pointer;
+}
 
 commands {
 	display: block;
