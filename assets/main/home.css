@@ -158,6 +158,11 @@ button, input {
 .board_line .board_link.show {
 	display: inline;
 }
+.board_line .board_link .icons {
+	position:relative;
+	display: inline-block;
+	vertical-align: bottom;
+}
 .board_line .board_link img {
 	height:32px;
 	vertical-align: bottom;
@@ -166,8 +171,14 @@ button, input {
 .board_line .board_link img.locked {
 	position: absolute;
 	height: 18px;
-	top: 4px;
-	left: calc(50% - 24px);
+	top: 0px;
+	left: -2px;
+}
+.board_line .board_link img.unavailable {
+	position: absolute;
+	/* height: 18px; */
+	top: 0px;
+	left: 0px;
 }
 .board_link, #home_actions > div {
 	border-radius: 16px;
@@ -188,6 +199,7 @@ button, input {
 	border: 2px solid var(--border-ble);
 }
 
+.board_link .unavailable,
 .board_link .locked,
 .board_link .editable {
 	display: none;
@@ -198,6 +210,9 @@ button, input {
 }
 .web_editable .link_web .editable,
 .usb_editable .link_usb .editable {
+	display: inline;
+}
+.board_link.board_unavailable .unavailable {
 	display: inline;
 }
 

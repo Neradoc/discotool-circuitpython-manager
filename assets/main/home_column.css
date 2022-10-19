@@ -50,13 +50,10 @@ SPDX-License-Identifier: MIT
 		text-align: center;
 		padding: 8px 4px;
 	}
-	.board_line .board_link img {
+	.board_line .board_link .icons {
 		position: relative;
 		float: left;
 		top: -4px;
 		margin: 0px 8px;
-	}
-	.board_line .board_link img.locked {
-		left: 0px;
 	}
 }

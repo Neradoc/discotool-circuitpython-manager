@@ -95,6 +95,8 @@ async function detect_usb() {
 				var name_field = all_dev_line.find(".board_name")
 				name_field.html(name)
 				var link = all_dev_line.find(".link_usb")
+				link.removeClass("old_entry")
+				link.removeClass("board_unavailable")
 				link.prop("href", url_link)
 				link.data("board_link", board_link)
 				link.find(".name").html(`${drive_name}`)
@@ -178,6 +180,8 @@ async function detect_web() {
 			var name_field = all_dev_line.find(".board_name")
 			name_field.html(name)
 			var link = all_dev_line.find(".link_web")
+			link.removeClass("old_entry")
+			link.removeClass("board_unavailable")
 			link.prop("href", url_link)
 			link.data("board_link", board_link)
 			link.find(".name").html(`${board_path}${board_port}`)
@@ -247,8 +251,9 @@ async function detect_boards() {
 	$(".board_name_load").hide()
 	// no await ?
 	update_timer = setInterval(async () => {
+		if(update_timer_running) return false
+		$(".board_link.show").addClass("old_entry")
 		try {
-			if(update_timer_running) return false
 			$("#prompt_refresh").addClass("refresh")
 			await detect_usb()
 			await detect_web()
@@ -257,6 +262,9 @@ async function detect_boards() {
 			console.log(e)
 		}
 		$("#prompt_refresh").removeClass("refresh")
+		$(".board_link.show.old_entry")
+			.addClass("board_unavailable")
+			.removeClass("old_entry")
 		update_timer_running = false
 	}, 10000)
 }
