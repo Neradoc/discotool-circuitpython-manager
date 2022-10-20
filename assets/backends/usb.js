@@ -185,7 +185,7 @@ class USBWorkflow extends Workflow {
 		return ""
 	}
 	async get_identifier() {
-		return this.root
+		return this.drive_name
 	}
 	async get_board_url() {
 		return `file://${this.root}`

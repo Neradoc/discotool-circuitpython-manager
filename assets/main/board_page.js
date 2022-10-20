@@ -372,7 +372,9 @@ async function download_all_event(event) {
 	var dir_path = event?.detail?.dir_path
 	// make the dir name
 	const vinfo = await board_control.device_info()
-	const uuid = vinfo.serial_num || await board_control.get_identifier()
+	var uuid = vinfo.serial_num || (
+		await board_control.get_identifier()
+	).replace(/\//g,"_")
 	const date_str = (new Date()).toISOString().replace(/:/g,"-")
 	var save_name = `${date_str}-${vinfo.board_name}-${uuid}`
 	var save_path = `${dir_path}/${save_name}`
