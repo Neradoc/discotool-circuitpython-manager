@@ -39,6 +39,11 @@ header { flex: 0; }
 	background-size: 38.5px auto;
 	background-position: 6px;
 }
+@media (prefers-color-scheme: light) {
+	.cm-content {
+		background-image: url("../images/stripes-light.png");
+	}
+}
 
 .cm-cursor {
 	border-color: var(--caret-color) !important;
@@ -62,6 +67,11 @@ header { flex: 0; }
 	.ͼl { color: #7A81FF; }
 	.ͼm { color: #FFFB00; }
 	.ͼn { color: #FF2600; }
+}
+
+.ͼ3 .cm-gutters {
+	background-color: var(--input-background);
+	color: var(--input-text);
 }
 
 /* Top title board icon */
