@@ -17,10 +17,16 @@ window.shell = shell
 window.delayed_events = []
 window.finished_loading = false
 
-var win = window.clientInformation.platform == "Win32"
-if(win) {
+window.is_windows = window.clientInformation.platform == "Win32"
+if(window.is_windows) {
 	const { PowerShell } = require('node-powershell')
 	window.PowerShell = PowerShell
+}
+
+window.is_macos = window.clientInformation.platform.startsWith("Mac")
+if(window.is_macos) {
+	const { load_usb_info } = require("./mac-usbinfo.cjs")
+	window.load_usb_info = load_usb_info
 }
 
 window.addEventListener('DOMContentLoaded', () => {

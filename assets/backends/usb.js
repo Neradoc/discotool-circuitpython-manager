@@ -11,7 +11,7 @@ const fs = window.moduleFs
 const fss = window.moduleFss
 
 var win = null
-if(window.clientInformation.platform == "Win32") {
+if(window.is_windows) {
 	win = await import("./usb-win32.js")
 }
 
@@ -74,6 +74,19 @@ class USBWorkflow extends Workflow {
 			}
 		} catch(e) {
 			console.log("No boot out")
+			console.log(e)
+		}
+		try {
+			if(window.load_usb_info) {
+				var infos = await window.load_usb_info()
+				if(infos[this.root]) {
+					if(local_device_info["serial_num"] == undefined) {
+						local_device_info["serial_num"] = infos[this.root]["serial_num"]
+					}
+				}
+			}
+		} catch(e) {
+			console.log("Issue with load_usb_info")
 			console.log(e)
 		}
 		this._device_info = local_device_info
