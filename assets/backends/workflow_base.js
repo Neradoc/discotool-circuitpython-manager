@@ -25,7 +25,12 @@ class WorkflowFile {
 }
 
 function semver(str) {
-	return str.split("-")[0].split(/\./).map((x) => parseInt(x))
+	try {
+		return str.split("-")[0].split(/\./).map((x) => parseInt(x))
+	} catch(e) {
+		console.log(e)
+	}
+	return null
 }
 
 class Workflow {

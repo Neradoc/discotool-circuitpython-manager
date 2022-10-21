@@ -37,6 +37,10 @@ async function start_circup() {
 		// 1 - setup the board control as selected if not already
 		// get the version data
 		cpver = await board_control.cp_version()
+		if(cpver == null) {
+			console.log("No CP version found, assume latest ?")
+			cpver = [8, 0, 0]
+		}
 		// 2 - setup the library bundle with the version from the board
 		// init circup with the CP version
 		if(common.is_electron) {
