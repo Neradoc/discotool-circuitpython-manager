@@ -3,7 +3,8 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
-import { DEBUG } from "../lib/tools.js"
+import { DISPLAY_GITHUB_LINK } from "../../config.js"
+import * as tools from "../lib/tools.js"
 import * as jq from "../extlib/jquery.min.js"
 
 export var modules_list = []
@@ -150,14 +151,20 @@ async function fill_modules_list() {
 	keys.forEach((module_name, pair) => {
 		var nd1 = circup.all_the_modules[module_name].dependencies.length
 		var nd2 = circup.all_the_modules[module_name].external_dependencies.length
+		var repo = circup.all_the_modules[module_name].repo
 		var num_deps = ""
-		if(DEBUG) { num_deps = `(${nd1+nd2})`; }
-		$("#bundle_modules").append(
-			`<p>
-				<input class="checkbox" type="checkbox"/>
-				<span class="module">${module_name}</span> ${num_deps}
-			</p>`
-		)
+		if(tools.DEBUG) { num_deps = `(${nd1+nd2})`; }
+		var line_to_add = $(`<p>
+			<input class="checkbox" type="checkbox"/>
+			<span class="module">${module_name}</span> ${num_deps}
+		</p>`)
+		if(DISPLAY_GITHUB_LINK && repo) {
+			var github = $("#template-icons .repo_link").clone()
+			github.prop("href", repo)
+			github.on("click", tools.open_outside_sync)
+			line_to_add.find(".module").append(github)
+		}
+		$("#bundle_modules").append(line_to_add)
 	})
 	filter_the_modules()
 }

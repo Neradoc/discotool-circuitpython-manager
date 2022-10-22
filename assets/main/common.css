@@ -57,6 +57,10 @@ SPDX-License-Identifier: MIT
 		--caret-color: white;
 		--color-editor-zebra: rgba(50, 50, 50, 0.2);
 	}
+	.light-mode { display: none; }
+}
+@media (prefers-color-scheme: light) {
+	.dark-mode { display: none; }
 }
 
 body {
@@ -84,4 +88,8 @@ button, input {
 	font: inherit;
 	border-radius: 4px;
 	padding: 2px 4px;
+}
+
+#template-icons {
+	display: none;
 }

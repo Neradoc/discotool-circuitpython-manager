@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: Copyright (c) 2022 Neradoc, https://neradoc.me
 SPDX-License-Identifier: MIT
 */
 
-import { BUNDLE_ACCESS, OPEN_IN_BROWSER } from "../../config.js"
+import { BUNDLE_ACCESS, OPEN_IN_BROWSER, DISPLAY_GITHUB_LINK } from "../../config.js"
 import * as common from "../main/common.js"
 import * as tools from "../lib/tools.js"
 import { setup_directory, refresh_list } from "../main/list_directory.js"
@@ -267,12 +267,21 @@ async function run_update_process(imports) {
 		var module = common.library_bundle.get_module(dependency)
 		var file_name = module.name + (module.package ? "" : ".mpy")
 		var icon = module.package ? "&#128193;" : "&#128196;"
-		var new_line = $("#circup_row_template").clone(); // clone the template
+		if(DISPLAY_GITHUB_LINK && module.repo) {
+			var github = $("#template-icons .repo_link").clone()
+			github.prop("href", module.repo)
+			github.on("click", tools.open_outside_sync)
+			github.show()
+		}
+		var new_line = $("#circup_row_template").clone() // clone the template
 		new_line.prop("id", "")
 		new_line.find(".upload button").on("click", upload_button_call)
 		new_line.find(".upload button").val(dependency)
 		new_line.find(".icon").html(icon)
 		new_line.find(".name").html(dependency)
+		if(DISPLAY_GITHUB_LINK && module.repo) {
+			new_line.find(".name").append(github)
+		}
 		new_line.find(".bundle_version").html(module.version)
 		new_line.find(".board_version").html("...")
 		if (imports.includes(dependency)) {

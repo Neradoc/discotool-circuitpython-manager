@@ -376,7 +376,17 @@ commands group.unrolled .icon-right {
 	text-align: center;
 	font-weight: normal;
 }
-#circup_page table .name { width: 100%; }
+#circup_page table .name {
+	width: 100%;
+}
+#circup_page table .name .repo_link {
+	margin-left: 8px;
+}
+#circup_page table .name .repo_link img {
+	height: 18px;
+	opacity: 0.5;
+	vertical-align: bottom;
+}
 #circup_page table .board_version { white-space: nowrap; }
 #circup_page table .bundle_version { white-space: nowrap; }
 #circup_page table .status_icon {
@@ -449,6 +459,16 @@ commands group.unrolled .icon-right {
 	padding: 2px 4px;
 }
 #bundle_list .liste p.hide { display: none; }
+#bundle_list .liste p .repo_link {
+	margin-left: 8px;
+}
+#bundle_list .liste p .repo_link img {
+	height: 16px;
+	vertical-align: bottom;
+	opacity: 0.5;
+	/* filter: var(--svg-glow); */
+}
+
 .pair0 {
 	background: var(--color-pair0);
 }
