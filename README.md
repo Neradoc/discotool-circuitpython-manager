@@ -1,7 +1,25 @@
 How to use the Web Workflow
 ===========================
 
-The main code now is for the electron app. You can run it in a browser though as mentioned below, but it won't include USB workflow and might have other limitations, in particular it's possible that it stops working in the future as browsers increasingly block features for security.
+The main code now is for the electron app. There is no guarantte that it will run in a browser anymore. In fact browser security features pretty much preclude that at all, so I finally gave up on that.
+
+Main features
+-------------
+
+- List boards connected on USB and web workflow boards that respond to circuitpython.local.
+- List files on a board, with multiple file management features.
+  - Create, delete, rename, move files and directories.
+  - File editor for web workflow with some simple features.
+  - Open in your local editor in USB workflow.
+  - Download all files for backup purposes.
+  - Upload files in bulk.
+- Library installer.
+  - Search for, and select libraries from the bundle to install them and their dependencies.
+  - Find and install all the dependencies for a python file from the file list.
+  - Auto install for the current code.py (or main.py, depending on which is available).
+- Serial panel for web workflow.
+  - Make errors into links to the source file (on web workflow).
+  - Make "unknown module" errors into links to install the missing module.
 
 Quick start electron
 --------------------
@@ -17,24 +35,6 @@ npm start
 ```
 
 Build the app with `npm run make`. Good luck.
-
-Quick start browser
--------------------
-
-```sh
-git clone https://github.com/Neradoc/circuitpython-web-packager
-cd circuitpython-web-packager
-python3 -m http.server
-echo "http://localhost:8000/index.html"
-```
-Connect to [http://localhost:8000/index.html](http://localhost:8000/index.html).
-
-How to with human words
------------------------
-
-- Get all the files of the repository locally.
-- Start a server on localhost in the repository's directory.
-- Connect to `/index.html` on that server.
 
 You need a board with the web workflow enabled ! [See docs here](https://github.com/adafruit/circuitpython/blob/main/docs/workflows.md#web).
 
