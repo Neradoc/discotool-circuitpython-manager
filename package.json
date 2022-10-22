@@ -1,6 +1,6 @@
 {
   "name": "Discotool Manager",
-  "version": "1.0.0-alpha.3",
+  "version": "1.0.0-alpha.4",
   "description": "A Files and Library Manager for Circuitpython USB and Web Workflow",
   "main": "code/main.cjs",
   "scripts": {
@@ -33,6 +33,7 @@
     "@codemirror/search": "^6.2.0",
     "@codemirror/state": "github:codemirror/state",
     "@codemirror/view": "github:codemirror/view",
+    "child_process": "^1.0.2",
     "codemirror": "^6.0.1",
     "drivelist": "^11.0.0",
     "electron-squirrel-startup": "^1.0.0",
