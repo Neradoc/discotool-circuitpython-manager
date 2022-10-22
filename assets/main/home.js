@@ -161,7 +161,9 @@ async function detect_web() {
 				continue
 			}
 			const info = await wf.device_info()
-			const serial = info["serial_num"] || board_path
+			var board_identifier = (await wf.get_identifier()).replace(/\.local$/, "")
+			if(!board_identifier) board_identifier = board_path
+			const serial = info["serial_num"] || board_identifier
 			const name = info["board_name"] || board_name
 			const line_id = `dev_line_${serial}`
 			var board = null
@@ -181,7 +183,7 @@ async function detect_web() {
 				all_dev_line = $(`#${line_id}`)
 			}
 			board.web_name = board_name
-			board.web_url = board_path
+			board.web_url = board_identifier
 			var name_field = all_dev_line.find(".board_name")
 			name_field.html(name)
 			var link = all_dev_line.find(".link_web")
@@ -189,7 +191,7 @@ async function detect_web() {
 			link.removeClass("board_unavailable")
 			link.prop("href", url_link)
 			link.data("board_link", board_link)
-			link.find(".name").html(`${board_path}${board_port}`)
+			link.find(".name").html(`${board_identifier}${board_port}`)
 			link.prop("title", device.ip)
 			var board_info = all_dev_line.find(".board_info")
 			board_info.html(link.href)
