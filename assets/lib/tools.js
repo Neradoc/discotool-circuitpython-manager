@@ -60,7 +60,10 @@ export async function open_outside(link) {
 		} else if(link.prop !== undefined) { // jQuery object, expecting a link
 			console.log("From jquery prop")
 			await shell.openExternal(link.prop("href"))
-		} else if(link.target !== undefined) { // onClick event with a target
+		} else if(link.currentTarget && link.currentTarget.href) { // onClick event with a target
+			console.log("From event.currentTarget")
+			await shell.openExternal(link.currentTarget.href)
+		} else if(link.target && link.target.href) { // onClick event with a target
 			console.log("From event.target")
 			await shell.openExternal(link.target.href)
 		}
