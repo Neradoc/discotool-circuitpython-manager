@@ -28,18 +28,15 @@ SPDX-License-Identifier: MIT
 		<h3></h3>
 		<div id="home_actions">
 			<div id="usb_open_panel" class="usb_workflow">
-				<span>
 				<input id="select_files_input" type="file" webkitdirectory directory/>
-				Drop disk drive here or:<br/>
-				<button id="file_select_button">Open a CIRCUITPY drive</button>
-				</span>
+				<!-- Drop disk drive here or:<br/> -->
+				<span>Local USB drive</span>
+				<button id="file_select_button">Open</button>
 			</div>
 			<div id="web_open_panel" class="web_workflow">
-				<span>
-				Connect to URL or IP:<br/>
-				<input class="web_input" type="text"/>
+				<!-- Connect to URL or IP:<br/> -->
+				<input class="web_input" type="text" placeholder="Web Workflow URL/IP"/>
 				<button class="web_go">GO</button>
-				</span>
 			</div>
 			<div id="ble_open_panel" class="ble_workflow">
 				<span>
@@ -49,7 +46,7 @@ SPDX-License-Identifier: MIT
 			</div>
 		</div>
 		<div id="prompt_refresh">
-			<span class="board_counter"><span class="count">0</span> boards.</span></span>
+			<span class="board_counter"><span class="count">0</span> board<ps>s</ps> found.</span></span>
 			<span class="loading_label"><img class="small_load_image" src="assets/images/loading_black.gif" /></span>
 			<button id="reload_boards">Reload</button>
 		</div>

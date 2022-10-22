@@ -49,6 +49,11 @@ async function insert_line(all_dev_line, name) {
 	}
 	const num_boards = $(".board_line").length
 	$("#prompt_refresh .board_counter .count").html(`${num_boards}`)
+	if(num_boards > 1) {
+		$("#prompt_refresh .board_counter ps").show()
+	} else {
+		$("#prompt_refresh .board_counter ps").hide()
+	}
 }
 
 async function detect_usb() {
