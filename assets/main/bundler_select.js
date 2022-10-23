@@ -162,7 +162,7 @@ async function fill_modules_list() {
 			var github = $("#template-icons .repo_link").clone()
 			github.prop("href", repo)
 			github.on("click", tools.open_outside_sync)
-			line_to_add.find(".module").append(github)
+			line_to_add.find(".module").after(github)
 		}
 		$("#bundle_modules").append(line_to_add)
 	})
