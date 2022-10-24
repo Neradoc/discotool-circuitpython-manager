@@ -17,6 +17,9 @@ window.shell = shell
 window.delayed_events = []
 window.finished_loading = false
 
+window.print_dialog = window.print
+window.print = console.log
+
 window.is_windows = window.clientInformation.platform == "Win32"
 if(window.is_windows) {
 	const { PowerShell } = require('node-powershell')

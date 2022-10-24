@@ -86,6 +86,7 @@ export function keys_info(event) {
 			+ (event.metaKey ? "M" : "")
 			+ (event.shiftKey ? "S" : "")
 		),
+		code: event.code,
 	}
 	return info
 }

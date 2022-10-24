@@ -587,6 +587,33 @@ function setup_events() {
 		if(redo_install_button_callback) redo_install_button_callback()
 	})
 
+	var mod_is_ctrl = ! window.moduleOS.platform().includes("darwin")
+	var cmd_key = (mod_is_ctrl ? "C" : "M")
+
+	const code_to_tabnum = {
+		"Digit1": 0,
+		"Digit2": 1,
+		"Digit3": 2,
+		"Digit4": 3,
+		"Numpad1": 0,
+		"Numpad2": 1,
+		"Numpad3": 2,
+		"Numpad4": 3,
+	}
+
+	$(document).on("keydown", (e) => {
+		const info = tools.keys_info(e)
+
+		if(info.modifiers == cmd_key) {
+			if(code_to_tabnum[info.code] !== undefined) {
+				var tabnum = code_to_tabnum[info.code]
+				$(`.tab_link_num${tabnum}`).click()
+				e.preventDefault()
+				return false
+			}
+		}
+	})
+
 	window.addEventListener("install-modules", (event) => {
 		var libs_list = event?.detail?.install?.modules
 		if(libs_list !== undefined) {

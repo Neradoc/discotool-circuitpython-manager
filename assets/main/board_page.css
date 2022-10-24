@@ -73,11 +73,15 @@ content {
 }
 
 #tablist {
+	display: flex;
 	padding: 4px 0px 0px;
-	margin: 0px 32px;
+	margin: 0px 8px;
 	border-bottom: 2px solid var(--border-basic);
+	text-align: center;
 }
 #tablist .tab_link {
+	flex-grow: 1;
+	margin: 0px 2px;
 	cursor: pointer;
 	padding: 4px 16px;
 	font-size: 120%;
@@ -126,7 +130,7 @@ body.loaded #welcome_page .loading_image {
 }
 
 #file_list table {
-	border-radius: 32px 32px 16px 16px;
+	border-radius: 0px 0px 16px 16px;
 	overflow: hidden;
 	width: 100%;
 }
