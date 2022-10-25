@@ -16,10 +16,18 @@ export const DEFAULT_SYSTEM_FILES = [
 	"System Volume Information",
 ]
 
+export const OPEN_MODE = {
+	LOCAL_EDITOR: 0,
+	BUILTIN_EDITOR: 1,
+	// LOCAL_PROXY: 2,
+}
+
 export const is_electron = window && window.process && window.process.type == "renderer"
+export var open_mode = OPEN_MODE.BUILTIN_EDITOR
 
 export var library_bundle = null
 export var board_control = null
+
 export async function start() {
 	var url = new URL(window.location)
 	var url_passed = url.searchParams.get("device") || ""
@@ -27,12 +35,16 @@ export async function start() {
 	if (url_passed.startsWith("file://")) {
 		var target_drive = url_passed.replace(/^file:\/\//, "")
 		board_control = new USBWorkflow(target_drive)
+		// open_mode = OPEN_MODE.LOCAL_EDITOR
 	} else if (url_passed.startsWith("ble:")) {
 		console.log("BLE workflow not supported")
 	} else if (url_passed.startsWith("http://")) {
 		// var target_url = url_passed.replace(/^http:\/\//, "")
 		board_control = new WebWorkflow(url_passed)
+		open_mode = OPEN_MODE.BUILTIN_EDITOR
 	}
+	const setting = `open_mode_${board_control.type}`
+	open_mode = localStorage.getItem(setting, open_mode)
 }
 export function set_library_bundle(bundle) {
 	library_bundle = bundle
@@ -53,10 +65,7 @@ function open_outside_a(e) {
 }
 
 export function open_file_editor_a(e, more=[]) {
-	if(board_control.type == "usb") {
-		return open_outside_a(e)
-	}
-	if(board_control.type == "web" && OPEN_IN_BROWSER) {
+	if(open_mode == OPEN_MODE.LOCAL_EDITOR || OPEN_IN_BROWSER) {
 		return open_outside_a(e)
 	}
 	const link = $(e.currentTarget)

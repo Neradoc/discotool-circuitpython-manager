@@ -39,6 +39,7 @@ async function init_page() {
 	*/
 	await common.start()
 	board_control = common.board_control
+	await board_control.start()
 
 	// setup the password
 	var window_url = new URL(window.location)
@@ -192,6 +193,7 @@ async function init_page() {
 	var saving_now = false
 	$(".save_button").on("click", async (e) => {
 		if(saving_now) { return }
+		if(!await board_control.is_editable()) { return }
 		saving_now = true
 		$(".save_button").prop("disabled", true)
 		$(".buttons_1").addClass("saving")
