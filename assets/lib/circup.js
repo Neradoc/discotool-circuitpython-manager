@@ -18,8 +18,13 @@ function semver_compare(a,b) {
 	)
 }
 
+function ignore_file(file_name) {
+	return file_name.match(/(^\.|\/\.)/) ? true : false
+}
+
 class Circup {
 	static BAD_MPY = -1
+	BAD_MPY = Circup.BAD_MPY
 
 	constructor(library_bundle, workflow) {
 		this.library_bundle = library_bundle
@@ -95,6 +100,7 @@ class Circup {
 
 		var version = false
 		for(var file_name of module_files) {
+			if(ignore_file(file_name)) { continue }
 			var file_path = ("/" + file_name).replace(/\/\/+/, "/")
 			var response = await this.workflow.get_file_content(file_path)
 			if(!response.ok) { continue }
