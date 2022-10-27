@@ -10,6 +10,7 @@ import { WebWorkflow } from "../backends/web.js"
 import { USBWorkflow } from "../backends/usb.js"
 import { BLEWorkflow } from "../backends/ble.js"
 
+const WEB_WORKFLOW_ENABLED = true
 const BOARD_PAGE = "html/board-template.html"
 var update_timer = null
 var update_timer_running = false
@@ -137,7 +138,7 @@ async function giveup_web(e) {
 
 async function detect_web() {
 	// Web workflow
-	if(true) {
+	if(WEB_WORKFLOW_ENABLED) {
 		// $(".web_workflow").show()
 		const devices = await WebWorkflow.find_devices()
 		// candidates
@@ -157,10 +158,14 @@ async function detect_web() {
 			var wf = new WebWorkflow(board_link)
 			var did_start = await wf.start()
 			if(!did_start) {
-				console.log("SKIP")
+				console.log("SKIP: no start")
 				continue
 			}
 			const info = await wf.device_info()
+			if($.isEmptyObject(info)) {
+				console.log("SKIP: device info not available")
+				continue
+			}
 			var board_identifier = (await wf.get_identifier()).replace(/\.local$/, "")
 			if(!board_identifier) board_identifier = board_path
 			const serial = info["serial_num"] || board_identifier
