@@ -1,12 +1,13 @@
 {
-  "name": "Discotool Manager",
+  "name": "Discotool-Manager",
   "version": "1.0.0-alpha.5",
   "description": "A Files and Library Manager for Circuitpython USB and Web Workflow",
   "main": "code/main.cjs",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
-    "make": "electron-forge make"
+    "make": "electron-forge make",
+    "make-deb": "electron-forge make --platform=linux --arch=arm64,x64"
   },
   "repository": "https://github.com/Neradoc/discotool-circuitpython-manager",
   "keywords": [
