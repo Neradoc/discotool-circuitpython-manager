@@ -389,12 +389,19 @@ async function download_all_event(event) {
 		await board_control.get_identifier()
 	).replace(/\//g,"_")
 	const date_str = (new Date()).toISOString().replace(/:/g,"-")
-	var save_name = `${date_str}-${vinfo.board_name}-${uuid}`
+	var save_name = `${date_str}-${vinfo.board_name}-${uuid}`.replace(/ /g,"_")
 	var save_path = `${dir_path}/${save_name}`
+	var save_link = ``
+	var description = $(`<span>Board files downloaded to <b><a href=""></a></b></span>`)
+	var a_link = description.find("a")
+	a_link.on("click", tools.open_outside_sync)
+	a_link.prop("href", save_path)
+	a_link.html(save_path)
+
 	// progress window
 	files_progress_dialog.open({}, {
 		title: "Download All",
-		description: `Board files downloaded to <b>${save_path}</b>`,
+		description: description,
 		has_cancel: false,
 	})
 	await window.moduleFs.mkdir(save_path, {recursive: true})

@@ -22,10 +22,12 @@ async function open(callback_list=null, options={}) {
 		Object.assign(callbacks, callback_list)
 	}
 	if(options.title != undefined) {
-		$("#files_progress_dialog .title").html(options.title)
+		$("#files_progress_dialog .title").empty()
+		$("#files_progress_dialog .title").append(options.title)
 	}
 	if(options.description != undefined) {
-		$("#files_progress_dialog .description").html(options.description)
+		$("#files_progress_dialog .description").empty()
+		$("#files_progress_dialog .description").append(options.description)
 	}
 	if(options.has_ok === false) {
 		$("#files_progress_dialog .ok_button").hide()
