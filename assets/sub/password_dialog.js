@@ -36,7 +36,7 @@ async function ok() {
 	} else {
 		if(serial_num) delete localStorage[password_key]
 	}
-	close()
+	await close()
 	callbacks?.button?.("ok")
 }
 async function cancel() {
@@ -49,7 +49,7 @@ async function cancel() {
 	} else {
 		$("#password_dialog #remember_password").prop("checked", false)
 	}
-	close()
+	await close()
 	callbacks?.button?.("cancel")
 }
 async function setup(board_ctrl, callback_list, password=undefined) {

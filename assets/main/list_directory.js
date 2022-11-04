@@ -8,6 +8,7 @@ import * as common from "../main/common.js"
 import * as tools from "../lib/tools.js"
 import * as password_dialog from "../sub/password_dialog.js"
 import * as files_progress_dialog from "../sub/files_progress_dialog.js"
+import * as file_rename_dialog from "../sub/file_rename_dialog.js"
 
 const SECRETS = [
 	".env",
@@ -237,7 +238,10 @@ async function insert_files_list(current_list_path, list_depth="") {
 		var rename_button = clone.find(".rename")
 		rename_button.data("path", file_path)
 		rename_button.attr("href", api_url)
-		rename_button.on("click", rename_dialog_open)
+		rename_button.on("click", (e) => {
+			file_rename_dialog.open(e)
+			return false;
+		})
 
 		var analyze_button = clone.find(".analyze")
 		if(file_info.name.endsWith(".py")) {  // || search("requirement") >= 0 ?
@@ -496,74 +500,6 @@ function load_directory(e) {
 }
 
 /*****************************************************************
-* File rename dialog
-*/
-
-function rename_dialog_close() {
-	$("#rename_dialog").data("path", "")
-	$("#rename_dialog").removeClass("popup_dialog")
-	$("body").removeClass("popup_dialog")
-}
-function rename_dialog_open(e) {
-	const target = e.currentTarget
-	var path = $(target).data("path")
-	$("#rename_dialog").data("path", path)
-	// TODO: filter path for html ?
-	$("#rename_dialog .error").hide().html("")
-	$("#rename_dialog .ok_button").prop("disabled", false)
-	$("#rename_dialog .cancel_button").prop("disabled", false)
-	$("#rename_dialog .original_name").val(path)
-	$("#rename_dialog .new_name").val(path)
-	$("#rename_dialog").addClass("popup_dialog")
-	$("body").addClass("popup_dialog")
-	$("#rename_dialog .new_name").focus()
-	return false
-}
-function rename_dialog_ok() {
-	$("#rename_dialog .ok_button").prop("disabled", true)
-	$("#rename_dialog .cancel_button").prop("disabled", true)
-	try {
-		var from_path = $("#rename_dialog").data("path")
-		var to_path = $("#rename_dialog .new_name").val()
-		// try doing the rename command
-		const from_path_dir = (`${from_path}/`).replace(/\/\/+/,"/")
-		console.log(`Rename “${from_path}” “${to_path}” <${from_path_dir}>`)
-		if(to_path.startsWith(from_path_dir)) {
-			console.log("Cannot move a directory into itself.")
-			$("#rename_dialog .error").show().html("Operation failed")
-			return
-		}
-		common.board_control.rename_file(from_path, to_path).then((res) => {
-			$("#rename_dialog .ok_button").prop("disabled", false)
-			$("#rename_dialog .cancel_button").prop("disabled", false)
-			if(res.ok) {
-				rename_dialog_close()
-				refresh_list()
-			} else {
-				// TODO: more info on the error
-				$("#rename_dialog .error").show().html("Operation failed")
-			}
-		})
-	} catch(e) {
-		console.log(e)
-	} finally {
-		$("#rename_dialog .ok_button").prop("disabled", false)
-		$("#rename_dialog .cancel_button").prop("disabled", false)
-	}
-}
-async function setup_rename_dialog() {
-	$("#rename_dialog .ok_button").on("click", rename_dialog_ok)
-	$("#rename_dialog .cancel_button").on("click", rename_dialog_close)
-	$("#rename_dialog .new_name").on("keydown", (e) => {
-		if(e.which == 13) {
-			$("#rename_dialog .ok_button").click()
-			return false
-		}
-		return true
-	})
-}
-
-/*****************************************************************
 * Startup
 */
 
@@ -618,7 +554,7 @@ async function setup_directory() {
 	if(common.board_control.supports_credentials) {
 		await password_dialog.setup(common.board_control, { "button": refresh_list })
 	}
-	await setup_rename_dialog()
+	await file_rename_dialog.setup(common.board_control, { "button": refresh_list })
 	
 	// setup closing dialogs with escape
 	$(document).on("keydown", (e) => {
@@ -627,7 +563,7 @@ async function setup_directory() {
 				password_dialog.close()
 			}
 			if($("#rename_dialog").is(".popup_dialog")) {
-				rename_dialog_close()
+				file_rename_dialog.close()
 			}
 			return false
 		}

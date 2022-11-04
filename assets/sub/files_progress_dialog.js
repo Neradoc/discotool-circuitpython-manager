@@ -44,11 +44,11 @@ async function open(callback_list=null, options={}) {
 	$("#files_progress_dialog .progress").show()
 }
 async function ok() {
-	close()
+	await close()
 	callbacks?.button?.("ok")
 }
 async function cancel() {
-	close()
+	await close()
 	callbacks?.button?.("cancel")
 }
 async function enable_buttons(status=true) {
@@ -72,6 +72,17 @@ async function description(text) {
 		$("#files_progress_dialog .description").html(text)
 	}
 }
+async function press_escape(e) {
+	if(e.which == 27 && $("body").is(".popup_dialog")) {
+		if($("#files_progress_dialog").is(".popup_dialog")) {
+			if($("#files_progress_dialog .cancel_button").prop("disabled") == false) {
+				await close()
+			}
+		}
+		return false
+	}
+	return true
+}
 async function setup(board_ctrl, callback_list) {
 	board_control = board_ctrl
 	if(callback_list) {
@@ -82,18 +93,7 @@ async function setup(board_ctrl, callback_list) {
 	$("#files_progress_dialog .cancel_button").on("click", cancel)
 	$("#files_progress_dialog .ok_button").prop("disabled", true)
 	$("#files_progress_dialog .cancel_button").prop("disabled", true)
-
-	$(document).on("keydown", (e) => {
-		if(e.which == 27 && $("body").is(".popup_dialog")) {
-			if($("#files_progress_dialog").is(".popup_dialog")) {
-				if($("#files_progress_dialog .cancel_button").prop("disabled") == false) {
-					close()
-				}
-			}
-			return false
-		}
-		return true
-	})
+	$(document).on("keydown", press_escape)
 }
 
 export { setup, open, close, ok, cancel, enable_buttons, log, title, description }

@@ -5,6 +5,7 @@ SPDX-License-Identifier: MIT
 
 @import url("../sub/password_dialog.css");
 @import url("../sub/files_progress_dialog.css");
+@import url("../sub/file_rename_dialog.css");
 
 div.usb_workflow { display: none; }
 body.workflow_type_usb div.usb_workflow { display: block; }
@@ -519,37 +520,3 @@ commands group.unrolled .icon-right {
 #small_load_image { display: none; }
 
 .template { display: none; }
-
-/*********************************************************************
-* Popup file rename dialog
-*/
-#rename_dialog { display: none; }
-#rename_dialog.popup_dialog {
-	display: block;
-	z-index: 100;
-	position: fixed;
-	top: 200px;
-	width: 300px;
-	left: calc(50% - 160px);
-	border: 4px solid var(--contrast-color);
-	background: var(--body-background);
-	border-radius: 8px;
-	padding: 8px 16px;
-}
-#rename_dialog label {
-	display: inline-block;
-	width: 4em;
-	text-align: right;
-}
-#rename_dialog .cancel_button {
-	display: block;
-	float: left;
-}
-#rename_dialog .ok_button {
-	display: block;
-	float: right;
-}
-#rename_dialog .error {
-	color: red;
-	padding: 0px 8px;
-}
