@@ -391,8 +391,7 @@ async function download_all_event(event) {
 	).replace(/\//g,"_")
 	const date_str = (new Date()).toISOString().replace(/:/g,"-")
 	var save_name = `${date_str}-${vinfo.board_name}-${uuid}`.replace(/ /g,"_")
-	var save_path = `${dir_path}/${save_name}`
-	var save_link = ``
+	var save_path = window.modulePath.join(dir_path, save_name)
 	var description = $(`<span>Board files downloaded to <b><a href=""></a></b></span>`)
 	var a_link = description.find("a")
 	a_link.on("click", tools.open_outside_sync)
