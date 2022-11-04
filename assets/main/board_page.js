@@ -369,7 +369,8 @@ async function install_a_module(libs_list) {
 * download a backup of all the files
 */
 
-const SKIP = common.DEFAULT_SYSTEM_FILES.map((x) => `/${x}`).concat(["/lib"])
+const SKIP = common.DEFAULT_SYSTEM_FILES.map((x) => `/${x}`)
+// .concat(["/lib"])
 
 async function download_all() {
 	// file save dialog
