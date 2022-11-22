@@ -226,13 +226,21 @@ async function insert_files_list(current_list_path, list_depth="") {
 		delete_button.val(file_path)
 		delete_button.on("click", delete_a_file)
 
-		var edit_button = clone.find(".edit")
-		edit_button.data("path", file_path)
+// 		var edit_button = clone.find(".edit")
+// 		edit_button.data("path", file_path)
+// 		if(file_info.directory) {
+// 			edit_button.remove()
+// 		} else {
+// 			edit_button.attr("href", api_url)
+// 			edit_button.on("click", common.open_file_editor_a)
+// 		}
+
+		var edit_icons = clone.find(".path .edit")
 		if(file_info.directory) {
-			edit_button.remove()
+			edit_icons.remove()
 		} else {
-			edit_button.attr("href", api_url)
-			edit_button.on("click", common.open_file_editor_a)
+			edit_icons.attr("href", api_url)
+			edit_icons.on("click", common.open_file_editor_a)
 		}
 
 		var rename_button = clone.find(".rename")
@@ -250,6 +258,15 @@ async function insert_files_list(current_list_path, list_depth="") {
 		} else {
 			analyze_button.hide()
 		}
+
+		var download_button = clone.find(".download")
+		download_button.data("path", file_path)
+		download_button.val(api_url)
+		download_button.on("click", (e) => {
+			// TODO Implement that thing
+			download_dialog.open(e)
+			return false;
+		})
 
 		new_children.push(clone)
 

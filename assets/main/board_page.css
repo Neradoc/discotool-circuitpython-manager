@@ -162,6 +162,9 @@ tr.odd { background: var(--color-pair1); }
 	padding: 0px 4px 0px 2px;
  */
 }
+#file_list td {
+	padding: 0px 2px;
+}
 #file_list .go_back_up img,
 #file_list td.type img {
 	height: 24px;
@@ -173,7 +176,6 @@ tr.odd { background: var(--color-pair1); }
 	position: relative;
 	text-align: left;
 	width: 100%;
-	padding: 0px;
 }
 #file_list td.modified {
 	text-align: right;
@@ -201,12 +203,19 @@ tr.odd { background: var(--color-pair1); }
 }
 #file_list td a.path {
 	display: block;
-	padding: 2px 4px 4px;
+	padding: 4px 6px 6px;
 }
 #file_list td a.path:hover {
 	background: var(--hover-background);
 	color: var(--hover-color);
 }
+
+#file_list td.path .edit {
+	position: absolute;
+	top: 2px;
+	right: 2px;
+}
+
 #file_list .refresh_list,
 #file_list td.buttons a,
 #file_list td.buttons button
@@ -229,14 +238,18 @@ tr.odd { background: var(--color-pair1); }
 	border: none;
 	background: transparent;
 }
+#file_list img,
 #file_list button img,
 #file_list a img {
 	max-height: 24px;
 }
 
-#file_list td.buttons a .view { display: none; }
-.board_locked #file_list td.buttons a .view { display: inline; }
-.board_locked #file_list td.buttons a .pencil { display: none; }
+#file_list td .view { display: none; }
+#file_list td .pencil { display: none; }
+#file_list td:hover .pencil { display: inline; }
+.board_locked #file_list td:hover .view { display: inline; }
+.board_locked #file_list td .pencil { display: none; }
+
 .board_locked #file_list .icon_locked { display: inline; }
 .board_locked #file_list td .delete { display: none; }
 .board_locked #file_list td .rename { display: none; }
@@ -520,3 +533,5 @@ commands group.unrolled .icon-right {
 #small_load_image { display: none; }
 
 .template { display: none; }
+
+
