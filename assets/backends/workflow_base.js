@@ -12,6 +12,14 @@ class WorkflowResponse {
 		// have text and json ?
 		// rename json to array/dict ?
 	}
+	textContent() {
+		try {
+			return this.content.toString("utf8")
+		} catch(e) {
+			console.log(e)
+		}
+		return ""
+	}
 }
 
 class WorkflowFile {

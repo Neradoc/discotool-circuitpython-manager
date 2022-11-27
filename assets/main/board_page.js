@@ -311,7 +311,7 @@ async function auto_install(file_name) {
 	}
 	$(".tab_link_circup").click()
 	// get the list
-	const code_content = code_response.content
+	const code_content = code_response.textContent()
 	$("#circup_page .loading").append(`<br/>Loading modules from <b>${file_name}</b>...`)
 	const imports = common.library_bundle.get_imports_from_python(code_content)
 	// do the thing

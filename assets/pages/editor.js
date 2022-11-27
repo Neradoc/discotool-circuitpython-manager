@@ -222,7 +222,7 @@ async function init_page() {
 	async function setup_editor_content() {
 		const result = await board_control.get_file_content(target_file)
 		if(result.ok) {
-			var file_content = result.content
+			var file_content = result.textContent()
 			// text_block.val(file_content)
 			view.dispatch(view.state.update({
 				changes: {

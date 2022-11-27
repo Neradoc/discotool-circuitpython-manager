@@ -95,7 +95,9 @@ class WebWorkflow extends WorkflowWithCredentials {
 		}
 	}
 	async get_file_content(file_path, range=null) {
-		var heads = this.headers()
+		var heads = this.headers({
+			'Accept': 'application/octet-stream',
+		})
 		var url = this.api_url(file_path)
 		var response = await fetch(
 			url,
@@ -105,7 +107,7 @@ class WebWorkflow extends WorkflowWithCredentials {
 			}
 		)
 		try {
-			var file_content = await response.text()
+			var file_content = new Buffer(await response.arrayBuffer())
 			return new WebResponse(response, file_content)
 		} catch {
 			return new WebResponse(response, null, false)
@@ -134,6 +136,12 @@ class WebWorkflow extends WorkflowWithCredentials {
 		}
 	}
 	async upload_file(upload_path, file_data) {
+	
+		if(upload_path.match(/mpy$/)) {
+			console.log(file_data)
+		}
+	
+	
 		var heads = this.headers({
 			'Content-Type': 'application/octet-stream',
 			'X-Timestamp': Date.now(), // file.lastModified,
