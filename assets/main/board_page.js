@@ -13,7 +13,6 @@ import * as bundler from "../main/bundler_select.js"
 import * as files_progress_dialog from "../sub/files_progress_dialog.js"
 
 // import { $ } from "../extlib/jquery.min.js"
-const CODE_FILES = ["code.txt", "code.py", "main.py", "main.txt"]
 
 var board_control = null
 var circup = null
@@ -547,7 +546,7 @@ function setup_events() {
 
 	$(".auto_install").on("click", async (e) => {
 		await run_exclusively(async () => {
-			for(const code of CODE_FILES) {
+			for(const code of common.CODE_FILES) {
 				if(await auto_install(code)) {
 					return
 				}

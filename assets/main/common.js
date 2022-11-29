@@ -15,6 +15,20 @@ export const DEFAULT_SYSTEM_FILES = [
 	".TemporaryItems",
 	"System Volume Information",
 ]
+export const CODE_FILES = [
+	"code.txt",
+	"code.py",
+	"main.py",
+	"main.txt",
+	"code.txt.py",
+	"code.py.txt",
+	"code.txt.txt",
+	"code.py.py",
+	"main.txt.py",
+	"main.py.txt",
+	"main.txt.txt",
+	"main.py.py",
+]
 
 export const OPEN_MODE = {
 	LOCAL_EDITOR: 0,
