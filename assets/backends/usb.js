@@ -100,7 +100,7 @@ class USBWorkflow extends Workflow {
 		var full_path = path.join(this.root, file_path)
 		var response = null
 		try {
-			const file_content = new Buffer(await fs.readFile(full_path))
+			const file_content = Buffer.from(await fs.readFile(full_path))
 			response = new WorkflowResponse(true, file_content)
 		} catch(e) {
 			response = new WorkflowResponse(false, null)

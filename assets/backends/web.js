@@ -107,7 +107,7 @@ class WebWorkflow extends WorkflowWithCredentials {
 			}
 		)
 		try {
-			var file_content = new Buffer(await response.arrayBuffer())
+			var file_content = Buffer.from(await response.arrayBuffer())
 			return new WebResponse(response, file_content)
 		} catch {
 			return new WebResponse(response, null, false)
