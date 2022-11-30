@@ -414,7 +414,12 @@ async function download_all_event(event) {
 		var files_list = result.content
 		for(var file_ref of files_list) {
 			var file_path = `${dir_path}/${file_ref.name}`.replace(/\/+/, "/")
-			if(SKIP.includes(file_path)) continue
+			if(SKIP.includes(file_path)) {
+				continue
+			}
+			if(file_ref.name.match(/^\._/)) {
+				continue
+			}
 			var file_size = file_ref.file_size
 			if(file_size < 1000) {
 				file_size = `${file_size} B`
