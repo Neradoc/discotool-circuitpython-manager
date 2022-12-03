@@ -94,7 +94,13 @@ $(window).on("dragover", (event) => {
 })
 
 $("#web_open_panel .web_go").on("click", (e) => {
-	const target = $("#web_open_panel .web_input").val()
+	var target = $("#web_open_panel .web_input").val()
+	target = target.replace(/^https?:\/\//, "")
+	target = target.replace("/", "")
+	if(!target.match(/:\d+/)) {
+		target += ":80"
+	}
+	$("#web_open_panel .web_input").val(target)
 	var link = `http://${target}`
 	window.postMessage({
 		type: 'open-board',
