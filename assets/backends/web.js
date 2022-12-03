@@ -136,12 +136,6 @@ class WebWorkflow extends WorkflowWithCredentials {
 		}
 	}
 	async upload_file(upload_path, file_data) {
-	
-		if(upload_path.match(/mpy$/)) {
-			console.log(file_data)
-		}
-	
-	
 		var heads = this.headers({
 			'Content-Type': 'application/octet-stream',
 			'X-Timestamp': Date.now(), // file.lastModified,
