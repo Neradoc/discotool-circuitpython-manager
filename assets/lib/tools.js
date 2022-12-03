@@ -14,6 +14,8 @@ export const DEBUG = (
 )
 export const current_path = url_params.get("path") || "/"
 
+window.DEBUG = DEBUG
+
 String.prototype.escapeHTML = function() {
 	return this.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
 }

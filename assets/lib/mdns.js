@@ -23,7 +23,7 @@ function query() {
 function set_responder() {
 	mdns.on('response', function(response) {
 		if(response.type == "response") {
-			if(DEBUG) console.log("MDNS:", response)
+			debug("MDNS:", JSON.stringify(response))
 			var candidate = {
 				port: 80,
 				hostname: "",
@@ -61,13 +61,15 @@ function set_responder() {
 			const start_with_cpy = (
 				candidate.hostname && candidate.hostname.startsWith("cpy-")
 			)
+			if(start_with_cpy) {
+				debug("CPY:", candidate.hostname)
+				debug(JSON.stringify(response))
+			}
 			const is_cp_local = (candidate.hostname == CP_LOCAL_DOMAIN)
 			if(ref == "_circuitpython" || start_with_cpy || is_cp_local) {
 				if(candidates[candidate.ip] == undefined) {
 					candidates[candidate.ip] = candidate
-					if(DEBUG) {
-						console.log("New board", candidate)
-					}
+					debug("New board", candidate)
 				} else {
 					if(candidates[candidate.ip].hostname == CP_LOCAL_DOMAIN) {
 						candidates[candidate.ip].hostname = candidate.hostname
@@ -81,11 +83,9 @@ function set_responder() {
 					everything_else[candidate.ip] = candidate
 				}
 				if(candidate.hostname && candidate.hostname.includes("cpy-")) {
-					if(DEBUG) {
-						console.log("*".repeat(70))
-						console.log('candidate:', candidate)
-						console.log('got a response packet:', response)
-					}
+					debug("*".repeat(70))
+					debug('candidate:', candidate)
+					debug('got a response packet:', response)
 				}
 			}
 		}

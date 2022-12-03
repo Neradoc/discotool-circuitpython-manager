@@ -13,12 +13,18 @@ window.moduleMdns = require('multicast-dns')
 window.moduleWS = require("ws")
 window.moduleOS = require("os")
 window.shell = shell
+window.DEBUG = false
 
 window.delayed_events = []
 window.finished_loading = false
 
 window.print_dialog = window.print
 window.print = console.log
+window.debug = function(...args) {
+	if(window.DEBUG) {
+		console.log(...args)
+	}
+}
 
 window.is_windows = window.clientInformation.platform == "Win32"
 if(window.is_windows) {
