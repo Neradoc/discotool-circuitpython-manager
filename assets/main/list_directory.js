@@ -13,6 +13,7 @@ import * as file_rename_dialog from "../sub/file_rename_dialog.js"
 const SECRETS = [
 	".env",
 	"secrets.py",
+	"settings.toml",
 ]
 const HIDE = {
 	"NOTHING": 0,
