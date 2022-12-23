@@ -28,7 +28,7 @@ First, have nodejs installed.
 
 ```sh
 git clone https://github.com/Neradoc/discotool-circuitpython-manager
-cd circuitpython-web-packager
+cd discotool-circuitpython-manager
 npm install
 ./node_modules/.bin/electron-rebuild
 npm start
