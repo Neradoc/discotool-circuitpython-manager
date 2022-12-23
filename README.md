@@ -27,7 +27,7 @@ Quick start electron
 First, have nodejs installed.
 
 ```sh
-git clone https://github.com/Neradoc/circuitpython-web-packager
+git clone https://github.com/Neradoc/discotool-circuitpython-manager
 cd circuitpython-web-packager
 npm install
 ./node_modules/.bin/electron-rebuild
