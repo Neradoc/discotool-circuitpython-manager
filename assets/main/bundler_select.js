@@ -145,6 +145,7 @@ $(document).on("click", "#bundle_deselect_all", (event) => {
 */
 
 async function fill_modules_list() {
+	// TODO: test if circup is valid
 	var keys = Object.keys(circup.all_the_modules)
 	$("#bundle_modules .loading_image").hide()
 	keys.sort()

@@ -32,6 +32,7 @@ function _icon(name) {
 }
 
 async function start_circup() {
+	// TODO: catch access errors, offline mode
 	if (circup == null) {
 		// 1 - setup the board control as selected if not already
 		// get the version data
