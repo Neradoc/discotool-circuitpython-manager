@@ -97,6 +97,10 @@ $("#web_open_panel .web_go").on("click", (e) => {
 	var target = $("#web_open_panel .web_input").val()
 	target = target.replace(/^https?:\/\//, "")
 	target = target.replace("/", "")
+	target = target.trim()
+	if(target.length == 0) {
+		return false
+	}
 	if(!target.match(/:\d+/)) {
 		target += ":80"
 	}
