@@ -141,6 +141,14 @@ async function init_page() {
 		return true
 	}
 
+	// disable fricking horrible "lineWiseCopyCut" nonsense
+	function copyNotEmpty({ state, dispatch }) {
+		if (state.selection.ranges.some(r => !r.empty)) {
+			return false
+		}
+		return true
+	}
+
 	let startState = CM.state.EditorState.create({
 		doc: "",
 		extensions: [
@@ -162,7 +170,15 @@ async function init_page() {
 				{
 					key: "Mod-4", // '
 					run: CM.commands.toggleComment,
-				}
+				},
+				{
+					key: "Mod-c",
+					run: copyNotEmpty,
+				},
+				{
+					key: "Mod-x",
+					run: copyNotEmpty,
+				},
 			]),
 			CM.python(),
 			CM.search.search({ top: true }),
