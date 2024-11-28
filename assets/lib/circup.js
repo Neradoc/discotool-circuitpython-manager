@@ -6,8 +6,11 @@ SPDX-License-Identifier: MIT
  * Implement the procedures to list, analyze and update libraries.
 */
 
-const MPY_VERSION = 5
-const MPY_HEADER = ["C".codePointAt(0), MPY_VERSION]
+const MPY_HEADERS = {
+	7: ["C".codePointAt(0), 5],
+	8: ["C".codePointAt(0), 5],
+	9: ["C".codePointAt(0), 6],
+}
 
 function semver(str) {
 	return str.split("-")[0].split(/\./).map((x) => parseInt(x))
@@ -29,9 +32,13 @@ class Circup {
 	static BAD_MPY = -1
 	BAD_MPY = Circup.BAD_MPY
 
-	constructor(library_bundle, workflow) {
+	constructor(library_bundle, workflow, cpver) {
 		this.library_bundle = library_bundle
 		this.workflow = workflow
+		this.MPY_HEADER = null
+		if(MPY_HEADERS[cpver] != undefined) {
+			this.MPY_HEADER = MPY_HEADERS[cpver]
+		}
 	}
 
 	async start() {
@@ -117,12 +124,19 @@ class Circup {
 			if(file_data.length > 0) {
 				if(file_name.endsWith(".mpy")) {
 					// bad version of mpy files
-					if(file_data[0] != MPY_HEADER[0] || file_data[1] != MPY_HEADER[1]) {
-						version = this.BAD_MPY
-						break
+					if(this.MPY_HEADER != null) {
+						if(file_data[0] != this.MPY_HEADER[0] || file_data[1] != this.MPY_HEADER[1]) {
+							version = this.BAD_MPY
+							break
+						}
 					}
-					// find version in mpy file
-					var matches = file_text.match(/(\d+\.\d+\.\d+).+?__version__/)
+					if(this.MPY_HEADER[1] < 6) {
+						// find version in mpy file with name
+						var matches = file_text.match(/(\d+\.\d+\.\d+).+?__version__/)
+					} else {
+						// find first thing that matches a version number at all
+						var matches = file_text.match(/(\d+\.\d+\.\d+)\x00/)
+					}
 					if(matches && matches.length > 1) {
 						version = matches[1]
 					}

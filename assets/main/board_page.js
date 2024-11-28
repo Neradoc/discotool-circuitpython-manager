@@ -41,6 +41,7 @@ async function start_circup() {
 			console.log("No CP version found, assume latest ?")
 			cpver = [8, 0, 0]
 		}
+		console.log("CP version found is ", cpver)
 		// 2 - setup the library bundle with the version from the board
 		// init circup with the CP version
 		if(common.is_electron) {
@@ -50,7 +51,7 @@ async function start_circup() {
 		}
 		await common.library_bundle.setup_the_modules_list()
 		// 3 - setup the circup updates manager for the actions
-		circup = new Circup(common.library_bundle, board_control)
+		circup = new Circup(common.library_bundle, board_control, cpver[0])
 		await circup.start()
 	}
 }
