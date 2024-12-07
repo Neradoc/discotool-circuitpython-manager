@@ -13,7 +13,7 @@ $bundles_config = [
 	"Neradoc/Circuitpython_Keyboard_Layouts",
 ];
 $actions = ["json", "zip"];
-$CACHEDIR = "bundle";
+$CACHEDIR = "cache";
 $USECACHE = true;
 
 $debug = false;
@@ -74,8 +74,6 @@ if($action == "json") {
 	$file_name = $zip_name;
 	$url = "${base_github}/${bundle}/releases/download/${bundle_tag}/${zip_name}";
 	$type = "application/zip";
-} else {
-	die("ERROR");
 }
 
 $cache_file = "$CACHEDIR/$file_name";
@@ -97,8 +95,8 @@ if($USECACHE) {
 		if($debug) print_r($data);
 		file_put_contents($cache_file, $data);
 		//
-		$tagfile = "${repo}-latest.json";
-		$output = json_encode({$repo => $bundle_tag});
+		$tagfile = "$CACHEDIR/${repo}-latest.json";
+		$output = json_encode([$repo => $bundle_tag]);
 		file_put_contents($tagfile, $output);
 	}
 
