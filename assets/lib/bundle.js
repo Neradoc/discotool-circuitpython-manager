@@ -11,7 +11,7 @@ const AccessMode = {
 }
 
 class LibraryBundle {
-	constructor(bundle_access=null, cpver=7) {
+	constructor(bundle_access=null, cpver=9) {
 		if(bundle_access == null) {
 			this.BUNDLE_ACCESS = AccessMode.GITHUB
 			this.BUNDLE_URL = "https://github.com/"
@@ -98,7 +98,8 @@ class LibraryBundle {
 		var repo_name = repo.split("/")[1]
 		switch(this.BUNDLE_ACCESS) {
 		case AccessMode.PROXY:
-			return `${this.BUNDLE_URL}?action=zip&user=${user}&repo=${repo_name}`
+			var proxy_url = `${this.BUNDLE_URL}?action=zip&user=${user}` + `&repo=${repo_name}&cpver=${this.cp_version_url}`
+			return proxy_url
 		case AccessMode.GITHUB:
 			var bundle_tag = await this.get_bundle_tag_github(repo)
 			var base_name = repo_name.toLowerCase().replaceAll("_","-")

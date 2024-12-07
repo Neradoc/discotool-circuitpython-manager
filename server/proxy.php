@@ -32,6 +32,10 @@ $repo = "";
 if(isset($_GET['repo'])) {
 	$repo = $_GET['repo'];
 }
+$cpver = "7";
+if(isset($_GET['cpver'])) {
+	$cpver = $_GET['cpver'];
+}
 $bundle = "$user/$repo";
 
 if(array_search($bundle, $bundles_config) === false) {
@@ -66,7 +70,7 @@ if($action == "json") {
 	$url = "${base_github}/${bundle}/releases/download/${bundle_tag}/${json_name}";
 	$type = "application/json";
 } else if($action == "zip") {
-	$zip_name = "${base_name}-7.x-mpy-${bundle_tag}.zip";
+	$zip_name = "${base_name}-${cpver}-mpy-${bundle_tag}.zip";
 	$file_name = $zip_name;
 	$url = "${base_github}/${bundle}/releases/download/${bundle_tag}/${zip_name}";
 	$type = "application/zip";
