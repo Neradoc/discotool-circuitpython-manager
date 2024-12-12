@@ -36,6 +36,7 @@ class WebWorkflow extends WorkflowWithCredentials {
 		this.drive_name = null
 		this.username = WORKFLOW_USERNAME
 		this.password = WORKFLOW_PASSWORD
+		this.api_version = 4
 	}
 	async start(url_passed=null) {
 		// TODO: setup the actual URL for the workflow OUTSIDE
@@ -69,6 +70,22 @@ class WebWorkflow extends WorkflowWithCredentials {
 			this.version_info = await response.json()
 			if( "UID" in this.version_info ) {
 				this.version_info.serial_num = this.version_info["UID"]
+			}
+			if( "web_api_version" in this.version_info ) {
+				this.api_version = this.version_info["web_api_version"]
+				console.log(`API version: ${this.api_version}`)
+			}
+			// get disk info if available
+			var response = await fetch(
+				new URL("/cp/diskinfo.json", this.workflow_url_base),
+			)
+			if(await response.ok) {
+				const diskinfo = await response.json()
+				if(this.api_version < 3) {
+					this.version_info.diskinfo = diskinfo
+				} else {
+					this.version_info.diskinfo = diskinfo[0]
+				}
 			}
 		} catch(e) {
 			console.log("Device inaccessible")
@@ -129,7 +146,12 @@ class WebWorkflow extends WorkflowWithCredentials {
 		)
 		try {
 			var data = await response.json()
-			var file_list = data.map((d) => new WebWorkflowFile(d))
+			if(this.api_version > 3 && "files" in data ) {
+				var files = data["files"]
+				var file_list = files.map((d) => new WebWorkflowFile(d))
+			} else {
+				var file_list = data.map((d) => new WebWorkflowFile(d))
+			}
 			return new WebResponse(response, file_list)
 		} catch {
 			return new WebResponse(response, [], false)
