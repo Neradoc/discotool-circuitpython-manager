@@ -182,6 +182,8 @@ async function init_page() {
 			var the_data = serial_content.text().slice(0, -left_count)
 			left_count = 0
 			set_the_serial_content(the_data)
+		} else if (e.data.match(/\x1b\[.?K/) || e.data.match(/\x1b\[.?G/)) {
+			// \x1b[2K\x1b[0G
 		} else {
 			var the_data = (serial_content.text() + e.data.escapeHTML())
 			set_the_serial_content(the_data)
