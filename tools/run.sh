@@ -22,23 +22,23 @@ fi
 if [[ "$1" == "SCROUBOULIFLIPELCHABIDOU" ]]
 then
 
-npm i -D electron
-npm i -D electron-rebuild
-./node_modules/.bin/electron-rebuild
-npm i drivelist
-./node_modules/.bin/electron-rebuild
-npm i fs-extra
-./node_modules/.bin/electron-rebuild
-npm i multicast-dns
-./node_modules/.bin/electron-rebuild
-npm i node-powershell
-./node_modules/.bin/electron-rebuild
-npm i path
-./node_modules/.bin/electron-rebuild
+	npm i -D electron
+	npm i -D electron-rebuild
+	./node_modules/.bin/electron-rebuild
+	npm i drivelist
+	./node_modules/.bin/electron-rebuild
+	npm i fs-extra
+	./node_modules/.bin/electron-rebuild
+	npm i multicast-dns
+	./node_modules/.bin/electron-rebuild
+	npm i node-powershell
+	./node_modules/.bin/electron-rebuild
+	npm i path
+	./node_modules/.bin/electron-rebuild
 
-npm install --save-dev @electron-forge/cli
-npx electron-forge import
+	npm install --save-dev @electron-forge/cli
+	npx electron-forge import
 
-npm run make
+	npm run make
 
 fi
