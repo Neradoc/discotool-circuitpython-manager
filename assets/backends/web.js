@@ -93,7 +93,7 @@ class WebWorkflow extends WorkflowWithCredentials {
 		}
 		return this.version_info
 	}
-	async is_editable() {
+	async is_editable_old() {
 		try {
 			const status = await fetch(this.api_url("/"),
 				{
@@ -106,6 +106,32 @@ class WebWorkflow extends WorkflowWithCredentials {
 				.toLowerCase()
 				.includes("delete")
 			return editable
+		} catch(e) {
+			console.log("Device inaccessible")
+			return false
+		}
+	}
+	async is_editable() {
+		if(this.api_version <= 3) {
+			return this.is_editable_old()
+		}
+		try {
+			var heads = this.headers({"Accept": "application/json"})
+			var url = this.api_url("/")
+			// console.log("URL", url)
+			var response = await fetch(
+				url,
+				{
+					headers: heads,
+					credentials: "include",
+				}
+			)
+			var data = await response.json()
+			if("writable" in data) {
+				return data["writable"]
+			} else {
+				return false
+			}
 		} catch(e) {
 			console.log("Device inaccessible")
 			return false
