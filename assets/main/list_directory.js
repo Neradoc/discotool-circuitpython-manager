@@ -447,7 +447,7 @@ async function delete_a_file(e) {
 		if (response.ok) {
 			refresh_list()
 		} else {
-			const message = `Deleting ${fn.pathname.substr(3)} failed`
+			const message = `Deleting ${path} failed`
 			const status = await response.status
 			const error = await response.statusText
 			switch(status) {
