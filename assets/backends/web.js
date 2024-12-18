@@ -9,9 +9,9 @@ import * as tools from "../lib/tools.js"
 import * as mdns from "../lib/mdns.js"
 
 class WebResponse extends WorkflowResponse {
-	constructor(response, content, ok=null) {
+	constructor(response, content, ok=null, properties=null) {
 		if(ok===null) ok = response.ok
-		super(ok, content, response.status, response.statusText)
+		super(ok, content, response.status, response.statusText, properties)
 	}
 }
 
@@ -172,13 +172,15 @@ class WebWorkflow extends WorkflowWithCredentials {
 		)
 		try {
 			var data = await response.json()
+			var properties = {}
 			if(this.api_version > 3 && "files" in data ) {
 				var files = data["files"]
 				var file_list = files.map((d) => new WebWorkflowFile(d))
+				properties = data
 			} else {
 				var file_list = data.map((d) => new WebWorkflowFile(d))
 			}
-			return new WebResponse(response, file_list)
+			return new WebResponse(response, file_list, null, properties)
 		} catch {
 			return new WebResponse(response, [], false)
 		}
