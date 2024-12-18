@@ -247,12 +247,20 @@ tr.odd { background: var(--color-pair1); }
 #file_list td .view { display: none; }
 #file_list td .pencil { display: none; }
 #file_list td:hover .pencil { display: inline; }
+
+/* 
 .board_locked #file_list td:hover .view { display: inline; }
 .board_locked #file_list td .pencil { display: none; }
-
 .board_locked #file_list .icon_locked { display: inline; }
 .board_locked #file_list td .delete { display: none; }
 .board_locked #file_list td .rename { display: none; }
+ */
+
+#file_list.dir_locked td:hover .view { display: inline; }
+#file_list.dir_locked td .pencil { display: none; }
+#file_list.dir_locked .icon_locked { display: inline; }
+#file_list.dir_locked td .delete { display: none; }
+#file_list.dir_locked td .rename { display: none; }
 
 #file_list .triangle {
 	cursor: pointer;

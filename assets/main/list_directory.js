@@ -89,6 +89,14 @@ async function insert_files_list(current_list_path, list_depth="") {
 	var new_children = []
 	var template = $('#file_list_template')
 
+	if("writable" in response.properties) {
+		if(! response.properties["writable"]) {
+			$("#file_list").addClass("dir_locked")
+		}
+	} else if($("body").hasClass("board_locked")) {
+		$("#file_list").addClass("dir_locked")
+	}
+
 	var link = $("#file_list .go_back_up")
 	if (current_list_path != "/") {
 		if(list_depth == "") {
