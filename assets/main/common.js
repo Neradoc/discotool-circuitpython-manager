@@ -12,6 +12,7 @@ export const DEFAULT_SYSTEM_FILES = [
 	".fseventsd",
 	".metadata_never_index",
 	".Trashes",
+	".Trash-1000",
 	".TemporaryItems",
 	"System Volume Information",
 ]
