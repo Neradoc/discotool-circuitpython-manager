@@ -41,7 +41,7 @@ async function start_circup() {
 			console.log("No CP version found, assume latest ?")
 			cpver = [8, 0, 0]
 		}
-		console.log("CP version found is ", cpver)
+		console.log("Using CP version:", cpver)
 		// 2 - setup the library bundle with the version from the board
 		// init circup with the CP version
 		if(common.is_electron) {
