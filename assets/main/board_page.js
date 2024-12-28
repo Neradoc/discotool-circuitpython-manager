@@ -41,7 +41,7 @@ async function start_circup() {
 			console.log("No CP version found, assume latest ?")
 			cpver = [8, 0, 0]
 		}
-		console.log("CP version found is ", cpver)
+		console.log("Using CP version:", cpver)
 		// 2 - setup the library bundle with the version from the board
 		// init circup with the CP version
 		if(common.is_electron) {
@@ -472,6 +472,7 @@ async function init_page() {
 	board_control = common.board_control
 	await board_control.start()
 	window.board_url = await board_control.get_board_url()
+	$("title").html(`${window.board_url}`)
 	var vinfo = await board_control.device_info()
 	var workflow_type = board_control.type
 	is_editable = await board_control.is_editable()

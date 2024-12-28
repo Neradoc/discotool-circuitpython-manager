@@ -4,11 +4,16 @@ SPDX-License-Identifier: MIT
 */
 
 class WorkflowResponse {
-	constructor(ok, content, status=200, statusText="OK") {
+	constructor(ok, content, status=200, statusText="OK", properties=null) {
 		this.ok = ok
 		this.status = status
 		this.statusText = statusText
 		this.content = content
+		if(properties) {
+			this.properties = properties
+		} else {
+			this.properties = {}
+		}
 		// have text and json ?
 		// rename json to array/dict ?
 	}
