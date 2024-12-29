@@ -12,6 +12,7 @@ const MPY_HEADERS = {
 	9: ["C".codePointAt(0), 6],
 }
 
+// Fuctions for getting and comparing version numbers in semver format (more or less).
 function semver(str) {
 	return str.split("-")[0].split(/\./).map((x) => parseInt(x))
 }
@@ -45,6 +46,9 @@ class Circup {
 		//  console.log(this.library_bundle)
 	}
 
+	
+	// Install the list of modules given, from the bundle(s).
+	// Copies the matching files from the bundle into the lib directory.
 	async install_modules(dependencies) {
 		for(var module_name of dependencies) {
 			console.log("Installing", module_name)
@@ -71,6 +75,8 @@ class Circup {
 		}
 	}
 
+	// List all module files (py or mpy) from this directory and its sub directories.
+	// Used to get the list of all files in a package module.
 	async sublist(cur_dir, module_files) {
 		const response = await this.workflow.list_dir(cur_dir + "/")
 		const these_files = response.content
@@ -87,6 +93,8 @@ class Circup {
 		module_files = module_files.map((item) => cur_dir + "/" + item.name)
 	}
 
+	// Get the module's version from python or MPY file.
+	// Depends on the MPY format and adafruit bundle conventions.
 	async get_module_version(module_name, board_libs=null) {
 		if(board_libs === null) {
 			board_libs = await this.library_bundle.get_lib_directory()
@@ -108,6 +116,9 @@ class Circup {
 			return null
 		}
 
+		// sort alphabetically, so that __init__ is normally first
+		module_files.sort()
+
 		var version = false
 		for(var file_name of module_files) {
 			if(ignore_file(file_name)) { continue }
@@ -123,6 +134,8 @@ class Circup {
 			}
 			if(file_data.length > 0) {
 				if(file_name.endsWith(".mpy")) {
+					var matches = null
+
 					// bad version of mpy files
 					if(this.MPY_HEADER != null) {
 						if(file_data[0] != this.MPY_HEADER[0] || file_data[1] != this.MPY_HEADER[1]) {
@@ -132,13 +145,16 @@ class Circup {
 					}
 					if(this.MPY_HEADER[1] < 6) {
 						// find version in mpy file with name
-						var matches = file_text.match(/(\d+\.\d+\.\d+).+?__version__/)
+						matches = file_text.match(/(\d+\.\d+\.\d+).+?__version__/)
 					} else {
 						// find first thing that matches a version number at all
-						var matches = file_text.match(/(\d+\.\d+\.\d+)\x00/)
+						matches = file_text.match(/(\d+\.\d+\.\d+)\x00/)
 					}
 					if(matches && matches.length > 1) {
-						version = matches[1]
+						// if version number already found, keep it
+						if(version === false) {
+							version = matches[1]
+						}
 					}
 				}
 				// find version in py file
