@@ -69,7 +69,7 @@ class Circup {
 					await this.workflow.create_dir(dir_path)
 				}
 				// var upload_path = file.name.replace(/^.+?\/lib\//, "/lib/")
-				const file_content = await file.async("blob")
+				const file_content = await file.async("uint8array")
 				await this.workflow.upload_file(upload_path, file_content)
 			}
 		}

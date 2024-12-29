@@ -57,29 +57,36 @@ class Workflow {
 			"version": null
 		}
 	}
+	// overall write status of the main drive of the device
 	async is_editable() {
 		return false
 	}
+	// get the content of a file as a WorkflowResponse
+	// the content property of the response is a Buffer
 	async get_file_content(filepath, range=null) {
-		// return `print("Hello world")`
 		return new WorkflowResponse(false, null)
 	}
+	// returns a WorkflowResponse with the list of directories in content
+	// additional properties can be in properties
 	async list_dir(dirpath) {
-		// return ["/code.py", "/boot_out.txt", "/lib/"]
 		return new WorkflowResponse(false, [])
 	}
-	async upload_file(upload_path, file) {
+	// creates a file at the path with the data (as Buffer or array of bytes)
+	async upload_file(upload_path, file_data) {
 		console.log("Error: Cannot write to the drive")
 		return new WorkflowResponse(false, null, 409, "ERROR")
 	}
+	// creates a directory at the target path
 	async create_dir(dir_path) {
 		console.log("Error: Cannot write to the drive")
 		return new WorkflowResponse(false, null, 409, "ERROR")
 	}
+	// delete the file at the target path
 	async delete_file(file_path) {
 		console.log("Error: Cannot write to the drive")
 		return new WorkflowResponse(false, null, 409, "ERROR")
 	}
+	// rename or move a file from path to path
 	async rename_file(from_path, to_path) {
 		console.log("Error: Cannot write to the drive")
 		return new WorkflowResponse(false, null, 409, "ERROR")

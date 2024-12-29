@@ -216,9 +216,9 @@ async function init_page() {
 		try {
 			// var new_content = text_block.val()
 			var new_content = await view.state.doc.toString()
-			var new_content_blob = new Blob([new_content], { type: 'text/plain' })
+			var new_content_buffer = Buffer.from(new_content, "utf8")
 			var save_path = target_file
-			var res = await board_control.upload_file(save_path, new_content_blob)
+			var res = await board_control.upload_file(save_path, new_content_buffer)
 			if(res.ok) {
 				last_saved = new Date()
 				update_saved()
