@@ -134,8 +134,12 @@ class USBWorkflow extends Workflow {
 	async upload_file(upload_path, file_content) {
 		var full_path = path.join(this.root, upload_path)
 		try {
-			var data_buffer = await file_content.arrayBuffer()
-			await fs.writeFile(full_path, Buffer.from(data_buffer))
+			if(file_content instanceof Buffer) {
+				await fs.writeFile(full_path, file_content)
+			} else {
+				var data_buffer = await file_content.arrayBuffer()
+				await fs.writeFile(full_path, Buffer.from(data_buffer))
+			}
 			// file.lastModified ?
 			return new WorkflowResponse(true, null)
 		} catch(e) {
