@@ -113,6 +113,8 @@ class LibraryBundle {
 		return null
 	}
 
+	// Fetch the zip file for a bundle based on a module.
+	// Each zip file is only fetched once, cached in the bundle_zips instance.
 	async get_bundle_module_contents(module) {
 		var zip_url = await this.get_bundle_zip_url(module.bundle)
 
@@ -127,6 +129,7 @@ class LibraryBundle {
 		return zip_contents
 	}
 
+	// List all the files in a module from a bundle.
 	async list_module_files(module) {
 		var files_list = []
 		var zip_contents = await this.get_bundle_module_contents(module)
@@ -158,7 +161,6 @@ class LibraryBundle {
 				console.log("NULL ???", in_file_name)
 			}
 		}
-		// console.log(files_list)
 		return files_list
 	}
 
@@ -166,6 +168,7 @@ class LibraryBundle {
 	*** NOTE Manage dependencies
 	*/
 
+	// Find a module in the modules list from its name or pypi name.
 	get_module(module_name) {
 		if(this.all_the_modules[module_name] != undefined) {
 			return this.all_the_modules[module_name]
@@ -179,10 +182,12 @@ class LibraryBundle {
 		return false
 	}
 
-	// gets the dependencies of modules, adds them to dependencies
+	// Gets the dependencies of modules, adds them to dependencies.
 	get_dependencies(modules, dependencies) {
 		for(var module of modules) {
-			if(this.get_module(module) !== false) {
+			// remove dots if fed composite paths with submodules
+			module = module.replace(/\.\S*$/, "")
+			if(module && this.get_module(module) !== false) {
 				if(!dependencies.includes(module)) {
 					dependencies.push(module)
 				}
@@ -202,8 +207,10 @@ class LibraryBundle {
 		}
 	}
 
-	// from a python file's full text, get the list of modules imported
-	// Does not know anything about multiline strings
+	// From a python file's full text, get the list of modules imported.
+	// Does not know anything about multiline strings.
+	// This only gets the basic root modules, no submodules or relative.
+	// Use to find library bundle imports.
 	get_imports_from_python(full_content) {
 		var modules_list = []
 		const pattern = /^\s*(import|from)\s+([^.\s]+).*/
@@ -226,6 +233,49 @@ class LibraryBundle {
 		return modules_list
 	}
 
+	// From a python file's full text, get the list of modules imported.
+	// Does not know anything about multiline strings.
+	// Tries to include everything with dots and stuff.
+	get_imports_from_python_all(full_content) {
+		var modules_list = []
+		const patternall0 = /^\s*(import|from)\s+([^#\s]+).*/
+		const patternall1 = /^\s*(import|from)\s+([^#\s]+).*/
+		const patternall2 = /^\s*from\s+(\.+)\s+import([^#\s]+).*/
+		const patterns = [patternall0, patternall1, patternall2]
+		full_content.split(/\n|\r/).forEach((line) => {
+			/*
+			import module
+			import module as ...
+			import module.sub ...
+			from module import ...
+			from module.sub import ... as ...
+			*/
+			/*
+			import .module
+			import ..module
+			from .module import ...
+			from ..module import ...
+			from . import module
+			from .. import module
+			*/
+			for(var patt of patterns) {
+				var m = line.match(patt)
+				if(m) {
+					var module = m[2]
+					var from = m[1]
+					if(from.includes(".")) {
+						module = from + module
+					}
+					if( !modules_list.includes(module)) {
+						modules_list.push(module)
+					}
+				}
+			}
+		})
+		return modules_list
+	}
+
+	// Setup the list of modules from each bundle.
 	async setup_the_modules_list() {
 		if(this.all_the_modules !== null) {
 			return

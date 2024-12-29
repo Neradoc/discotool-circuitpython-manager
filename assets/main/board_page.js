@@ -300,6 +300,10 @@ async function run_update_process(imports) {
 }
 
 async function auto_install(file_name) {
+	return await auto_install_all(file_name)
+}
+
+async function auto_install_one(file_name) {
 	// TODO: wait until the bundle and board are inited
 	await pre_update_process()
 	$("#circup_page .loading").append(`<br/>Loading <b>${file_name}</b>...`)
@@ -316,8 +320,101 @@ async function auto_install(file_name) {
 	$("#circup_page .loading").append(`<br/>Loading modules from <b>${file_name}</b>...`)
 	const imports = common.library_bundle.get_imports_from_python(code_content)
 	// do the thing
-	redo_install_button_callback = () => { auto_install(file_name) }
+	redo_install_button_callback = () => { auto_install_one(file_name) }
 	await run_update_process(imports)
+	return true
+}
+
+async function auto_install_all(file_name) {
+	await pre_update_process()
+	// pretend to be loading unless told otherwise
+	$("#circup_page .loading").append(`<br/>Loading modules from <b>${file_name}</b>...`)
+	$("#circup_page .title .filename").html(`${file_name}`)
+	// get the things
+	var dependencies = []
+	var imports = []
+	const file_path = file_name
+	const response = await get_imports_all(file_path, dependencies, imports)
+	// bail out if root file not found
+	if(!response) {
+		$("#circup_page .loading").html(`No such file: <b>${file_name}</b>`)
+		return false
+	}
+	$(".tab_link_circup").click()
+	// do the thing
+	redo_install_button_callback = () => { auto_install_all(file_name) }
+	await run_update_process(dependencies)
+	return true
+}
+
+// Get imports recursively, from file name.
+async function get_imports_all(file_path, dependencies, imports) {
+	// find the file on the board
+	var code_response = await board_control.get_file_content(file_path)
+	if(!code_response.ok) {
+		return false
+	}
+	// add it to the imports
+	imports.push(file_path)
+	// get the list of imported modules from the content
+	const code_content = code_response.textContent()
+	const depmodules = common.library_bundle.get_imports_from_python_all(code_content)
+	// add the bundle ones to the dependencies
+	common.library_bundle.get_dependencies(depmodules, dependencies)
+	// loop over the other ones not in imports recursively
+	for(var depmodule of depmodules) {
+		var test_module = depmodule.replace(/\.\S*$/, "")
+		if(test_module) {
+			const dep_info = common.library_bundle.get_module(test_module)
+			if(dep_info !== false) { continue; }
+		}
+		if(dependencies.includes(depmodule)) {
+			continue
+		}
+		// find the file matching the module
+		var dep_path = depmodule
+		// if it's a relative path, check for that too
+		if(depmodule.startsWith("..")) {
+			var dir_path = file_path.replace(/\/[^\/]+\/[^\/]+$/, "")
+			dep_path = dir_path + "/" + dep_path.substr(2).replace(/\./, "/")
+		} else if(depmodule.startsWith(".")) {
+			var dir_path = file_path.replace(/\/[^\/]+$/, "")
+			dep_path = dir_path + "/" + dep_path.substr(1).replace(/\./, "/")
+		} else {
+			dep_path = "/" + dep_path.replace(/\./, "/")
+		}
+		// try if it's a directory
+		var dir_response = null
+		try {
+			dir_response = await board_control.list_dir(dep_path)
+		} catch(e) {
+		}
+		if(dir_response == null || !dir_response.ok) {
+			// if it's a .py file, use that
+			dep_path = dep_path + ".py"
+		} else {
+			// if it's a directory, look for __init__.py
+			var found = false
+			for(var file of dir_response.content) {
+				if(file.name == "__init__.py") {
+					dep_path = dep_path + "/__init__.py"
+					found = true
+					break
+				}
+			}
+			if(!found) {
+				// no init, skip
+				continue
+			}
+		}
+		// check that it's not in imports
+		if(imports.includes(dep_path)) {
+			continue;
+		}
+		// pass the file into the loop
+		await get_imports_all(dep_path, dependencies, imports)
+	}
+	// return a full list of dependencies
 	return true
 }
 
