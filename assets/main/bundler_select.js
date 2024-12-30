@@ -78,12 +78,13 @@ function filter_the_modules() {
 		return
 	}
 	$("#bundle_clear_search").addClass("enabled")
-	var list_search = search_string.split(" ").filter(i => i)
+	// search all space separated terms, using case insensitive
+	var list_search = search_string.split(" ").filter(i => i).map(i => new RegExp(i, 'i'))
 	$("#bundle_modules p").each((i,item) => {
 		var module_name = $(item).children(".module").html()
 		var matches = false
 		list_search.forEach((sstring) => {
-			if(module_name.match(sstring)) {
+			if(sstring.test(module_name)) {
 				matches = true
 			}
 		})
