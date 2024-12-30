@@ -89,6 +89,17 @@ async function insert_files_list(current_list_path, list_depth="") {
 	var new_children = []
 	var template = $('#file_list_template')
 
+	try {
+		const prop = response.properties
+		const total = prop.block_size * prop.total
+		const free = prop.block_size * prop.free
+		$("#current_drive_info .free").html(Math.floor(free/1000))
+		$("#current_drive_info .total").html(Math.floor(total/1000))
+		$("#current_drive_info .size").show()
+	} catch(e) {
+		console.log(e)
+	}
+
 	if("writable" in response.properties) {
 		if(! response.properties["writable"]) {
 			$("#file_list").addClass("dir_locked")

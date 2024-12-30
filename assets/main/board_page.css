@@ -111,17 +111,20 @@ content > div.hide { display: none; }
 	padding: 8px 22px;
 	margin: 4px;
 }
-#welcome_page > div:nth-child(even) {
-	background: var(--color-pair0);
-}
-#welcome_page > div:nth-child(odd) {
-	background: var(--color-pair1);
-}
+#welcome_page > div:nth-child(even) { background: var(--color-pair0); }
+#welcome_page > div:nth-child(odd) { background: var(--color-pair1); }
 #welcome_page .loading_image {
 	text-align: center;
 }
 body.loaded #welcome_page .loading_image {
 	display: none;
+}
+#welcome_page .circuitpy_drive_info {
+	display: none;
+}
+#welcome_page .circuitpy_drive_info .free,
+#welcome_page .circuitpy_drive_info .total {
+	font-weight: bold;
 }
 
 #password {
@@ -388,6 +391,14 @@ commands group.unrolled .icon-right {
 	vertical-align: bottom;
 	display: none;
 }
+#file_list #current_drive_info {
+	font-weight: normal;
+	font-size: 75%;
+	padding: 0px;
+}
+#file_list #current_drive_info .size {
+	display: none;
+}
 
 #dependencies table thead { display: none; }
 #circup_page .line {
@@ -542,4 +553,4 @@ commands group.unrolled .icon-right {
 
 .template { display: none; }
 
-
+.visible { display: block !important; }

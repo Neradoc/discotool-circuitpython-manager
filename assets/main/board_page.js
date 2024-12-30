@@ -615,6 +615,7 @@ async function init_page() {
 		if(workflow_type == "usb") {
 			$("a.board_drive").prop("href", board_control.root)
 			$("a.board_drive").html(board_control.root)
+			$("div.usb_workflow").addClass("visible")
 		}
 		if(workflow_type == "web") {
 			$("a.board_link").prop("href", board_control.workflow_url_base)
@@ -624,11 +625,29 @@ async function init_page() {
 			$("a.board_repl").html(repl_url.href)
 			$("a.board_ip").prop("href", `http://${vinfo.ip}`)
 			$("a.board_ip").html(vinfo.ip)
+			$("div.web_workflow").addClass("visible")
 		}
+		// *** load drive info
+		var response = await common.board_control.list_dir("/")
+		if (response.ok) {
+			try {
+				const prop = response.properties
+				const total = prop.block_size * prop.total
+				const free = prop.block_size * prop.free
+				$(".circuitpy_drive_info .free").html(Math.floor(free/1000))
+				$(".circuitpy_drive_info .total").html(Math.floor(total/1000))
+				$(".circuitpy_drive_info").addClass("visible")
+			} catch(e) {
+				console.log(e)
+			}
+		}
+		// *** clean unused
+		$("#welcome_page > div").not(".visible").remove()
 	})()
 	//
 	await prom1
 	await prom2
+	// we're good, trigger the finished event
 	window.dispatchEvent(new Event('finished-starting'))
 }
 
@@ -685,7 +704,7 @@ function setup_events() {
 	})
 
 	$(".tab_link").on("click", (e) => {
-		var target = e.currentTarget.value
+		const target = e.currentTarget.value
 		$(".tab_page").hide()
 		$(".tab_link").removeClass("active")
 		window.location.hash = `#${target}`
