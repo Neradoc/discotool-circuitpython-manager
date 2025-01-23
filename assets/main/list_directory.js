@@ -10,6 +10,9 @@ import * as password_dialog from "../sub/password_dialog.js"
 import * as files_progress_dialog from "../sub/files_progress_dialog.js"
 import * as file_rename_dialog from "../sub/file_rename_dialog.js"
 
+const fs = window.moduleFs // async
+const fss = window.moduleFss // sync
+
 const SECRETS = [
 	".env",
 	"secrets.py",
@@ -385,11 +388,10 @@ async function upload_files_action(e) {
 }
 
 async function upload_files_to(source_files, target_path) {
-	const fs = window.moduleFss
 	const path = window.modulePath
 
 	for(var file_path of source_files) {
-		var stat = fs.statSync(file_path)
+		var stat = fss.statSync(file_path)
 		var file_size = stat.size
 		if(file_size < 1000) {
 			file_size = `${file_size} B`
@@ -413,14 +415,14 @@ async function upload_files_to(source_files, target_path) {
 		if(stat.isDirectory()) {
 			await files_progress_dialog.log(`<c class="right">Creating:</c><c> ${sub_target}/</c>`)
 			var response = await common.board_control.create_dir(sub_target)
-			var subdir = fs.opendirSync(file_path)
+			var subdir = fss.opendirSync(file_path)
 			for await (const dirent of subdir) {
 				var sub_file = path.join(file_path, dirent.name)
 				await upload_files_to([sub_file], sub_target)
 			}
 		} else {
 			await files_progress_dialog.log(`<c class="right">Uploading:</c><c> ${sub_target} (${file_size})</c>`)
-			var file_data = fs.readFileSync(file_path)
+			var file_data = fss.readFileSync(file_path)
 			var response = await common.board_control.upload_file(sub_target, file_data)
 		}
 	}
@@ -428,7 +430,6 @@ async function upload_files_to(source_files, target_path) {
 
 async function upload_files_from_dialog(event) {
 	if(event?.detail?.sender != window.location.toString()) return
-	const fs = window.moduleFss
 	const path = window.modulePath
 
 	files_progress_dialog.open({}, {
@@ -442,11 +443,109 @@ async function upload_files_from_dialog(event) {
 	} catch(e) {
 		console.log(e)
 	}
-	await files_progress_dialog.log("Upload finished.")
+	await files_progress_dialog.postscript("Upload finished.")
 	await files_progress_dialog.enable_buttons()
 	refresh_list()
 }
 
+/*****************************************************************
+* Drag and drop files
+*/
+
+var hoverer = null
+
+function start_hover() {
+	$("#file_list").addClass("being_hovered")
+
+	const liste = $("#file_list_list")
+	$("#file_list #blanket").css({
+		"top":liste.offset().top,
+		"left":liste.offset().left,
+		"width":liste.width,
+		"height":liste.height,
+	})
+}
+
+function update_hovered() {
+	if(hoverer !== null) {
+		clearTimeout(hoverer)
+		hoverer = null
+	}
+	hoverer = setTimeout(() => {
+		$("#file_list").removeClass("being_hovered")
+	}, 1000)
+}
+
+async function look_at_files(files_dropped) {
+	var source_files = []
+	for(const file of files_dropped) {
+		if(fss.existsSync(file.path)) {
+			var link = `file://${file.path}`
+			source_files.push(file.path)
+		}
+	}
+	if(source_files.length > 0) {
+		files_progress_dialog.open({}, {
+			title: "Uploading Files",
+			description: `Files uploaded to the board.`,
+			has_cancel: false,
+		})
+		try {
+			await upload_files_to(source_files, current_path)
+		} catch(e) {
+			console.log(e)
+		}
+		await files_progress_dialog.postscript("Upload finished.")
+		await files_progress_dialog.enable_buttons()
+		refresh_list()
+	}
+}
+
+const drag_target = $("#file_list") // $(window)
+drag_target.on("drop", (event) => {
+	event.stopPropagation()
+	event.preventDefault()
+	var dropped_files_list = []
+
+	$("#file_list").removeClass("being_hovered")
+
+	var data_transfer = event.originalEvent.dataTransfer
+	if (data_transfer.items) {
+		// Use DataTransferItemList interface to access the file(s)
+		for (var i = 0; i < data_transfer.items.length; i++) {
+			// If dropped items aren't files, reject them
+			if (data_transfer.items[i].kind === 'file') {
+				var file = data_transfer.items[i].getAsFile()
+				dropped_files_list.push(file)
+			}
+		}
+	} else {
+		// Use DataTransfer interface to access the file(s)
+		for (var i = 0; i < data_transfer.files.length; i++) {
+			var file = data_transfer.files[i]
+			dropped_files_list.push(file)
+		}
+	}
+	look_at_files(dropped_files_list)
+	return false
+})
+
+drag_target.on("dragenter", (event) => {
+	start_hover()
+	update_hovered()
+	event.stopPropagation()
+	event.preventDefault()
+})
+drag_target.on("dragexit", (event) => {
+	$(".drop_zone").removeClass("being_hovered")
+	event.stopPropagation()
+	event.preventDefault()
+})
+drag_target.on("dragover", (event) => {
+	update_hovered()
+	event.stopPropagation()
+	event.preventDefault()
+})
 
 /*****************************************************************
 * Delete file

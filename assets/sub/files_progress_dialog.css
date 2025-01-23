@@ -42,6 +42,10 @@ SPDX-License-Identifier: MIT
 	flex-grow: 1;
 	overflow-y: auto;
 }
+#files_progress_dialog .postscript {
+	flex-grow: 0;
+	margin: 8px 0px;
+}
 #files_progress_dialog .buttons {
 	flex-grow: 0;
 	text-align: center;

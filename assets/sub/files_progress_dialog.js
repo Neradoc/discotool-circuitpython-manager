@@ -62,6 +62,12 @@ async function log(text) {
 	$("#files_progress_dialog .list").append(line)
 	$("#files_progress_dialog .list div:last")[0].scrollIntoView()
 }
+async function postscript(text) {
+	if(text != undefined) {
+		$("#files_progress_dialog .postscript").html(text)
+		$("#files_progress_dialog .postscript")[0].scrollIntoView()
+	}
+}
 async function title(text) {
 	if(text != undefined) {
 		$("#files_progress_dialog .title").html(text)
@@ -96,4 +102,4 @@ async function setup(board_ctrl, callback_list) {
 	$(document).on("keydown", press_escape)
 }
 
-export { setup, open, close, ok, cancel, enable_buttons, log, title, description }
+export { setup, open, close, ok, cancel, enable_buttons, log, postscript, title, description }
