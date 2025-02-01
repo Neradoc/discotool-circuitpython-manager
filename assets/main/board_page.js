@@ -303,29 +303,8 @@ async function auto_install(file_name) {
 	return await auto_install_all(file_name)
 }
 
-async function auto_install_one(file_name) {
-	// TODO: wait until the bundle and board are inited
-	await pre_update_process()
-	$("#circup_page .loading").append(`<br/>Loading <b>${file_name}</b>...`)
-	$("#circup_page .title .filename").html(`${file_name}`)
-	// get the file
-	var code_response = await board_control.get_file_content("/" + file_name)
-	if(!code_response.ok) {
-		$("#circup_page .loading").html(`No such file: <b>${file_name}</b>`)
-		return false
-	}
-	$(".tab_link_circup").click()
-	// get the list
-	const code_content = code_response.textContent()
-	$("#circup_page .loading").append(`<br/>Loading modules from <b>${file_name}</b>...`)
-	const imports = common.library_bundle.get_imports_from_python(code_content)
-	// do the thing
-	redo_install_button_callback = () => { auto_install_one(file_name) }
-	await run_update_process(imports)
-	return true
-}
-
 async function auto_install_all(file_name) {
+	// TODO: wait until the bundle and board are inited
 	await pre_update_process()
 	// pretend to be loading unless told otherwise
 	$("#circup_page .loading").append(`<br/>Loading modules from <b>${file_name}</b>...`)
@@ -363,11 +342,13 @@ async function get_imports_all(file_path, dependencies, imports) {
 	common.library_bundle.get_dependencies(depmodules, dependencies)
 	// loop over the other ones not in imports recursively
 	for(var depmodule of depmodules) {
+		// skip library modules (they are aleady taken)
 		var test_module = depmodule.replace(/\.\S*$/, "")
 		if(test_module) {
 			const dep_info = common.library_bundle.get_module(test_module)
 			if(dep_info !== false) { continue; }
 		}
+		// skip known modules
 		if(dependencies.includes(depmodule)) {
 			continue
 		}

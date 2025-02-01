@@ -238,36 +238,47 @@ class LibraryBundle {
 	// Tries to include everything with dots and stuff.
 	get_imports_from_python_all(full_content) {
 		var modules_list = []
-		const patternall0 = /^\s*(import|from)\s+([^#\s]+).*/
-		const patternall1 = /^\s*(import|from)\s+([^#\s]+).*/
-		const patternall2 = /^\s*from\s+(\.+)\s+import([^#\s]+).*/
-		const patterns = [patternall0, patternall1, patternall2]
+		const patterns = [
+			// import module, module as name, module
+			/^\s*(import)\s+([^#]+).*/,
+			/^\s*from\s+(\S+)\s+import\s+([^#]+).*/,
+		]
 		full_content.split(/\n|\r/).forEach((line) => {
 			/*
-			import module
-			import module as ...
-			import module.sub ...
-			from module import ...
-			from module.sub import ... as ...
-			*/
-			/*
-			import .module
-			import ..module
-			from .module import ...
-			from ..module import ...
-			from . import module
-			from .. import module
+			import module0, module1
+			import module2 as thing2
+			import module3.sub3
+			from module4 import thing4
+			from module5.sub2 import thing5 as thing6
+			from .module6 import thing7
+			from ..module7 import thing8
+			from . import module8, module9
+			from .. import module10
 			*/
 			for(var patt of patterns) {
 				var m = line.match(patt)
 				if(m) {
-					var module = m[2]
 					var from = m[1]
-					if(from.includes(".")) {
-						module = from + module
-					}
-					if( !modules_list.includes(module)) {
-						modules_list.push(module)
+					const modules = m[2].split(",")
+					for(var module of modules) {
+						// remove everything after the space ("as ...")
+						var module = module.replace(/^([^\s]+)\s+.*/, "$1").trim()
+						// reltive imports use from (simply append "." or "..")
+						if(from == "." || from == "..") {
+							module = from + module
+						} else if(from != "import") {
+							module = from + "." + module
+						}
+						const subs = module.split(".")
+						for(var sub=1; sub<=subs.length; ++sub) {
+							const module = subs.slice(0, sub).join(".")
+							if(module == "") { continue }
+							if(module == ".") { continue }
+							if(module == "..") { continue }
+							if(!modules_list.includes(module)) {
+								modules_list.push(module)
+							}
+						}
 					}
 				}
 			}
