@@ -12,6 +12,7 @@ import { BLEWorkflow } from "../backends/ble.js"
 
 const WEB_WORKFLOW_ENABLED = true
 const BOARD_PAGE = "html/board-template.html"
+const DETECT_BOARDS_TIMER = 15000
 var update_timer = null
 var update_timer_running = false
 
@@ -236,7 +237,8 @@ async function detect_ble() {
 
 async function detect_boards() {
 	if(update_timer != null) {
-		clearInterval(update_timer)
+		clearTimeout(update_timer)
+		update_timer = null
 		update_timer_running = false
 	}
 	$("#prompt_refresh").addClass("loading")
@@ -252,6 +254,7 @@ async function detect_boards() {
 	//       finished with this device.
 	//       The section where the serial number is compared and the Board
 	//       instance created should be a critical section.
+	console.log("First detects")
 	await Promise.all([
 		detect_usb(),
 		detect_ble(),
@@ -262,23 +265,29 @@ async function detect_boards() {
 	$("#prompt_refresh").removeClass("loading")
 	$(".board_name_load").hide()
 	// no await ?
-	update_timer = setInterval(async () => {
-		if(update_timer_running) return false
-		$(".board_link.show").addClass("old_entry")
-		try {
-			$("#prompt_refresh").addClass("refresh")
-			await detect_usb()
-			await detect_web()
-			await detect_ble()
-		} catch(e) {
-			console.log(e)
+	async function update_the_detections() {
+		if(!update_timer_running) {
+			update_timer_running = true
+			$(".board_link.show").addClass("old_entry")
+			try {
+				$("#prompt_refresh").addClass("refresh")
+				await detect_usb()
+				await detect_web()
+				await detect_ble()
+			} catch(e) {
+				console.log(e)
+			}
+			$("#prompt_refresh").removeClass("refresh")
+			$(".board_link.show.old_entry")
+				.addClass("board_unavailable")
+				.removeClass("old_entry")
 		}
-		$("#prompt_refresh").removeClass("refresh")
-		$(".board_link.show.old_entry")
-			.addClass("board_unavailable")
-			.removeClass("old_entry")
+		clearTimeout(update_timer)
+		update_timer = setTimeout(update_the_detections, DETECT_BOARDS_TIMER)
 		update_timer_running = false
-	}, 10000)
+	}
+	console.log("Setup timer 0")
+	update_timer = setTimeout(update_the_detections, DETECT_BOARDS_TIMER)
 }
 
 async function init_page() {
