@@ -77,19 +77,25 @@ button, input {
 #prompt_refresh .loading_label {
 	display: none;
 }
-#prompt_refresh.loading .loading_label {
+#prompt_refresh.loading .loading_label,
+#prompt_refresh.refresh .loading_label {
 	float: left;
 	display: inline-block;
 	margin-left: 10px;
 }
-#reload_boards {
+#reload_buttons {
 	position: absolute;
 	right: 8px;
-	top: 4px;
+	top: auto;
+	bottom: 4px;
 }
 #prompt_refresh.loading #reload_boards,
 #prompt_refresh.refresh #reload_boards {
 	opacity: 0.8;
+}
+#reload_boards {
+}
+#scan_active {
 }
 #prompt_refresh .small_load_image {
 	display: inline-block;

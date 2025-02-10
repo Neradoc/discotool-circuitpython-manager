@@ -12,6 +12,7 @@ class MyListener(ServiceListener):
         info = zc.get_service_info(type_, name)
         print(f"+++ Service {name} added")
         print("   ", info.server)
+        print(info)
 
 zeroconf = Zeroconf()
 listener = MyListener()

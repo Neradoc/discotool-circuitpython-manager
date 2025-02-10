@@ -48,7 +48,10 @@ SPDX-License-Identifier: MIT
 		<div id="prompt_refresh">
 			<span class="board_counter"><span class="count">0</span> board<ps>s</ps> found.</span></span>
 			<span class="loading_label"><img class="small_load_image" src="assets/images/loading_black.gif" /></span>
-			<button id="reload_boards">Scan</button>
+			<span id="reload_buttons">
+				<input title="Auto scan" checked="checked" type="checkbox" id="scan_active"/>
+				<button id="reload_boards">Scan</button>
+			</span>
 		</div>
 		<div id="all_boards_list">
 			<div id="template_board_all" class="template_board">
