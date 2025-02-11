@@ -228,15 +228,12 @@ async function init_page() {
 	input.on("keydown", function(e) {
 		const info = tools.keys_info(e)
 		$("#history_panel").hide()
-// 		if(info.key == "TAB" && info.modifiers == "") {
-// 			if(input.val().length == 0) {
-// 				input.val("\t")
-// 			} else {
-// 				socket.send("\t")
-// 			}
-// 			e.preventDefault()
-// 			return false
-// 		}
+		if(info.key == "ENTER" && ["M", "C", "A"].includes(info.modifiers)) {
+			e.stopPropagation()
+			e.preventDefault()
+			$("#serial_send_button").click()
+			return false
+		}
 		e.stopPropagation()
 	})
 

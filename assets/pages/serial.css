@@ -54,12 +54,6 @@ header .icon .icon_locked {
 	filter: var(--svg-glow);
 }
 
-/*
-#serial_buttons {
-	display: block;
-}
-*/
-
 /* serial thingies */
 #serial_log {
 	background: var(--input-background);
