@@ -136,3 +136,9 @@ header {
 #serial_log {
 	flex: 1;
 }
+
+/* cursor */
+.cursor {
+	background: white;
+	color: black;
+}

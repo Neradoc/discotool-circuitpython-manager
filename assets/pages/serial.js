@@ -130,7 +130,7 @@ async function init_page() {
 	}
 
 	function set_the_serial_content(the_data) {
-		the_data = the_data.replace(
+		the_data = the_data.replace(/\r/g,"").replace(
 			/(\s+)(https?:\/\/\S+)(\s+)/g,
 			`$1<a class="outside_link"
 				href="$2"
@@ -168,12 +168,15 @@ async function init_page() {
 
 	var setting_title = false
 	var encoder = new TextEncoder()
-	var left_count = 0
+	var cursor_pos = 0
 	socket.onmessage = function(e) {
 		const scroll_top = serial_log.scrollTop()
 		const scroll_margin = serial_content.height() - (
 			serial_log.scrollTop() + serial_log.height()
 		)
+		serial_content.find(".cursor.empty").remove()
+		var content_data = serial_content.text()
+
 		if (e.data == "\x1b]0;") {
 			setting_title = true
 			// start reading status thing
@@ -185,11 +188,10 @@ async function init_page() {
 			// title.textContent += e.data
 		} else if (e.data.match(/\x08+/)) {
 			const m = e.data.match(/\x08+/)
-			left_count += m[0].length
+			cursor_pos += m[0].length
 		} else if (e.data == "\x1b[K") { // Clear line
-			var the_data = serial_content.text().slice(0, -left_count)
-			left_count = 0
-			set_the_serial_content(the_data)
+			content_data = content_data.slice(0, -cursor_pos)
+			cursor_pos = 0
 		} else if (e.data.match(/\x1b\[.?K/) || e.data.match(/\x1b\[.?G/)) {
 			// \x1b[2K\x1b[0G
 		} else if (e.data.match(/\x1b\[(\d*)([A-Z])/)) {
@@ -198,24 +200,38 @@ async function init_page() {
 			const com = m[2]
 			switch(com) {
 			case "D":
-				left_count += arg
+				cursor_pos += arg
 				break
 			}
 		} else {
-			if (e.data == "\x0D\x0A") {
-				left_count = 0
+			var the_data = ""
+			const new_content = e.data
+			if (new_content == "\r\n") {
+				cursor_pos = 0
 			}
-			var the_data = left_count ?
-				serial_content.text().slice(0, -left_count)
-				:serial_content.text()
-			the_data += e.data.escapeHTML()
-			if(e.data.length < left_count) {
-				the_data += serial_content.text().slice(-left_count + e.data.length)
+			if(cursor_pos) {
+				the_data = content_data.slice(0, -cursor_pos)
+			} else {
+				the_data = content_data
 			}
-
-			left_count = Math.max(0, left_count - e.data.length)
+			the_data += new_content.escapeHTML()
+			if(new_content.length < cursor_pos) {
+				the_data += content_data.slice(new_content.length - cursor_pos)
+			}
+			cursor_pos = Math.max(0, cursor_pos - new_content.length)
 			set_the_serial_content(the_data)
+			content_data = the_data
 		}
+
+		if(cursor_pos > 0) {
+			the_data = content_data.slice(0, -cursor_pos)
+			const next = content_data.slice(-cursor_pos)
+			the_data += `<span class="cursor">${next[0]}</span>`+next.substr(1)
+		} else {
+			the_data = content_data+`<span class="cursor empty"> </span>`
+		}
+		set_the_serial_content(the_data)
+
 		if(scroll_margin < 32) {
 			bottom_scroll[0].scrollIntoView()
 		} else {
@@ -243,10 +259,13 @@ async function init_page() {
 			return false
 		}
 		e.stopPropagation()
+	}).on("paste", (e) => {
+		e.stopPropagation()
 	})
 
 	var mod_is_ctrl = ! window.moduleOS.platform().includes("darwin")
 	var command_modifiers = (mod_is_ctrl ? "CS" : "C")
+	var char_modifiers = ["", "S", "A", "AS"]
 
 	function control_keys(letter) {
 		return String.fromCharCode(letter.charCodeAt(0) - "A".charCodeAt(0) + 1)
@@ -271,7 +290,7 @@ async function init_page() {
 				e.preventDefault()
 				return false
 			}
-		} else if(info.modifiers == "" || info.modifiers == "S") {
+		} else if(char_modifiers.includes(info.modifiers)) {
 			if(info.original_key.length == 1) {
 				socket.send(info.original_key)
 			} else {
@@ -300,19 +319,24 @@ async function init_page() {
 		}
 	})
 
-	$("#ctrlc").on("click", () => {
+	$(document).on("paste", (e) => {
+		const pasted = e.originalEvent.clipboardData.getData("text/plain")
+		socket.send(pasted)
+	})
+
+	$("#ctrlc").on("click", (e) => {
 		$("#ctrlc").addClass("pressed")
 		socket.send(control_keys("C"))
 		setTimeout(() => $("#ctrlc").removeClass("pressed"), 250)
 	})
 
-	$("#ctrld").on("click", () => {
+	$("#ctrld").on("click", (e) => {
 		$("#ctrld").addClass("pressed")
 		socket.send(control_keys("D"))
 		setTimeout(() => $("#ctrld").removeClass("pressed"), 250)
 	})
 
-	$("#serial_send_button").on("click", () => {
+	$("#serial_send_button").on("click", (e) => {
 		send_input_content()
 	})
 
