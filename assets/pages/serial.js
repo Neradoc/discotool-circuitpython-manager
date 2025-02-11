@@ -69,7 +69,7 @@ async function init_page() {
 	$(`header .icon_${board_control.type}`).show()
 	$("title").html(`${board_name} - ${uuid} - REPL`)
 
-	$(document).on("click", ".board_link", (e) => {
+	$(document).on("click", ".board_link", function(e) {
 		const link = $(e.currentTarget)
 		const url = link.data("board_link")
 		window.postMessage({
@@ -259,7 +259,7 @@ async function init_page() {
 			return false
 		}
 		e.stopPropagation()
-	}).on("paste", (e) => {
+	}).on("paste", function(e) {
 		e.stopPropagation()
 	})
 
@@ -319,28 +319,28 @@ async function init_page() {
 		}
 	})
 
-	$(document).on("paste", (e) => {
+	$(document).on("paste", function(e) {
 		const pasted = e.originalEvent.clipboardData.getData("text/plain")
 		socket.send(pasted)
 	})
 
-	$("#ctrlc").on("click", (e) => {
+	$("#ctrlc").on("click", function(e) {
 		$("#ctrlc").addClass("pressed")
 		socket.send(control_keys("C"))
 		setTimeout(() => $("#ctrlc").removeClass("pressed"), 250)
 	})
 
-	$("#ctrld").on("click", (e) => {
+	$("#ctrld").on("click", function(e) {
 		$("#ctrld").addClass("pressed")
 		socket.send(control_keys("D"))
 		setTimeout(() => $("#ctrld").removeClass("pressed"), 250)
 	})
 
-	$("#serial_send_button").on("click", (e) => {
+	$("#serial_send_button").on("click", function(e) {
 		send_input_content()
 	})
 
-	$(document).on("click", ".circup_link", (e) => {
+	$(document).on("click", ".circup_link", function(e) {
 		const link = $(e.currentTarget)
 		const url = link.data("board_link")
 		const module = link.data("module")
@@ -354,7 +354,7 @@ async function init_page() {
 		return false
 	})
 
-	$(document).on("click", ".file_link", (e) => {
+	$(document).on("click", ".file_link", function(e) {
 		try {
 			var line = $(e.currentTarget).data("line")
 			common.open_file_editor_a(e, { line: line })
@@ -364,7 +364,7 @@ async function init_page() {
 		return false
 	})
 
-	$(document).on("click", ".outside_link", (e) => {
+	$(document).on("click", ".outside_link", function(e) {
 		e.preventDefault()
 		try {
 			tools.open_outside(e)
@@ -374,11 +374,11 @@ async function init_page() {
 		return false
 	})
 
-	$("#history_button").on("click", (e) => {
+	$("#history_button").on("click", function(e) {
 		$("#history_panel").toggle()
 	})
 
-	$(document).on("click", "#history_panel .history_line", (e) => {
+	$(document).on("click", "#history_panel .history_line", function(e) {
 		$("#history_panel").hide()
 		var line = $(e.currentTarget)
 		var index = line.data("command")
