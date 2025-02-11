@@ -84,23 +84,39 @@ button, input {
 	margin-left: 10px;
 }
 #reload_buttons {
+	display: flex;
 	position: absolute;
 	right: 8px;
-	top: auto;
-	bottom: 4px;
+	top: 4px;
+	flex-direction: row;
 }
 #prompt_refresh.loading #reload_boards,
 #prompt_refresh.refresh #reload_boards {
 	opacity: 0.8;
 }
 #reload_boards {
+	background: transparent;
+	border: none;
+	padding: 0px;
+}
+#reload_boards img {
+	display: block;
+	width: 28px;
 }
 #scan_active {
+	height: 28px;
+	font-size: 75%;
+	background: #80FF80;
+	border: 1px solid grey;
+	border-radius: 16px;
+	margin-right: 4px;
+}
+#scan_active.off {
+	background: #808080;
 }
 #prompt_refresh .small_load_image {
 	display: inline-block;
 	height: 22px;
-
 }
 #prompt_refresh .board_counter ps {
 	display: none;

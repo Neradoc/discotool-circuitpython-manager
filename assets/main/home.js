@@ -302,12 +302,14 @@ function start_refresh_timer() {
 }
 
 async function toggle_refresh(ev) {
-	const checked = $("#scan_active").is(":checked")
-	localStorage.setItem("auto_scan_active", checked)
-	auto_scan_active = checked
-	if(checked) {
+	const active = $("#scan_active").hasClass("off")
+	localStorage.setItem("auto_scan_active", active)
+	auto_scan_active = active
+	if(active) {
+		$("#scan_active").removeClass("off")
 		start_refresh_timer()
 	} else {
+		$("#scan_active").addClass("off")
 		clearTimeout(update_timer)
 		update_timer = null
 	}
@@ -330,9 +332,10 @@ async function init_page() {
 	$("#scan_active").on("click", toggle_refresh)
 	auto_scan_active = localStorage.getItem("auto_scan_active", null)
 	if(auto_scan_active == "false" || auto_scan_active == false) {
-		$("#scan_active").prop("checked", false)
+		$("#scan_active").addClass("off")
 		auto_scan_active = false
 	} else {
+		$("#scan_active").removeClass("off")
 		auto_scan_active = true
 	}
 	await reset_board_list()
