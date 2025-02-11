@@ -158,6 +158,14 @@ async function init_page() {
 		serial_content.html(the_data)
 	}
 
+	function send_input_content() {
+		const sending = input.val()
+		push_history(sending)
+		socket.send(sending)
+		socket.send("\r")
+		input.val("")
+	}
+
 	var setting_title = false
 	var encoder = new TextEncoder()
 	var left_count = 0
@@ -231,7 +239,7 @@ async function init_page() {
 		if(info.key == "ENTER" && ["M", "C", "A"].includes(info.modifiers)) {
 			e.stopPropagation()
 			e.preventDefault()
-			$("#serial_send_button").click()
+			send_input_content()
 			return false
 		}
 		e.stopPropagation()
@@ -305,11 +313,7 @@ async function init_page() {
 	})
 
 	$("#serial_send_button").on("click", () => {
-		const sending = input.val()
-		push_history(sending)
-		socket.send(sending)
-		socket.send("\r")
-		input.val("")
+		send_input_content()
 	})
 
 	$(document).on("click", ".circup_link", (e) => {
