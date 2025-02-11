@@ -81,6 +81,7 @@ export function open_outside_sync(link) {
 
 export function keys_info(event) {
 	const info = {
+		original_key: event.key,
 		key: event.key.toLocaleUpperCase(),
 		modifiers: (
 			(event.altKey ? "A" : "")

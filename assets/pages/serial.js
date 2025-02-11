@@ -24,7 +24,7 @@ function push_history(item) {
 	var history_panel = $("#history_panel")
 	var pos = -1
 	while( (pos = input_history.indexOf(item)) >= 0) {
-		input_history.splice(pos,pos)
+		input_history.splice(pos,1)
 	}
 	input_history.push(item)
 	history_panel.children().remove()
@@ -127,7 +127,6 @@ async function init_page() {
 		set_enabled(true)
 		$("body").removeClass("loading")
 		$("body").removeClass("error")
-		input.focus()
 	}
 
 	function set_the_serial_content(the_data) {
@@ -176,16 +175,37 @@ async function init_page() {
 		} else if (setting_title) {
 			// receiving status thing
 			// title.textContent += e.data
-		} else if (e.data == "\b") {
-			left_count += 1
+		} else if (e.data.match(/\x08+/)) {
+			const m = e.data.match(/\x08+/)
+			left_count += m[0].length
 		} else if (e.data == "\x1b[K") { // Clear line
 			var the_data = serial_content.text().slice(0, -left_count)
 			left_count = 0
 			set_the_serial_content(the_data)
 		} else if (e.data.match(/\x1b\[.?K/) || e.data.match(/\x1b\[.?G/)) {
 			// \x1b[2K\x1b[0G
+		} else if (e.data.match(/\x1b\[(\d*)([A-Z])/)) {
+			const m = e.data.match(/\x1b\[(\d*)([A-Z])/)
+			const arg = parseInt(m[1])
+			const com = m[2]
+			switch(com) {
+			case "D":
+				left_count += arg
+				break
+			}
 		} else {
-			var the_data = (serial_content.text() + e.data.escapeHTML())
+			if (e.data == "\x0D\x0A") {
+				left_count = 0
+			}
+			var the_data = left_count ?
+				serial_content.text().slice(0, -left_count)
+				:serial_content.text()
+			the_data += e.data.escapeHTML()
+			if(e.data.length < left_count) {
+				the_data += serial_content.text().slice(-left_count + e.data.length)
+			}
+
+			left_count = Math.max(0, left_count - e.data.length)
 			set_the_serial_content(the_data)
 		}
 		if(scroll_margin < 32) {
@@ -208,15 +228,16 @@ async function init_page() {
 	input.on("keydown", function(e) {
 		const info = tools.keys_info(e)
 		$("#history_panel").hide()
-		if(info.key == "TAB" && info.modifiers == "") {
-			if(input.val().length == 0) {
-				input.val("\t")
-			} else {
-				socket.send("\t")
-			}
-			e.preventDefault()
-			return false
-		}
+// 		if(info.key == "TAB" && info.modifiers == "") {
+// 			if(input.val().length == 0) {
+// 				input.val("\t")
+// 			} else {
+// 				socket.send("\t")
+// 			}
+// 			e.preventDefault()
+// 			return false
+// 		}
+		e.stopPropagation()
 	})
 
 	var mod_is_ctrl = ! window.moduleOS.platform().includes("darwin")
@@ -245,32 +266,32 @@ async function init_page() {
 				e.preventDefault()
 				return false
 			}
-		} else if(info.modifiers == "") {
-			input.focus()
-			return true
-		}
-	})
+		} else if(info.modifiers == "" || info.modifiers == "S") {
+			if(info.original_key.length == 1) {
+				socket.send(info.original_key)
+			} else {
+				const commands = {
+					"BACKSPACE": () => {socket.send("\b")},
+					"DELETE": () => {socket.send("\x1b[3~")},
+					"TAB": () => {socket.send("\t")},
+					"ENTER": () => {socket.send("\r")},
 
-	input.on("beforeinput", function(e) {
-		var inputType = e.originalEvent.inputType
-		var data = e.originalEvent.data
-		if (inputType == "insertLineBreak") {
-			push_history(input_line)
-			input_line = ""
-			socket.send("\r")
-			input.val("")
-			input.focus()
-			bottom_scroll[0].scrollIntoView()
-			e.preventDefault()
-			return false
-		} else if (inputType == "insertText" || inputType == "insertFromPaste") {
-			input_line += data
-			socket.send(data)
-		} else if (inputType == "deleteContentBackward") {
-			input_line = input_line.substr(0,-1)
-			socket.send("\b")
-		} else {
-			// console.log(e)
+					"ARROWUP": () => {socket.send("\x1b[A")},
+					"ARROWDOWN": () => {socket.send("\x1b[B")},
+					"ARROWRIGHT": () => {socket.send("\x1b[C")},
+					"ARROWLEFT": () => {socket.send("\x1b[D")},
+					//"HOME": () => {socket.send("\b")},
+					//"END": () => {socket.send("\b")},
+					//"PAGEUP": () => {socket.send("\b")},
+					//"PAGEDOWN": () => {socket.send("\b")},
+				}
+				if(commands[info.key]) {
+					commands[info.key]()
+					e.preventDefault()
+					return false
+				}
+			}
+			return true
 		}
 	})
 
@@ -287,9 +308,11 @@ async function init_page() {
 	})
 
 	$("#serial_send_button").on("click", () => {
+		const sending = input.val()
+		push_history(sending)
+		socket.send(sending)
 		socket.send("\r")
 		input.val("")
-		input.focus()
 	})
 
 	$(document).on("click", ".circup_link", (e) => {
@@ -339,7 +362,6 @@ async function init_page() {
 		socket.send(command)
 	})
 
-	input.focus()
 	window.dispatchEvent(new Event('finished-starting'))
 }
 
