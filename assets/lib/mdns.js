@@ -17,7 +17,10 @@ function available() {
 
 function query() {
 	if(!available()) return
-	mdns.query({ questions:[{ name: CP_LOCAL_DOMAIN, type: 'A' }]})
+	// old: mdns.query([{ name: CP_LOCAL_DOMAIN, type: 'A' }])
+	// cp: mdns_server_find(service_type="_circuitpython", protocol="_tcp")
+	// all services: _services._dns-sd._udp.local
+	mdns.query([{ name: '_circuitpython._tcp.local', type: 'PTR' }])
 }
 
 function set_responder() {
