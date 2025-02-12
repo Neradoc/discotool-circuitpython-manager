@@ -18,6 +18,8 @@ var password = ""
 var input_history = []
 var input_line = ""
 
+const PROMPT_PATTERN = /^(>|&gt;|\.){3}\s.*/
+
 function push_history(item) {
 	item = item.trim()
 	if(item == "") return
@@ -130,7 +132,7 @@ async function init_page() {
 	}
 
 	function set_the_serial_content(the_data) {
-		the_data = the_data.replace(/\r/g,"").replace(
+		the_data = the_data.replace(
 			/(\s+)(https?:\/\/\S+)(\s+)/g,
 			`$1<a class="outside_link"
 				href="$2"
@@ -154,7 +156,7 @@ async function init_page() {
 					href="?dev=${board_url}"
 				>File "${p1}", line ${p2}</a>`
 			}
-		).replace(/\n$/, "") // somehow there's a return added at the end ?
+		).replace(/\r$/, "") // somehow there's a return added at the end ?
 		serial_content.html(the_data)
 	}
 
@@ -223,14 +225,21 @@ async function init_page() {
 			content_data = the_data
 		}
 
-		if(cursor_pos > 0) {
-			the_data = content_data.slice(0, -cursor_pos)
-			const next = content_data.slice(-cursor_pos)
-			the_data += `<span class="cursor">${next[0]}</span>`+next.substr(1)
-		} else {
-			the_data = content_data+`<span class="cursor empty"> </span>`
+		const should_show_cursor = (
+			content_data.split(/\n/)
+			.slice(-1)[0]
+			.match(PROMPT_PATTERN)
+		)
+		if(should_show_cursor) {
+			if(cursor_pos > 0) {
+				the_data = content_data.slice(0, -cursor_pos)
+				const next = content_data.slice(-cursor_pos)
+				the_data += `<span class="cursor">${next[0]}</span>`+next.substr(1)
+			} else {
+				the_data = content_data+`<span class="cursor empty"> </span>`
+			}
+			set_the_serial_content(the_data)
 		}
-		set_the_serial_content(the_data)
 
 		if(scroll_margin < 32) {
 			bottom_scroll[0].scrollIntoView()

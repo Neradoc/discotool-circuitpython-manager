@@ -63,11 +63,13 @@ class WebWorkflow extends WorkflowWithCredentials {
 		if(this.version_info !== null) {
 			return this.version_info
 		}
+		var response_text = ""
 		try {
 			var response = await fetch(
 				new URL("/cp/version.json", this.workflow_url_base),
 			)
-			this.version_info = await response.json()
+			response_text = await response.text()
+			this.version_info = JSON.parse(response_text)
 			if( "UID" in this.version_info ) {
 				this.version_info.serial_num = this.version_info["UID"]
 			}
@@ -80,7 +82,8 @@ class WebWorkflow extends WorkflowWithCredentials {
 				new URL("/cp/diskinfo.json", this.workflow_url_base),
 			)
 			if(await response.ok) {
-				const diskinfo = await response.json()
+				response_text = await response.text()
+				const diskinfo = JSON.parse(response_text)
 				if(this.api_version < 3) {
 					this.version_info.diskinfo = diskinfo
 				} else {
@@ -89,6 +92,8 @@ class WebWorkflow extends WorkflowWithCredentials {
 			}
 		} catch(e) {
 			console.log("Device inaccessible")
+			console.log(e)
+			console.log(response_text)
 			return {}
 		}
 		return this.version_info
