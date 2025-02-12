@@ -37,6 +37,7 @@ class WebWorkflow extends WorkflowWithCredentials {
 		this.username = WORKFLOW_USERNAME
 		this.password = WORKFLOW_PASSWORD
 		this.api_version = 4
+		this._is_editable = null
 	}
 	async start(url_passed=null) {
 		// TODO: setup the actual URL for the workflow OUTSIDE
@@ -77,6 +78,8 @@ class WebWorkflow extends WorkflowWithCredentials {
 				this.api_version = this.version_info["web_api_version"]
 				console.log(`API version: ${this.api_version}`)
 			}
+			// wait a little bit
+			await tools.sleep(1)
 			// get disk info if available
 			var response = await fetch(
 				new URL("/cp/diskinfo.json", this.workflow_url_base),
@@ -106,24 +109,28 @@ class WebWorkflow extends WorkflowWithCredentials {
 					credentials: "include",
 				}
 			)
-			var editable = status.headers
+			this._is_editable = status.headers
 				.get("Access-Control-Allow-Methods")
 				.toLowerCase()
 				.includes("delete")
-			return editable
+			return this._is_editable
 		} catch(e) {
 			console.log("Device inaccessible")
-			return false
 		}
+		return false
 	}
 	async is_editable() {
+		if(this._is_editable !== null) {
+			return this._is_editable
+		}
 		if(this.api_version <= 3) {
 			return this.is_editable_old()
 		}
 		try {
+			// short sleep to pace oneself before fetch
+			await tools.sleep(1)
 			var heads = this.headers({"Accept": "application/json"})
 			var url = this.api_url("/")
-			// console.log("URL", url)
 			var response = await fetch(
 				url,
 				{
@@ -133,14 +140,15 @@ class WebWorkflow extends WorkflowWithCredentials {
 			)
 			var data = await response.json()
 			if("writable" in data) {
-				return data["writable"]
+				this._is_editable = data["writable"]
 			} else {
-				return false
+				this._is_editable = false
 			}
+			return this._is_editable
 		} catch(e) {
 			console.log("Device inaccessible")
-			return false
 		}
+		return false
 	}
 	async get_file_content(file_path, range=null) {
 		var heads = this.headers({

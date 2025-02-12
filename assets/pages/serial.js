@@ -69,7 +69,11 @@ async function init_page() {
 	$(".board_link").prop("href", `?dev=${board_url}`)
 	$(".board_link").data("board_link", board_url)
 	$(`header .icon_${board_control.type}`).show()
-	$("title").html(`${board_name} - ${uuid} - REPL`)
+	if(board_name == undefined || uuid == undefined) {
+		$("title").html(`Board inaccessible`)
+	} else {
+		$("title").html(`${board_name} - ${uuid} - REPL`)
+	}
 
 	$(document).on("click", ".board_link", function(e) {
 		const link = $(e.currentTarget)
