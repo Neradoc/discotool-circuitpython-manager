@@ -1,6 +1,6 @@
 {
   "name": "Discotool-Manager",
-  "version": "1.0.0-alpha.7",
+  "version": "1.0.0-alpha.8",
   "description": "A Files and Library Manager for Circuitpython USB and Web Workflow",
   "main": "code/main.cjs",
   "scripts": {
