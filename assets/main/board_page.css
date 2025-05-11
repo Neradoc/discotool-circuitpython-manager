@@ -207,6 +207,7 @@ tr.odd { background: var(--color-pair1); }
 #file_list td a.path {
 	display: block;
 	padding: 4px 6px 6px;
+	text-decoration: none;
 }
 #file_list td a.path:hover {
 	background: var(--hover-background);

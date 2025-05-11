@@ -39,7 +39,7 @@ async function start_circup() {
 		cpver = await board_control.cp_version()
 		if(cpver == null) {
 			console.log("No CP version found, assume latest ?")
-			cpver = [8, 0, 0]
+			cpver = [10, 0, 0]
 		}
 		console.log("Using CP version:", cpver)
 		// 2 - setup the library bundle with the version from the board

@@ -10,6 +10,8 @@ const MPY_HEADERS = {
 	7: ["C".codePointAt(0), 5],
 	8: ["C".codePointAt(0), 5],
 	9: ["C".codePointAt(0), 6],
+	10: ["C".codePointAt(0), 6],
+	"default": ["C".codePointAt(0), 6],
 }
 
 // Fuctions for getting and comparing version numbers in semver format (more or less).
@@ -39,6 +41,8 @@ class Circup {
 		this.MPY_HEADER = null
 		if(MPY_HEADERS[cpver] != undefined) {
 			this.MPY_HEADER = MPY_HEADERS[cpver]
+		} else {
+			this.MPY_HEADER = MPY_HEADERS["default"]
 		}
 	}
 
